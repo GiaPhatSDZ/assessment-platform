@@ -4,7 +4,8 @@ test.describe("E2E Smoke Suite", () => {
   test("loads landing page and renders heading", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
-      "Assessment Studio"
+      "Đo lường năng lực thực chất trong kỷ nguyên Trí tuệ Nhân tạo"
     );
+    await expect(page.getByText("Assessment Studio").first()).toBeVisible();
   });
 });

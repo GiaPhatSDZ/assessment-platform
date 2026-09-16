@@ -6,7 +6,7 @@ describe("Application Smoke Test", () => {
   it("renders HomePage heading", () => {
     render(<HomePage />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Assessment Studio"
+      "Đo lường năng lực thực chất trong kỷ nguyên Trí tuệ Nhân tạo"
     );
   });
 });
