@@ -190,6 +190,13 @@ describe("Curriculum Content Database V1 — Authority, Provenance & Boundary Te
       reviewState: "INTERNAL_REVIEWED",
       publicationState: "PUBLISHED_BETA",
       version: "1.0.0",
+      reviewAttestation: {
+        reviewerId: "REV-HUMAN-01",
+        reviewerName: "Pham Thi C (Math Controller)",
+        role: "PEDAGOGICAL_CONTROLLER",
+        attestedAt: "2026-09-17T00:00:00Z",
+        contentHash: "a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90",
+      },
     };
 
     it("allows PUBLISHED_BETA items only when reviewState is at least INTERNAL_REVIEWED", () => {

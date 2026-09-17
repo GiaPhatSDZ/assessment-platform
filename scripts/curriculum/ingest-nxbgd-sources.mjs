@@ -1,27 +1,23 @@
 #!/usr/bin/env node
 /**
- * AI School V3 — Source Verification & Ingestion Engine V2 (Grade 6 Math)
+ * AI School V3 — Source Verification & Ingestion Engine V2.1 (Grade 6 Math)
  *
- * Implements Controller Audit Fix R2 Source Provenance:
- * 1. Multi-Tier Authority Architecture:
- *    - Tier A: MOET Curriculum Authority & Consolidated Legal Chain (32/2018, 20/2021, 13/2022, 10/VBHN-2022)
- *    - Tier B1: MOET Approved Textbooks (SGK Toán 6 Tập 1 & Tập 2)
- *    - Tier B2: NXBGD Publisher Resources (SGV Toán 6, VBT Toán 6 Bài mẫu)
- *    - Tier B3: Pedagogical Training Resources (Tài liệu tập huấn GV, Slide bồi dưỡng)
- *    - Tier C: Internal Reviewed Content (Architectural Destination)
- *    - Tier D: AI Draft (Current Content State)
+ * Implements Controller Audit Fix R2.1 Metadata Truth & Enforcement:
+ * 1. Legal Metadata Truth:
+ *    - Accurate TT20/2021/TT-BGDĐT metadata (issuedAt: 2021-07-01, effectiveFrom: 2021-08-16).
+ *    - Official MOET Grade 6 Textbook Approval Provenance: Quyết định 718/QĐ-BGDĐT ngày 09/02/2021.
  *
- * 2. Strict TLS Verification (Fail Closed):
- *    - Cryptographically verifies TLS using Node root certificates plus authentic Sectigo intermediate CA.
- *    - Strictly prohibits rejectUnauthorized=false or NODE_TLS_REJECT_UNAUTHORIZED=0.
- *    - Sets TLS_VERIFICATION_FAILED upon any TLS handshake failure.
+ * 2. MOET Verification Honesty:
+ *    - MOET sources are marked OFFLINE_REGISTERED_METADATA based on official legal gazette records.
+ *    - Strictly no hardcoded fake httpStatus 200.
  *
- * 3. 5-Stage Verification Status Model:
- *    - UNVERIFIED -> URL_REACHABLE -> METADATA_VERIFIED -> VIEWER_INVENTORY_VERIFIED -> LOCATOR_HUMAN_VERIFIED
- *    - HTTP 200/302 alone does NOT claim locator verification.
+ * 3. Fail-Closed Pipeline Gate:
+ *    - Core sources flagged with requiredForSlice: true.
+ *    - If any required source fails minimum verification, execution aborts, source-registry.json
+ *      is NOT overwritten, and process exits non-zero.
  *
- * 4. Deterministic Canonical Metadata Fingerprinting:
- *    - Canonical metadata JSON is normalized and hashed separately from volatile dynamic HTML/tokens.
+ * 4. Approval Provenance for TIER_B1_MOET_APPROVED_TEXTBOOK:
+ *    - SGK Toán 6 Tập 1 & Tập 2 explicitly bind to approvalDecisionNumber 718/QĐ-BGDĐT.
  *
  * 5. Repository Copyright Boundary:
  *    - "Repository copyright boundary enforced: no full textbook files stored; commercial reuse rights are not granted; legal review is required before commercial deployment using NXBGD-derived resources."
@@ -80,7 +76,7 @@ JEltkYnTAH41QJ6SAWO66GrrUESwN/cgZzL4JLEqz1Y=
 -----END CERTIFICATE-----`;
 
 export const RAW_GRADE_6_SOURCES = [
-  // --- TẦNG A: CURRICULUM AUTHORITY (Bộ GD&ĐT) ---
+  // --- TẦNG A: CURRICULUM AUTHORITY & LEGAL CHAIN (Bộ GD&ĐT) ---
   {
     id: "SRC-VN-MOET-GEP-2018",
     authority: "Bộ Giáo dục và Đào tạo Việt Nam",
@@ -100,6 +96,7 @@ export const RAW_GRADE_6_SOURCES = [
       "SRC-VN-MOET-VBHN-10-2022",
     ],
     curriculumStatus: "CURRENT_NATIONAL",
+    requiredForSlice: false,
     rights: {
       redistribution: true,
       commercialReuse: "CONDITIONAL",
@@ -124,6 +121,7 @@ export const RAW_GRADE_6_SOURCES = [
       "SRC-VN-MOET-VBHN-10-2022",
     ],
     curriculumStatus: "CURRENT_NATIONAL",
+    requiredForSlice: true,
     rights: {
       redistribution: true,
       commercialReuse: "CONDITIONAL",
@@ -134,20 +132,21 @@ export const RAW_GRADE_6_SOURCES = [
   {
     id: "SRC-VN-MOET-AMEND-20-2021",
     authority: "Bộ Giáo dục và Đào tạo Việt Nam",
-    title: "Thông tư sửa đổi, bổ sung một số điều của Quy chế đánh giá học sinh THCS và THPT (Thông tư 20/2021/TT-BGDĐT)",
+    title: "Sửa đổi, bổ sung Điều 3 Thông tư số 32/2018/TT-BGDĐT ngày 26/12/2018 của Bộ trưởng Bộ GD&ĐT ban hành Chương trình giáo dục phổ thông",
     documentNumber: "20/2021/TT-BGDĐT",
-    sourceType: "OFFICIAL_GUIDANCE",
+    sourceType: "OFFICIAL_CURRICULUM",
     sourceTier: "TIER_A_CURRICULUM_AUTHORITY",
     resourceType: "LEGAL_DOCUMENT",
     url: "https://moet.gov.vn/van-ban/van-ban-quan-ly/Pages/chi-tiet-van-ban.aspx?ItemID=1409",
-    issuedAt: "2021-11-01",
-    effectiveFrom: "2021-12-16",
-    sourceVersion: "2021-11-01-TT20-AMEND",
+    issuedAt: "2021-07-01",
+    effectiveFrom: "2021-08-16",
+    sourceVersion: "2021-07-01-TT20-AMEND",
     curriculumStatus: "CURRENT_NATIONAL",
+    requiredForSlice: false,
     rights: {
       redistribution: true,
       commercialReuse: "CONDITIONAL",
-      notes: "Văn bản sửa đổi, bổ sung quy chế chuyên môn cấp THCS/THPT.",
+      notes: "Thông tư sửa đổi, bổ sung lộ trình thực hiện Chương trình GDPT 2018.",
     },
     rightsNotes: COPYRIGHT_BOUNDARY_DECLARATION,
   },
@@ -164,6 +163,7 @@ export const RAW_GRADE_6_SOURCES = [
     effectiveFrom: "2022-09-18",
     sourceVersion: "2022-08-03-TT13-AMEND",
     curriculumStatus: "CURRENT_NATIONAL",
+    requiredForSlice: false,
     rights: {
       redistribution: true,
       commercialReuse: "CONDITIONAL",
@@ -184,10 +184,32 @@ export const RAW_GRADE_6_SOURCES = [
     effectiveFrom: "2022-12-30",
     sourceVersion: "2022-12-30-VBHN10-CONSOLIDATED",
     curriculumStatus: "CURRENT_NATIONAL",
+    requiredForSlice: true,
     rights: {
       redistribution: true,
       commercialReuse: "CONDITIONAL",
       notes: "Văn bản hợp nhất chính thức toàn bộ Chương trình Giáo dục Phổ thông hiện hành.",
+    },
+    rightsNotes: COPYRIGHT_BOUNDARY_DECLARATION,
+  },
+  {
+    id: "SRC-VN-MOET-QD-718-2021",
+    authority: "Bộ Giáo dục và Đào tạo Việt Nam",
+    title: "Quyết định số 718/QĐ-BGDĐT ngày 09/02/2021 của Bộ trưởng Bộ GD&ĐT phê duyệt danh mục sách giáo khoa lớp 6 sử dụng trong cơ sở GDPT",
+    documentNumber: "718/QĐ-BGDĐT",
+    sourceType: "OFFICIAL_GUIDANCE",
+    sourceTier: "TIER_A_CURRICULUM_AUTHORITY",
+    resourceType: "LEGAL_DOCUMENT",
+    url: "https://moet.gov.vn/van-ban/van-ban-quan-ly/Pages/chi-tiet-van-ban.aspx?ItemID=1401",
+    issuedAt: "2021-02-09",
+    effectiveFrom: "2021-02-09",
+    sourceVersion: "2021-02-09-QD718",
+    curriculumStatus: "CURRENT_NATIONAL",
+    requiredForSlice: true,
+    rights: {
+      redistribution: true,
+      commercialReuse: "CONDITIONAL",
+      notes: "Quyết định hành chính phê duyệt danh mục SGK lớp 6 của Bộ trưởng Bộ GD&ĐT (Phụ lục phê duyệt SGK Toán 6 Kết nối tri thức).",
     },
     rightsNotes: COPYRIGHT_BOUNDARY_DECLARATION,
   },
@@ -205,6 +227,18 @@ export const RAW_GRADE_6_SOURCES = [
     subject: "math",
     url: "https://taphuan.nxbgd.vn/tap-huan/doc-sach/sgk-toan-6-tap-mot.4699854777",
     curriculumStatus: "CURRENT_NATIONAL",
+    requiredForSlice: false,
+    approvalSourceId: "SRC-VN-MOET-QD-718-2021",
+    approvalDecisionNumber: "718/QĐ-BGDĐT",
+    approvalDecisionDate: "2021-02-09",
+    approvalStatus: "MOET_APPROVED",
+    approval: {
+      approvalSourceId: "SRC-VN-MOET-QD-718-2021",
+      approvalDecisionNumber: "718/QĐ-BGDĐT",
+      approvalDecisionDate: "2021-02-09",
+      approvalStatus: "MOET_APPROVED",
+      approvalNotes: "Phê duyệt theo Quyết định số 718/QĐ-BGDĐT ngày 09/02/2021 của Bộ trưởng Bộ GD&ĐT (Phụ lục: Môn Toán 6, NXB Giáo Dục Việt Nam, Tổng chủ biên Hà Huy Khoái)",
+    },
     rights: {
       redistribution: false,
       commercialReuse: "NOT_GRANTED",
@@ -224,6 +258,18 @@ export const RAW_GRADE_6_SOURCES = [
     subject: "math",
     url: "https://taphuan.nxbgd.vn/tap-huan/doc-sach/sgk-toan-6-tap-hai.4699864675",
     curriculumStatus: "CURRENT_NATIONAL",
+    requiredForSlice: true,
+    approvalSourceId: "SRC-VN-MOET-QD-718-2021",
+    approvalDecisionNumber: "718/QĐ-BGDĐT",
+    approvalDecisionDate: "2021-02-09",
+    approvalStatus: "MOET_APPROVED",
+    approval: {
+      approvalSourceId: "SRC-VN-MOET-QD-718-2021",
+      approvalDecisionNumber: "718/QĐ-BGDĐT",
+      approvalDecisionDate: "2021-02-09",
+      approvalStatus: "MOET_APPROVED",
+      approvalNotes: "Phê duyệt theo Quyết định số 718/QĐ-BGDĐT ngày 09/02/2021 của Bộ trưởng Bộ GD&ĐT (Phụ lục: Môn Toán 6, NXB Giáo Dục Việt Nam, Tổng chủ biên Hà Huy Khoái)",
+    },
     rights: {
       redistribution: false,
       commercialReuse: "NOT_GRANTED",
@@ -245,6 +291,7 @@ export const RAW_GRADE_6_SOURCES = [
     subject: "math",
     url: "https://taphuan.nxbgd.vn/tap-huan/doc-sach/sgv-toan-6.4918795172",
     curriculumStatus: "CURRENT_NATIONAL",
+    requiredForSlice: true,
     rights: {
       redistribution: false,
       commercialReuse: "NOT_GRANTED",
@@ -264,6 +311,7 @@ export const RAW_GRADE_6_SOURCES = [
     subject: "math",
     url: "https://taphuan.nxbgd.vn/tap-huan/doc-sach/vbt-toan-6-tap-hai-bai-mau.4733221119",
     curriculumStatus: "CURRENT_NATIONAL",
+    requiredForSlice: false,
     rights: {
       redistribution: false,
       commercialReuse: "NOT_GRANTED",
@@ -285,6 +333,7 @@ export const RAW_GRADE_6_SOURCES = [
     subject: "math",
     url: "https://taphuan.nxbgd.vn/tap-huan/doc-sach/tai-lieu-tap-huan-giao-vien-mon-toan-6.4528872517",
     curriculumStatus: "CURRENT_NATIONAL",
+    requiredForSlice: false,
     rights: {
       redistribution: false,
       commercialReuse: "NOT_GRANTED",
@@ -304,6 +353,7 @@ export const RAW_GRADE_6_SOURCES = [
     subject: "math",
     url: "https://nxbgdco-my.sharepoint.com/:p:/g/personal/khodulieudungchung_nxbgd_vn/IQCNCEOqjRYuSJ17gJbbE9zUAfL8PchaylW61hcMq79g3nc?e=QnPFVW",
     curriculumStatus: "CURRENT_NATIONAL",
+    requiredForSlice: false,
     rights: {
       redistribution: false,
       commercialReuse: "NOT_GRANTED",
@@ -431,14 +481,19 @@ export async function verifyRemoteUrl(url) {
 }
 
 /**
- * Executes full Source Verification V2 pipeline and saves source-registry.json.
+ * Executes full Source Verification V2.1 pipeline and saves source-registry.json.
+ * Fails closed if any source marked requiredForSlice fails verification.
  */
-export async function runSourceVerificationV2() {
-  console.log("=== AI School V3 — Running Source Verification Engine V2 ===");
+export async function runSourceVerificationV2({
+  sources = RAW_GRADE_6_SOURCES,
+  targetPath = path.resolve(REPO_ROOT, "curriculum/vietnam/lower-secondary/grade-6/math/source-registry.json"),
+  remoteVerifier = verifyRemoteUrl,
+} = {}) {
+  console.log("=== AI School V3 — Running Source Verification Engine V2.1 ===");
   const retrievedAt = new Date().toISOString().split("T")[0];
   const verifiedSources = [];
 
-  for (const src of RAW_GRADE_6_SOURCES) {
+  for (const src of sources) {
     process.stdout.write(`Verifying [${src.id}] (${src.url}) ... `);
     let verificationStatus = "UNVERIFIED";
     let httpStatus = null;
@@ -447,12 +502,13 @@ export async function runSourceVerificationV2() {
     let remoteResponseFingerprint = null;
 
     if (src.url.startsWith("https://moet.gov.vn/")) {
-      // Government legal texts: verified offline against MOET official publication records
-      verificationStatus = "METADATA_VERIFIED";
+      // Government legal texts: registered honestly from official state legal gazette archives.
+      // Do NOT claim remote live HTTP verification; do NOT hard-code fake httpStatus=200.
+      verificationStatus = "OFFLINE_REGISTERED_METADATA";
       canonicalTitle = src.title;
-      httpStatus = 200;
+      httpStatus = undefined;
     } else if (src.url.startsWith("https://taphuan.nxbgd.vn/") || src.url.startsWith("https://nxbgdco-my.sharepoint.com/")) {
-      const probe = await verifyRemoteUrl(src.url);
+      const probe = await remoteVerifier(src.url);
       if (probe.ok) {
         httpStatus = probe.httpStatus;
         canonicalTitle = probe.canonicalTitle || src.title;
@@ -473,6 +529,21 @@ export async function runSourceVerificationV2() {
       }
     }
 
+    // Fail-Closed Enforcement: Check if required source failed minimum verification
+    if (src.requiredForSlice) {
+      const isFailed =
+        verificationStatus === "TLS_VERIFICATION_FAILED" ||
+        verificationStatus === "UNREACHABLE" ||
+        verificationStatus === "UNVERIFIED";
+
+      if (isFailed) {
+        console.error(`\nFATAL: Required source [${src.id}] failed verification with status '${verificationStatus}'! Pipeline aborted.`);
+        throw new Error(
+          `Pipeline gate failed: required source [${src.id}] failed verification (${verificationStatus}). Prior registry preserved.`
+        );
+      }
+    }
+
     // Deterministic canonical metadata fingerprint
     const canonicalMetadata = {
       id: src.id,
@@ -482,6 +553,7 @@ export async function runSourceVerificationV2() {
       sourceTier: src.sourceTier,
       totalPages: remoteViewerInventory?.totalPages || null,
       haveCoverPage: remoteViewerInventory?.haveCoverPage ?? null,
+      approvalDecisionNumber: src.approvalDecisionNumber || null,
     };
 
     const canonicalMetadataFingerprint = crypto
@@ -502,13 +574,9 @@ export async function runSourceVerificationV2() {
     };
 
     verifiedSources.push(record);
-    console.log(`[${verificationStatus}] (HTTP ${httpStatus})`);
+    console.log(`[${verificationStatus}]${httpStatus ? ` (HTTP ${httpStatus})` : ""}`);
   }
 
-  const targetPath = path.resolve(
-    REPO_ROOT,
-    "curriculum/vietnam/lower-secondary/grade-6/math/source-registry.json"
-  );
   fs.writeFileSync(targetPath, JSON.stringify(verifiedSources, null, 2), "utf-8");
   console.log(`✓ Source Registry saved to: ${targetPath}`);
   return verifiedSources;
@@ -518,7 +586,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   runSourceVerificationV2()
     .then(() => process.exit(0))
     .catch((err) => {
-      console.error("FATAL: Source Verification Engine V2 failed:", err);
+      console.error("FATAL: Source Verification Engine V2.1 failed:", err);
       process.exit(1);
     });
 }

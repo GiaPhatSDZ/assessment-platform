@@ -2,7 +2,7 @@
 **Mã hồ sơ:** `NXBGD_SOURCE_PROVENANCE_R2_REPORT.md`  
 **Dự án:** `GiaPhatSDZ/assessment-platform`  
 **Ngày thực thi kiểm toán:** 17/09/2026  
-**Trạng thái kiểm toán:** HOÀN TẤT KHẮC PHỤC R2 (CONTROLLER AUDIT R2 RESOLVED)  
+**Trạng thái kiểm toán:** EXECUTOR R2.1 REMEDIATION COMPLETE / CONTROLLER REVIEW: PENDING  
 **Trạng thái nội dung:** `AI_ASSISTED` / `AI_DRAFT` / `DRAFT` / `PENDING_HUMAN_CONTROLLER_AUDIT`
 
 ---
@@ -25,17 +25,18 @@ Tiếp thu kết luận kiểm toán Controller Audit đối với commit `9a019
 
 ---
 
-## 2. Kết Quả Xác Minh Mạng Sống Động (Live Source Verification Evidence)
+## 2. Kết Quả Xác Minh Thực Tế (Source Verification Evidence)
 
-Engine `scripts/curriculum/ingest-nxbgd-sources.mjs` đã kết nối thực tế qua giao thức HTTPS với cơ chế xác thực chứng chỉ nghiêm ngặt (tích hợp chứng chỉ trung gian Sectigo Public Server Authentication CA DV R36):
+Engine `scripts/curriculum/ingest-nxbgd-sources.mjs` phân định rạch ròi giữa xác minh mạng sống động (NXBGD) và metadata đăng ký theo công báo (Bộ GD&ĐT):
 
 | Mã Nguồn | Tầng Thẩm Quyền | URL Nguồn | Mã HTTP | Tiêu Đề Bóc Tách / Xác Nhận | Thống Kê Reader | Trạng Thái Xác Minh |
 | :--- | :---: | :--- | :---: | :--- | :---: | :---: |
-| `SRC-VN-MOET-GEP-2018` | **TIER_A** | moet.gov.vn (ItemID=1301) | 200 | CT GDPT 2018 — Chương trình Tổng thể | N/A (Văn bản QPPL) | `METADATA_VERIFIED` |
-| `SRC-VN-MOET-MATH-2018` | **TIER_A** | moet.gov.vn (ItemID=1301) | 200 | CT GDPT 2018 Môn Toán THCS | N/A (Văn bản QPPL) | `METADATA_VERIFIED` |
-| `SRC-VN-MOET-AMEND-20-2021` | **TIER_A** | moet.gov.vn (ItemID=1409) | 200 | Thông tư 20/2021/TT-BGDĐT | N/A (Văn bản QPPL) | `METADATA_VERIFIED` |
-| `SRC-VN-MOET-AMEND-13-2022` | **TIER_A** | moet.gov.vn (ItemID=1488) | 200 | Thông tư 13/2022/TT-BGDĐT | N/A (Văn bản QPPL) | `METADATA_VERIFIED` |
-| `SRC-VN-MOET-VBHN-10-2022` | **TIER_A** | moet.gov.vn (ItemID=4440) | 200 | Văn bản hợp nhất số 10/VBHN-BGDĐT | N/A (Văn bản QPPL) | `METADATA_VERIFIED` |
+| `SRC-VN-MOET-GEP-2018` | **TIER_A** | moet.gov.vn (ItemID=1301) | N/A | CT GDPT 2018 — Chương trình Tổng thể | Lưu trữ Công báo QPPL | `OFFLINE_REGISTERED_METADATA` |
+| `SRC-VN-MOET-MATH-2018` | **TIER_A** | moet.gov.vn (ItemID=1301) | N/A | CT GDPT 2018 Môn Toán THCS | Lưu trữ Công báo QPPL | `OFFLINE_REGISTERED_METADATA` |
+| `SRC-VN-MOET-AMEND-20-2021` | **TIER_A** | moet.gov.vn (ItemID=1409) | N/A | Sửa đổi Điều 3 Thông tư 32/2018 (TT 20/2021) | Lưu trữ Công báo QPPL | `OFFLINE_REGISTERED_METADATA` |
+| `SRC-VN-MOET-AMEND-13-2022` | **TIER_A** | moet.gov.vn (ItemID=1488) | N/A | Thông tư 13/2022/TT-BGDĐT | Lưu trữ Công báo QPPL | `OFFLINE_REGISTERED_METADATA` |
+| `SRC-VN-MOET-VBHN-10-2022` | **TIER_A** | moet.gov.vn (ItemID=4440) | N/A | Văn bản hợp nhất số 10/VBHN-BGDĐT | Lưu trữ Công báo QPPL | `OFFLINE_REGISTERED_METADATA` |
+| `SRC-VN-MOET-QD-718-2021` | **TIER_A** | moet.gov.vn (ItemID=1401) | N/A | Quyết định 718/QĐ-BGDĐT phê duyệt SGK lớp 6 | Quyết định hành chính | `OFFLINE_REGISTERED_METADATA` |
 | `SRC-NXBGD-KNTT-MATH6-T1` | **TIER_B1** | taphuan.nxbgd.vn (...4699854777) | 200 | SGK Toán 6, tập một | 124 trang, có bìa | `VIEWER_INVENTORY_VERIFIED` |
 | `SRC-NXBGD-KNTT-MATH6-T2` | **TIER_B1** | taphuan.nxbgd.vn (...4699864675) | 200 | SGK Toán 6, tập hai | 112 trang, có bìa | `VIEWER_INVENTORY_VERIFIED` |
 | `SRC-NXBGD-KNTT-MATH6-SGV-T2` | **TIER_B2** | taphuan.nxbgd.vn (...4918795172) | 200 | SGV Toán 6 | 220 trang, có bìa | `VIEWER_INVENTORY_VERIFIED` |

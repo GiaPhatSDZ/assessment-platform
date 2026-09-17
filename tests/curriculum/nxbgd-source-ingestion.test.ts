@@ -9,11 +9,20 @@ import {
   Lesson,
   ParentGuide,
   PublicationManifest,
+  QuestionItem,
+  ReviewAttestation,
   assertCannotSelfPromote,
   SelfPromotionForbiddenError,
 } from "@/src/domain/content/schema";
+import {
+  assertPublishedForStudent,
+  promoteContent,
+  ContentNotPublishedError,
+} from "@/src/domain/content/publication-guard";
+// @ts-ignore - ESM script import for unit testing
+import { runSourceVerificationV2 } from "../../scripts/curriculum/ingest-nxbgd-sources.mjs";
 
-describe("NXBGD Source Verification Engine V2 & Provenance R2 Audit", () => {
+describe("NXBGD Source Verification Engine V2.1 & Provenance R2.1 Audit", () => {
   const g6MathDir = path.resolve("curriculum/vietnam/lower-secondary/grade-6/math");
 
   it("verifies distinct Tier B categories and Tier A consolidated chain in source-registry.json", () => {
@@ -21,12 +30,15 @@ describe("NXBGD Source Verification Engine V2 & Provenance R2 Audit", () => {
       fs.readFileSync(path.join(g6MathDir, "source-registry.json"), "utf-8")
     );
 
-    // Tier A: MOET Curriculum Authority (5 sources)
+    // Tier A: MOET Curriculum Authority (6 sources including QĐ 718)
     const tierA = sourceRegistry.filter((s) => s.sourceTier === "TIER_A_CURRICULUM_AUTHORITY");
-    expect(tierA.length).toBe(5);
+    expect(tierA.length).toBe(6);
     for (const s of tierA) {
       expect(s.authority).toBe("Bộ Giáo dục và Đào tạo Việt Nam");
       expect(s.rights?.redistribution).toBe(true);
+      // Honest status: registered from official legal gazette, strictly no fake httpStatus 200
+      expect(s.verificationStatus).toBe("OFFLINE_REGISTERED_METADATA");
+      expect(s.httpStatus).toBeUndefined();
     }
 
     // Tier A: Check verified authority chain and absence of erroneous 08/VBHN-2023
@@ -75,32 +87,55 @@ describe("NXBGD Source Verification Engine V2 & Provenance R2 Audit", () => {
     }
   });
 
-  it("verifies VBT identity consistency and eliminates phantom SBT", () => {
+  it("verifies accurate TT20/2021/TT-BGDĐT legal metadata", () => {
     const sourceRegistry: SourceDocument[] = JSON.parse(
       fs.readFileSync(path.join(g6MathDir, "source-registry.json"), "utf-8")
     );
 
-    const sbtSource = sourceRegistry.find((s) => s.id === "SRC-NXBGD-KNTT-MATH6-SBT-T2");
-    expect(sbtSource).toBeUndefined();
-
-    const vbtSource = sourceRegistry.find((s) => s.id === "SRC-NXBGD-KNTT-MATH6-VBT-T2");
-    expect(vbtSource).toBeDefined();
-    expect(vbtSource?.url).toBe("https://taphuan.nxbgd.vn/tap-huan/doc-sach/vbt-toan-6-tap-hai-bai-mau.4733221119");
+    const tt20 = sourceRegistry.find((s) => s.id === "SRC-VN-MOET-AMEND-20-2021");
+    expect(tt20).toBeDefined();
+    expect(tt20?.documentNumber).toBe("20/2021/TT-BGDĐT");
+    expect(tt20?.title).toContain("Điều 3 Thông tư số 32/2018/TT-BGDĐT");
+    expect(tt20?.issuedAt).toBe("2021-07-01");
+    expect(tt20?.effectiveFrom).toBe("2021-08-16");
+    expect(tt20?.sourceType).toBe("OFFICIAL_CURRICULUM");
   });
 
-  it("verifies remote source verification status is explicit and records reader inventory", () => {
+  it("verifies official approval provenance for TIER_B1_MOET_APPROVED_TEXTBOOK", () => {
     const sourceRegistry: SourceDocument[] = JSON.parse(
       fs.readFileSync(path.join(g6MathDir, "source-registry.json"), "utf-8")
     );
 
-    // No source can be claimed as LOCATOR_HUMAN_VERIFIED by network probe
+    const qd718 = sourceRegistry.find((s) => s.id === "SRC-VN-MOET-QD-718-2021");
+    expect(qd718).toBeDefined();
+    expect(qd718?.documentNumber).toBe("718/QĐ-BGDĐT");
+    expect(qd718?.issuedAt).toBe("2021-02-09");
+
+    const sgk1 = sourceRegistry.find((s) => s.id === "SRC-NXBGD-KNTT-MATH6-T1");
+    expect(sgk1?.approvalStatus).toBe("MOET_APPROVED");
+    expect(sgk1?.approvalDecisionNumber).toBe("718/QĐ-BGDĐT");
+    expect(sgk1?.approvalDecisionDate).toBe("2021-02-09");
+    expect(sgk1?.approvalSourceId).toBe("SRC-VN-MOET-QD-718-2021");
+
+    const sgk2 = sourceRegistry.find((s) => s.id === "SRC-NXBGD-KNTT-MATH6-T2");
+    expect(sgk2?.approvalStatus).toBe("MOET_APPROVED");
+    expect(sgk2?.approvalDecisionNumber).toBe("718/QĐ-BGDĐT");
+    expect(sgk2?.approvalDecisionDate).toBe("2021-02-09");
+  });
+
+  it("verifies remote source verification status and viewer inventory without claiming human verification", () => {
+    const sourceRegistry: SourceDocument[] = JSON.parse(
+      fs.readFileSync(path.join(g6MathDir, "source-registry.json"), "utf-8")
+    );
+
     for (const s of sourceRegistry) {
       expect(s.verificationStatus).not.toBe("LOCATOR_HUMAN_VERIFIED");
-      expect(["METADATA_VERIFIED", "VIEWER_INVENTORY_VERIFIED"]).toContain(s.verificationStatus);
+      expect(["OFFLINE_REGISTERED_METADATA", "METADATA_VERIFIED", "VIEWER_INVENTORY_VERIFIED"]).toContain(
+        s.verificationStatus
+      );
       expect(s.canonicalMetadataFingerprint).toMatch(/^[a-f0-9]{64}$/);
     }
 
-    // Reader sources on taphuan.nxbgd.vn must have viewer inventory verified
     const sgk2 = sourceRegistry.find((s) => s.id === "SRC-NXBGD-KNTT-MATH6-T2");
     expect(sgk2?.verificationStatus).toBe("VIEWER_INVENTORY_VERIFIED");
     expect(sgk2?.httpStatus).toBe(200);
@@ -115,6 +150,25 @@ describe("NXBGD Source Verification Engine V2 & Provenance R2 Audit", () => {
 
     const trainDoc = sourceRegistry.find((s) => s.id === "SRC-NXBGD-KNTT-MATH6-TRAIN-DOC");
     expect(trainDoc?.remoteViewerInventory?.totalPages).toBe(56);
+  });
+
+  it("verifies requiredForSlice flags exist on foundational sources", () => {
+    const sourceRegistry: SourceDocument[] = JSON.parse(
+      fs.readFileSync(path.join(g6MathDir, "source-registry.json"), "utf-8")
+    );
+
+    const requiredIds = [
+      "SRC-VN-MOET-MATH-2018",
+      "SRC-VN-MOET-VBHN-10-2022",
+      "SRC-VN-MOET-QD-718-2021",
+      "SRC-NXBGD-KNTT-MATH6-T2",
+      "SRC-NXBGD-KNTT-MATH6-SGV-T2",
+    ];
+
+    for (const id of requiredIds) {
+      const src = sourceRegistry.find((s) => s.id === id);
+      expect(src?.requiredForSlice).toBe(true);
+    }
   });
 
   it("enforces copyright boundary: zero pirated textbook PDFs or scans in the curriculum tree", () => {
@@ -197,7 +251,7 @@ describe("NXBGD Source Verification Engine V2 & Provenance R2 Audit", () => {
     expect(manifest.publishedAt).toBeNull();
     expect(manifest.publishedBy).toBeNull();
     expect(manifest.manifestCreatedAt).toBeDefined();
-    expect(manifest.sourceDocumentIds).toHaveLength(11);
+    expect(manifest.sourceDocumentIds).toHaveLength(12);
 
     // Check exact SHA-256
     const itemsRaw = fs.readFileSync(path.join(g6MathDir, "question-bank/items.json"));
@@ -206,45 +260,262 @@ describe("NXBGD Source Verification Engine V2 & Provenance R2 Audit", () => {
     expect(manifest.checksum).toBe(expectedChecksum);
   });
 
-  it("enforces anti-self-promotion guard: AI_ASSISTED content cannot self-promote to INTERNAL_REVIEWED", () => {
-    // Attempting self-promotion without human reviewer metadata must throw
+  it("enforces cryptographic promoteContent gate and blocks publication without attestation", () => {
+    const sampleItem: QuestionItem = {
+      id: "ITEM-TEST-AI-01",
+      primaryNodeId: "NODE-MATH-6-FRAC-03",
+      supportingNodeIds: [],
+      type: "MULTIPLE_CHOICE",
+      cognitiveDemand: "UNDERSTAND",
+      prompt: [{ type: "text", value: "Tính giá trị" }],
+      correctAnswer: "1/2",
+      rationale: "Giải thích",
+      misconceptionTags: [],
+      sourceRefs: [],
+      authoringOrigin: "AI_ASSISTED",
+      itemMaturity: "DRAFT",
+      reviewState: "AI_DRAFT",
+      publicationState: "PUBLISHED_BETA",
+      version: "1.0.0",
+    };
+
+    // 1. Unattested AI_ASSISTED item must be rejected by publication guard even if marked PUBLISHED_BETA
+    expect(() => assertPublishedForStudent(sampleItem)).toThrow(ContentNotPublishedError);
+
+    // 2. Promotion with fake AI reviewer must be blocked
+    const contentPayload = JSON.stringify(sampleItem.prompt);
+    const contentHash = crypto.createHash("sha256").update(contentPayload).digest("hex");
+
     expect(() => {
-      assertCannotSelfPromote({
-        authoringOrigin: "AI_ASSISTED",
-        reviewState: "INTERNAL_REVIEWED",
-      });
+      promoteContent(
+        sampleItem,
+        "INTERNAL_REVIEWED",
+        {
+          reviewerId: "AI_BOT_01",
+          reviewerName: "AI Review Bot",
+          role: "PEDAGOGICAL_CONTROLLER",
+          attestedAt: "2026-09-17T00:00:00Z",
+          contentHash,
+        },
+        contentPayload
+      );
     }).toThrow(SelfPromotionForbiddenError);
 
-    // AI-labeled reviewer must still throw
+    // 3. Promotion with hash mismatch must be blocked
     expect(() => {
-      assertCannotSelfPromote({
-        authoringOrigin: "AI_ASSISTED",
-        reviewState: "INTERNAL_REVIEWED",
-        reviewedBy: "AI_AGENT_BOT",
-        reviewedAt: "2026-09-17",
-      });
+      promoteContent(
+        sampleItem,
+        "INTERNAL_REVIEWED",
+        {
+          reviewerId: "REV-HUMAN-01",
+          reviewerName: "Tran Van B (Lead Reviewer)",
+          role: "PEDAGOGICAL_CONTROLLER",
+          attestedAt: "2026-09-17T00:00:00Z",
+          contentHash: "mismatched-tampered-hash",
+        },
+        contentPayload
+      );
     }).toThrow(SelfPromotionForbiddenError);
 
-    // Human reviewer with valid metadata succeeds
-    expect(() => {
-      assertCannotSelfPromote({
-        authoringOrigin: "AI_ASSISTED",
-        reviewState: "INTERNAL_REVIEWED",
-        reviewedBy: "Nguyen Van A (Math Reviewer)",
-        reviewedAt: "2026-09-17T00:00:00Z",
-      });
-    }).not.toThrow();
+    // 4. Valid human attestation successfully promotes content and unlocks publication
+    const promoted = promoteContent(
+      sampleItem,
+      "INTERNAL_REVIEWED",
+      {
+        reviewerId: "REV-HUMAN-01",
+        reviewerName: "Tran Van B (Lead Reviewer)",
+        role: "PEDAGOGICAL_CONTROLLER",
+        attestedAt: "2026-09-17T00:00:00Z",
+        contentHash,
+        auditNotes: "Fully audited against SGK Grade 6 Mathematics Lesson 25.",
+      },
+      contentPayload
+    );
+
+    expect(promoted.reviewState).toBe("INTERNAL_REVIEWED");
+    expect(promoted.reviewAttestation).toBeDefined();
+    expect(() => assertPublishedForStudent(promoted)).not.toThrow();
   });
 
-  it("enforces repository copyright boundary declaration across all sources", () => {
+  it("enforces that MOET status cannot become remote-verified without an actual request", () => {
     const sourceRegistry: SourceDocument[] = JSON.parse(
       fs.readFileSync(path.join(g6MathDir, "source-registry.json"), "utf-8")
     );
 
-    for (const s of sourceRegistry) {
-      expect(s.rightsNotes).toBe(
-        "Repository copyright boundary enforced: no full textbook files stored; commercial reuse rights are not granted; legal review is required before commercial deployment using NXBGD-derived resources."
-      );
+    const moetSources = sourceRegistry.filter((s) => s.id.startsWith("SRC-VN-MOET-"));
+    expect(moetSources.length).toBeGreaterThanOrEqual(5);
+
+    for (const src of moetSources) {
+      // Must NOT be stamped as METADATA_VERIFIED or VIEWER_INVENTORY_VERIFIED without an actual successful remote fetch
+      expect(src.verificationStatus).toBe("OFFLINE_REGISTERED_METADATA");
+      expect(src.verificationStatus).not.toBe("METADATA_VERIFIED");
+      expect(src.verificationStatus).not.toBe("VIEWER_INVENTORY_VERIFIED");
+      // Strictly no hardcoded fake HTTP status 200
+      expect(src.httpStatus).toBeUndefined();
     }
+  });
+
+  it("enforces fail-closed: required source failure aborts pipeline and preserves prior registry", async () => {
+    const tmpDir = path.resolve("scratch/test-fail-closed");
+    fs.mkdirSync(tmpDir, { recursive: true });
+    const tmpRegistryPath = path.join(tmpDir, "source-registry.json");
+    const initialContent = JSON.stringify([{ id: "PRE_EXISTING_RECORD", note: "preserve me" }]);
+    fs.writeFileSync(tmpRegistryPath, initialContent, "utf-8");
+
+    const mockSources = [
+      {
+        id: "SRC-REQUIRED-TEST",
+        authority: "Test Authority",
+        title: "Test Required Source",
+        sourceType: "OFFICIAL_CURRICULUM",
+        url: "https://taphuan.nxbgd.vn/mock-failed",
+        requiredForSlice: true,
+        retrievedAt: "2026-09-17",
+      },
+    ];
+
+    // Mock remote verifier to return TLS failure
+    const mockTlsFailVerifier = async () => ({
+      ok: false,
+      httpStatus: 0,
+      error: "unable to verify the first certificate",
+      errorCode: "TLS_VERIFICATION_FAILED",
+    });
+
+    await expect(
+      runSourceVerificationV2({
+        sources: mockSources as any,
+        targetPath: tmpRegistryPath,
+        remoteVerifier: mockTlsFailVerifier as any,
+      })
+    ).rejects.toThrow(/Pipeline gate failed: required source \[SRC-REQUIRED-TEST\] failed verification/);
+
+    // Verify prior registry was NOT overwritten
+    const preservedContent = fs.readFileSync(tmpRegistryPath, "utf-8");
+    expect(preservedContent).toBe(initialContent);
+
+    // Clean up
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it("enforces that publication cannot bypass review attestation", () => {
+    // Attempting to bypass review attestation by directly setting PUBLISHED_BETA and INTERNAL_REVIEWED on an AI_ASSISTED item
+    const bypassedItem: QuestionItem = {
+      id: "ITEM-BYPASS-ATTEMPT",
+      primaryNodeId: "NODE-MATH-6-FRAC-03",
+      supportingNodeIds: [],
+      type: "MULTIPLE_CHOICE",
+      cognitiveDemand: "UNDERSTAND",
+      prompt: [{ type: "text", value: "Bypass prompt" }],
+      correctAnswer: "1/2",
+      rationale: "Bypass rationale",
+      misconceptionTags: [],
+      sourceRefs: [],
+      authoringOrigin: "AI_ASSISTED",
+      itemMaturity: "DRAFT",
+      reviewState: "INTERNAL_REVIEWED",
+      publicationState: "PUBLISHED_BETA",
+      version: "1.0.0",
+      // Notice: NO reviewAttestation attached
+    };
+
+    expect(() => assertPublishedForStudent(bypassedItem)).toThrow(ContentNotPublishedError);
+  });
+
+  it("enforces that arbitrary reviewer strings do not prove human review", () => {
+    // A mere arbitrary string like "Nguyen Van A (Math Reviewer)" attached as reviewedBy is rejected
+    const arbitraryReviewerItem: QuestionItem = {
+      id: "ITEM-ARBITRARY-STR-01",
+      primaryNodeId: "NODE-MATH-6-FRAC-03",
+      supportingNodeIds: [],
+      type: "MULTIPLE_CHOICE",
+      cognitiveDemand: "UNDERSTAND",
+      prompt: [{ type: "text", value: "Test prompt" }],
+      correctAnswer: "1/2",
+      rationale: "Test rationale",
+      misconceptionTags: [],
+      sourceRefs: [],
+      authoringOrigin: "AI_ASSISTED",
+      itemMaturity: "DRAFT",
+      reviewState: "INTERNAL_REVIEWED",
+      publicationState: "PUBLISHED_BETA",
+      version: "1.0.0",
+      // Attaching arbitrary string does NOT satisfy publication guard
+      ...({ reviewedBy: "Nguyen Van A (Math Reviewer)" } as any),
+    };
+
+    expect(() => assertPublishedForStudent(arbitraryReviewerItem)).toThrow(ContentNotPublishedError);
+
+    // In promoteContent(), an arbitrary reviewer string or invalid reviewerId prefix is rejected
+    const contentPayload = JSON.stringify(arbitraryReviewerItem.prompt);
+    const contentHash = crypto.createHash("sha256").update(contentPayload).digest("hex");
+
+    expect(() => {
+      promoteContent(
+        arbitraryReviewerItem,
+        "INTERNAL_REVIEWED",
+        {
+          reviewerId: "arbitrary-user-id", // not starting with REV-HUMAN-
+          reviewerName: "Nguyen Van A (Math Reviewer)",
+          role: "PEDAGOGICAL_CONTROLLER",
+          attestedAt: "2026-09-17T00:00:00Z",
+          contentHash,
+        },
+        contentPayload
+      );
+    }).toThrow(SelfPromotionForbiddenError);
+
+    expect(() => {
+      promoteContent(
+        arbitraryReviewerItem,
+        "INTERNAL_REVIEWED",
+        {
+          reviewerId: "REV-HUMAN-01",
+          reviewerName: "Nguyen Van A (Math Reviewer)",
+          role: "CONTRIBUTOR" as any, // invalid role
+          attestedAt: "2026-09-17T00:00:00Z",
+          contentHash,
+        },
+        contentPayload
+      );
+    }).toThrow(SelfPromotionForbiddenError);
+  });
+
+  it("enforces that TIER_B1_MOET_APPROVED_TEXTBOOK requires explicit approval provenance", () => {
+    const sourceRegistry: SourceDocument[] = JSON.parse(
+      fs.readFileSync(path.join(g6MathDir, "source-registry.json"), "utf-8")
+    );
+
+    const b1Sources = sourceRegistry.filter((s) => s.sourceTier === "TIER_B1_MOET_APPROVED_TEXTBOOK");
+    expect(b1Sources.length).toBeGreaterThanOrEqual(2);
+
+    for (const b1 of b1Sources) {
+      expect(b1.approvalStatus).toBe("MOET_APPROVED");
+      expect(b1.approvalDecisionNumber).toBe("718/QĐ-BGDĐT");
+      expect(b1.approvalDecisionDate).toBe("2021-02-09");
+      expect(b1.approvalSourceId).toBe("SRC-VN-MOET-QD-718-2021");
+      expect(b1.approval?.approvalNotes).toContain("718/QĐ-BGDĐT");
+    }
+  });
+
+  it("verifies evidence reports honestly declare CONTROLLER REVIEW: PENDING and never self-declare PASS", () => {
+    const r2Path = path.resolve("docs/evidence/NXBGD_SOURCE_PROVENANCE_R2_REPORT.md");
+    const r21Path = path.resolve("docs/evidence/NXBGD_SOURCE_PROVENANCE_R2_1_REPORT.md");
+
+    const r2Content = fs.readFileSync(r2Path, "utf-8");
+    const r21Content = fs.readFileSync(r21Path, "utf-8");
+
+    // Neither report may claim resolved or PASS from controller
+    expect(r2Content).not.toContain("CONTROLLER AUDIT R2 RESOLVED");
+    expect(r21Content).not.toContain("CONTROLLER AUDIT R2 RESOLVED");
+    expect(r2Content).not.toContain("CONTROLLER PASS");
+    expect(r21Content).not.toContain("CONTROLLER PASS");
+
+    // Both reports must honestly disclose controller review is pending
+    expect(r2Content).toContain("CONTROLLER REVIEW: PENDING");
+    expect(r21Content).toContain("CONTROLLER REVIEW: PENDING");
+
+    // Must disclose local executor evidence
+    expect(r21Content).toContain("Local Executor Evidence");
   });
 });

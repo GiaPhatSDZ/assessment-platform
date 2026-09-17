@@ -112,12 +112,30 @@ export interface SourceRef {
 
 export type RemoteVerificationStatus =
   | "UNVERIFIED"
+  | "OFFLINE_REGISTERED_METADATA"
   | "URL_REACHABLE"
   | "METADATA_VERIFIED"
   | "VIEWER_INVENTORY_VERIFIED"
   | "LOCATOR_HUMAN_VERIFIED"
   | "TLS_VERIFICATION_FAILED"
   | "UNREACHABLE";
+
+export interface ApprovalProvenance {
+  approvalSourceId: string;
+  approvalDecisionNumber: string;
+  approvalDecisionDate: string;
+  approvalStatus: "MOET_APPROVED" | "UNVERIFIED" | "DEPRECATED";
+  approvalNotes?: string;
+}
+
+export interface ReviewAttestation {
+  reviewerId: string;
+  reviewerName: string;
+  role: "PEDAGOGICAL_CONTROLLER" | "SUBJECT_EXPERT" | "CURRICULUM_AUDITOR";
+  attestedAt: string;
+  contentHash: string;
+  auditNotes?: string;
+}
 
 export interface SourceDocument {
   id: string;
@@ -148,6 +166,12 @@ export interface SourceDocument {
   remoteResponseFingerprint?: string;
   canonicalMetadataFingerprint?: string;
   fingerprint?: string;
+  approval?: ApprovalProvenance;
+  approvalStatus?: "MOET_APPROVED" | "UNVERIFIED" | "DEPRECATED";
+  approvalDecisionNumber?: string;
+  approvalDecisionDate?: string;
+  approvalSourceId?: string;
+  requiredForSlice?: boolean;
 }
 
 export class SelfPromotionForbiddenError extends Error {
@@ -230,6 +254,7 @@ export interface Lesson {
   reviewState: ReviewState;
   publicationState: PublicationState;
   version: string;
+  reviewAttestation?: ReviewAttestation;
 }
 
 export type QuestionType =
@@ -268,6 +293,7 @@ export interface QuestionItem {
   reviewState: ReviewState;
   publicationState: PublicationState;
   version: string;
+  reviewAttestation?: ReviewAttestation;
 }
 
 export interface Explanation {
