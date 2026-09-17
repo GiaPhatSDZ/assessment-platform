@@ -6,7 +6,7 @@ describe("Application Smoke Test", () => {
   it("renders HomePage heading", () => {
     render(<HomePage />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Đo lường năng lực thực chất trong kỷ nguyên Trí tuệ Nhân tạo"
+      "Con không chỉ cần học thêm"
     );
   });
 });

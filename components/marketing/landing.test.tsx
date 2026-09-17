@@ -6,29 +6,28 @@ describe("Landing Page Experience", () => {
   it("renders main heading H1, primary CTA, and core sections", () => {
     render(<HomePage />);
 
-    // H1
+    // H1 (V3 Knowledge Control)
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Đo lường năng lực thực chất trong kỷ nguyên Trí tuệ Nhân tạo"
+      "Con không chỉ cần học thêm."
     );
 
     // Primary CTA
-    const ctas = screen.getAllByRole("link", { name: /Bắt đầu/i });
+    const ctas = screen.getAllByRole("link", { name: /chẩn đoán/i });
     expect(ctas.length).toBeGreaterThan(0);
 
-    // 4 Dimensions
-    expect(screen.getAllByText("Tư duy phân tích").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Giải quyết vấn đề").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Hiểu biết & ứng dụng AI").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Khả năng thích nghi").length).toBeGreaterThan(0);
+    // V3 Vertical Slice Section
+    expect(
+      screen.getByText(/Lát Cắt Mẫu Chuẩn Hóa Thực Tế/i)
+    ).toBeInTheDocument();
 
     // FAQ section
     expect(
-      screen.getByRole("heading", { level: 2, name: /Câu hỏi thường gặp/i })
+      screen.getByRole("heading", { level: 2, name: /Những Câu Hỏi Phụ Huynh Hay Thắc Mắc/i })
     ).toBeInTheDocument();
 
-    // Disclaimer hint
+    // Privacy hint
     expect(
-      screen.getByText(/Không yêu cầu đăng ký tài khoản trước/i)
-    ).toBeInTheDocument();
+      screen.getAllByText(/Không yêu cầu Số điện thoại/i).length
+    ).toBeGreaterThan(0);
   });
 });

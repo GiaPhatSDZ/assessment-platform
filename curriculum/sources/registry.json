@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "updatedAt": "2026-09-17T12:00:00.000Z",
+  "jurisdiction": "VN",
+  "sources": [
+    {
+      "id": "SRC-VN-MOET-GEP-2018",
+      "authority": "Bộ Giáo dục và Đào tạo (MOET)",
+      "title": "Chương trình Giáo dục phổ thông tổng thể (Văn bản hợp nhất số 32/2018/TT-BGDĐT, 20/2021/TT-BGDĐT, 13/2022/TT-BGDĐT)",
+      "documentNumber": "VBHN-32/2018-20/2021-13/2022-TT-BGDĐT",
+      "issuedAt": "2022-08-03",
+      "effectiveAt": "2022-08-03",
+      "url": "https://moet.gov.vn/content/vanban/Lists/VBPQ/Attachments/1483/vbhn-chuong-trinh-tong-the.pdf",
+      "sourceTier": "A",
+      "status": "CURRENT_NATIONAL",
+      "notes": "Chương trình GDPT 2018 áp dụng cuốn chiếu từ năm học 2020-2021 đến 2024-2025 (hoàn tất cho toàn bộ 12 lớp)."
+    },
+    {
+      "id": "SRC-VN-MOET-MATH-2018",
+      "authority": "Bộ Giáo dục và Đào tạo (MOET)",
+      "title": "Chương trình Giáo dục phổ thông môn Toán (Ban hành kèm Thông tư 32/2018/TT-BGDĐT ngày 26/12/2018)",
+      "documentNumber": "32/2018/TT-BGDĐT",
+      "issuedAt": "2018-12-26",
+      "effectiveAt": "2020-02-15",
+      "url": "https://moet.gov.vn/content/vanban/Lists/VBPQ/Attachments/1483/vbhn-ttu-322018-202021-132022-ttbgddt.pdf",
+      "sourceTier": "A",
+      "status": "CURRENT_NATIONAL",
+      "notes": "Văn bản gốc quy định chuẩn kiến thức, kĩ năng và yêu cầu cần đạt môn Toán từ lớp 1 đến lớp 12."
+    },
+    {
+      "id": "SRC-VN-MOET-PRESCHOOL-CURRENT",
+      "authority": "Bộ Giáo dục và Đào tạo (MOET)",
+      "title": "Chương trình Giáo dục mầm non hiện hành (Thông tư 17/2009/TT-BGDĐT, sửa đổi theo Thông tư 28/2016/TT-BGDĐT và 51/2020/TT-BGDĐT)",
+      "documentNumber": "51/2020/TT-BGDĐT",
+      "issuedAt": "2020-12-31",
+      "effectiveAt": "2021-04-13",
+      "url": "https://moet.gov.vn/content/vanban/Lists/VBDT/Attachments/1642/4bao-cao-thuc-hien-ctgdmn.pdf",
+      "sourceTier": "A",
+      "status": "CURRENT_NATIONAL",
+      "notes": "Chương trình GDMN quốc gia hiện hành áp dụng cho nhà trẻ (3 tháng - 36 tháng) và mẫu giáo (3 - 6 tuổi)."
+    },
+    {
+      "id": "SRC-VN-MOET-PRESCHOOL-PILOT-2026",
+      "authority": "Bộ Giáo dục và Đào tạo & Văn phòng Chính phủ",
+      "title": "Nhiệm vụ thí điểm Chương trình Giáo dục mầm non mới năm học 2026-2027",
+      "documentNumber": "Đề án GDMN mới 2026",
+      "issuedAt": "2026-08-05",
+      "effectiveAt": "2026-09-01",
+      "url": "https://www2.en.baochinhphu.vn/cac-nhiem-vu-trong-tam-nam-hoc-2026-2027-102260805161858624.htm",
+      "sourceTier": "B",
+      "status": "PILOT",
+      "notes": "Chương trình thí điểm GDMN mới được triển khai có phạm vi giới hạn trong năm học 2026-2027; không được coi là chuẩn quốc gia đại trà."
+    },
+    {
+      "id": "SRC-VN-MOET-UPPER-SEC-ELECTIVES",
+      "authority": "Bộ Giáo dục và Đào tạo (MOET)",
+      "title": "Quy định điều chỉnh cơ cấu môn học cấp THPT (Thông tư 13/2022/TT-BGDĐT)",
+      "documentNumber": "13/2022/TT-BGDĐT",
+      "issuedAt": "2022-08-03",
+      "effectiveAt": "2022-08-03",
+      "url": "https://baochinhphu.vn/bo-gddt-sua-doi-bo-sung-chuong-trinh-giao-duc-pho-thong-dac-biet-nhan-manh-mon-lich-su-102220803182224737.htm",
+      "sourceTier": "A",
+      "status": "CURRENT_NATIONAL",
+      "notes": "Quy định môn Lịch sử là bắt buộc; học sinh THPT chọn 4 môn trong 9 môn tự chọn."
+    }
+  ]
+}

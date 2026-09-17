@@ -1,0 +1,86 @@
+{
+  "release": {
+    "id": "REL-VN-MOET-2018-MATH",
+    "jurisdiction": "VN",
+    "authority": "MOET",
+    "title": "Chương trình Giáo dục phổ thông môn Toán 2018",
+    "status": "CURRENT_NATIONAL",
+    "effectiveFrom": "2020-02-15",
+    "sourceDocumentIds": ["SRC-VN-MOET-MATH-2018"],
+    "createdAt": "2026-09-17T12:00:00.000Z"
+  },
+  "learningOutcomes": [
+    {
+      "id": "LO-VN-MATH-4-NUM-01",
+      "curriculumReleaseId": "REL-VN-MOET-2018-MATH",
+      "stage": "PRIMARY",
+      "grade": 4,
+      "subjectId": "math",
+      "strandId": "numbers_operations",
+      "topicId": "fractions_intro",
+      "officialText": "Thực hiện được phép cộng, phép trừ hai phân số có cùng mẫu số.",
+      "normalizedSummary": "Cộng và trừ phân số cùng mẫu số.",
+      "sourceRef": {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "documentTitle": "Chương trình môn Toán 2018",
+        "clauseOrSection": "Lớp 4 - Số và phép tính (trang 32)",
+        "quote": "Thực hiện được phép cộng, phép trừ hai phân số có cùng mẫu số."
+      },
+      "reviewStatus": "APPROVED"
+    },
+    {
+      "id": "LO-VN-MATH-6-NUM-01",
+      "curriculumReleaseId": "REL-VN-MOET-2018-MATH",
+      "stage": "LOWER_SECONDARY",
+      "grade": 6,
+      "subjectId": "math",
+      "strandId": "numbers_algebra",
+      "topicId": "natural_numbers",
+      "officialText": "Tìm được ước chung, ước chung lớn nhất; tìm được bội chung, bội chung nhỏ nhất của hai hoặc ba số tự nhiên; vận dụng được trong việc quy đồng mẫu số các phân số.",
+      "normalizedSummary": "Tìm BCNN của hai hoặc ba số tự nhiên để quy đồng mẫu số.",
+      "sourceRef": {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "documentTitle": "Chương trình môn Toán 2018",
+        "clauseOrSection": "Lớp 6 - Số tự nhiên (trang 46)",
+        "quote": "tìm được bội chung, bội chung nhỏ nhất của hai hoặc ba số tự nhiên; vận dụng được trong việc quy đồng mẫu số các phân số."
+      },
+      "reviewStatus": "APPROVED"
+    },
+    {
+      "id": "LO-VN-MATH-6-NUM-02",
+      "curriculumReleaseId": "REL-VN-MOET-2018-MATH",
+      "stage": "LOWER_SECONDARY",
+      "grade": 6,
+      "subjectId": "math",
+      "strandId": "numbers_algebra",
+      "topicId": "fractions",
+      "officialText": "Vận dụng được tính chất cơ bản của phân số trong việc rút gọn phân số và quy đồng mẫu số nhiều phân số.",
+      "normalizedSummary": "Quy đồng mẫu số nhiều phân số có mẫu là số nguyên dương.",
+      "sourceRef": {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "documentTitle": "Chương trình môn Toán 2018",
+        "clauseOrSection": "Lớp 6 - Phân số (trang 47)",
+        "quote": "Vận dụng được tính chất cơ bản của phân số trong việc rút gọn phân số và quy đồng mẫu số nhiều phân số."
+      },
+      "reviewStatus": "APPROVED"
+    },
+    {
+      "id": "LO-VN-MATH-6-NUM-03",
+      "curriculumReleaseId": "REL-VN-MOET-2018-MATH",
+      "stage": "LOWER_SECONDARY",
+      "grade": 6,
+      "subjectId": "math",
+      "strandId": "numbers_algebra",
+      "topicId": "fractions",
+      "officialText": "Thực hiện được các phép tính cộng, trừ, nhân, chia đối với phân số. Vận dụng được các tính chất giao hoán, kết hợp, phân phối của phép nhân đối với phép cộng trong tính toán.",
+      "normalizedSummary": "Thực hiện phép cộng và trừ phân số không cùng mẫu số.",
+      "sourceRef": {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "documentTitle": "Chương trình môn Toán 2018",
+        "clauseOrSection": "Lớp 6 - Phân số (trang 48)",
+        "quote": "Thực hiện được các phép tính cộng, trừ, nhân, chia đối với phân số."
+      },
+      "reviewStatus": "APPROVED"
+    }
+  ]
+}

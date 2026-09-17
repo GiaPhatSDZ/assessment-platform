@@ -1,0 +1,199 @@
+{
+  "version": "1.0.0",
+  "subjectId": "math",
+  "topicId": "fractions",
+  "items": [
+    {
+      "id": "ITEM-DIAG-FRAC-01",
+      "primaryNodeId": "NODE-MATH-6-FRAC-03",
+      "nodeIds": ["NODE-MATH-6-FRAC-03", "NODE-MATH-6-FRAC-02", "NODE-MATH-4-FRAC-01"],
+      "type": "MULTIPLE_CHOICE",
+      "cognitiveDemand": "APPLY",
+      "prompt": "Tính kết quả của phép tính: \\frac{3}{8} + \\frac{5}{12}",
+      "options": [
+        { "id": "A", "text": "\\frac{19}{24}" },
+        { "id": "B", "text": "\\frac{8}{20}" },
+        { "id": "C", "text": "\\frac{2}{5}" },
+        { "id": "D", "text": "\\frac{11}{24}" }
+      ],
+      "correctAnswer": "A",
+      "rationale": "Mẫu số chung nhỏ nhất của 8 và 12 là BCNN(8, 12) = 24. Quy đồng: 3/8 = (3*3)/(8*3) = 9/24; 5/12 = (5*2)/(12*2) = 10/24. Kết quả: 9/24 + 10/24 = 19/24.",
+      "distractorRationales": {
+        "B": "Ngộ nhận cộng tử với tử, mẫu với mẫu: (3+5)/(8+12) = 8/20.",
+        "C": "Cộng tử với tử, mẫu với mẫu rồi rút gọn: 8/20 = 2/5 (ngộ nhận nghiêm trọng về bản chất phân số).",
+        "D": "Tìm đúng mẫu chung 24 nhưng nhân nhầm thừa số phụ: 3*2 + 5*1 = 11/24."
+      },
+      "misconceptionTags": ["ADD_NUM_AND_DENOM_DIRECTLY", "INCORRECT_FACTOR_MULTIPLICATION"],
+      "itemStatus": "REVIEWED",
+      "isReTest": false
+    },
+    {
+      "id": "ITEM-DIAG-FRAC-02",
+      "primaryNodeId": "NODE-MATH-6-FRAC-02",
+      "nodeIds": ["NODE-MATH-6-FRAC-02", "NODE-MATH-6-INT-01"],
+      "type": "MULTIPLE_CHOICE",
+      "cognitiveDemand": "UNDERSTAND",
+      "prompt": "Khi quy đồng mẫu số hai phân số \\frac{5}{6} và \\frac{7}{9}, mẫu số chung dương nhỏ nhất là bao nhiêu?",
+      "options": [
+        { "id": "A", "text": "18" },
+        { "id": "B", "text": "54" },
+        { "id": "C", "text": "15" },
+        { "id": "D", "text": "3" }
+      ],
+      "correctAnswer": "A",
+      "rationale": "BCNN(6, 9) = 18. Vậy mẫu số chung dương nhỏ nhất là 18.",
+      "distractorRationales": {
+        "B": "Nhân hai mẫu số 6 * 9 = 54 (mẫu chung nhưng chưa phải là nhỏ nhất).",
+        "C": "Cộng hai mẫu số 6 + 9 = 15 (sai hoàn toàn nguyên lý quy đồng).",
+        "D": "Lấy ƯCLN(6, 9) = 3 thay vì lấy BCNN."
+      },
+      "misconceptionTags": ["CONFUSE_LCM_WITH_PRODUCT", "CONFUSE_GCD_WITH_LCM"],
+      "itemStatus": "REVIEWED",
+      "isReTest": false
+    },
+    {
+      "id": "ITEM-DIAG-INT-01",
+      "primaryNodeId": "NODE-MATH-6-INT-01",
+      "nodeIds": ["NODE-MATH-6-INT-01"],
+      "type": "MULTIPLE_CHOICE",
+      "cognitiveDemand": "PROCEDURE",
+      "prompt": "Bội chung nhỏ nhất của hai số 12 và 18, kí hiệu BCNN(12, 18), là:",
+      "options": [
+        { "id": "A", "text": "36" },
+        { "id": "B", "text": "6" },
+        { "id": "C", "text": "72" },
+        { "id": "D", "text": "216" }
+      ],
+      "correctAnswer": "A",
+      "rationale": "12 = 2^2 * 3; 18 = 2 * 3^2. BCNN(12, 18) = 2^2 * 3^2 = 4 * 9 = 36.",
+      "distractorRationales": {
+        "B": "Nhầm sang Ước chung lớn nhất: ƯCLN(12, 18) = 6.",
+        "C": "Lấy bội chung nhưng chưa nhỏ nhất (36 * 2).",
+        "D": "Nhân trực tiếp hai số: 12 * 18 = 216."
+      },
+      "misconceptionTags": ["CONFUSE_GCD_WITH_LCM", "CONFUSE_LCM_WITH_PRODUCT"],
+      "itemStatus": "REVIEWED",
+      "isReTest": false
+    },
+    {
+      "id": "ITEM-DIAG-FRAC-SAME-01",
+      "primaryNodeId": "NODE-MATH-4-FRAC-01",
+      "nodeIds": ["NODE-MATH-4-FRAC-01"],
+      "type": "MULTIPLE_CHOICE",
+      "cognitiveDemand": "RECALL",
+      "prompt": "Kết quả của phép tính \\frac{4}{15} + \\frac{7}{15} là:",
+      "options": [
+        { "id": "A", "text": "\\frac{11}{15}" },
+        { "id": "B", "text": "\\frac{11}{30}" },
+        { "id": "C", "text": "\\frac{28}{15}" },
+        { "id": "D", "text": "\\frac{3}{15}" }
+      ],
+      "correctAnswer": "A",
+      "rationale": "Hai phân số cùng mẫu 15: giữ nguyên mẫu số, cộng tử số: (4 + 7) / 15 = 11/15.",
+      "distractorRationales": {
+        "B": "Cộng cả mẫu với mẫu: (4+7)/(15+15) = 11/30 (ngộ nhận cộng mẫu số).",
+        "C": "Nhân tử số thay vì cộng: 4 * 7 / 15.",
+        "D": "Lấy hiệu tử số: (7 - 4)/15 = 3/15."
+      },
+      "misconceptionTags": ["ADD_DENOMINATORS_IN_SAME_DENOM"],
+      "itemStatus": "REVIEWED",
+      "isReTest": false
+    },
+    {
+      "id": "ITEM-RETEST-FRAC-01",
+      "primaryNodeId": "NODE-MATH-6-FRAC-03",
+      "nodeIds": ["NODE-MATH-6-FRAC-03", "NODE-MATH-6-FRAC-02"],
+      "type": "MULTIPLE_CHOICE",
+      "cognitiveDemand": "APPLY",
+      "prompt": "[Kiểm Tra Lại] Tính kết quả của phép tính: \\frac{1}{6} + \\frac{3}{10}",
+      "options": [
+        { "id": "A", "text": "\\frac{7}{15}" },
+        { "id": "B", "text": "\\frac{4}{16}" },
+        { "id": "C", "text": "\\frac{1}{4}" },
+        { "id": "D", "text": "\\frac{14}{30}" }
+      ],
+      "correctAnswer": "A",
+      "rationale": "BCNN(6, 10) = 30. Quy đồng: 1/6 = 5/30; 3/10 = 9/30. Tổng: 5/30 + 9/30 = 14/30 = 7/15 (rút gọn tối giản).",
+      "distractorRationales": {
+        "B": "Cộng tử với tử, mẫu với mẫu: (1+3)/(6+10) = 4/16.",
+        "C": "Rút gọn 4/16 = 1/4 từ ngộ nhận cộng tử và mẫu.",
+        "D": "Tính ra 14/30 nhưng chưa rút gọn về phân số tối giản 7/15."
+      },
+      "misconceptionTags": ["ADD_NUM_AND_DENOM_DIRECTLY", "UNSIMPLIFIED_RESULT"],
+      "itemStatus": "REVIEWED",
+      "isReTest": true
+    },
+    {
+      "id": "ITEM-RETEST-FRAC-02",
+      "primaryNodeId": "NODE-MATH-6-FRAC-02",
+      "nodeIds": ["NODE-MATH-6-FRAC-02", "NODE-MATH-6-INT-01"],
+      "type": "MULTIPLE_CHOICE",
+      "cognitiveDemand": "UNDERSTAND",
+      "prompt": "[Kiểm Tra Lại] Khi quy đồng mẫu số hai phân số \\frac{3}{8} và \\frac{7}{10}, mẫu số chung nhỏ nhất là:",
+      "options": [
+        { "id": "A", "text": "40" },
+        { "id": "B", "text": "80" },
+        { "id": "C", "text": "18" },
+        { "id": "D", "text": "2" }
+      ],
+      "correctAnswer": "A",
+      "rationale": "8 = 2^3; 10 = 2 * 5. BCNN(8, 10) = 2^3 * 5 = 40.",
+      "distractorRationales": {
+        "B": "Nhân 8 * 10 = 80 (chưa phải mẫu chung nhỏ nhất).",
+        "C": "Cộng mẫu 8 + 10 = 18.",
+        "D": "Lấy ƯCLN(8, 10) = 2."
+      },
+      "misconceptionTags": ["CONFUSE_LCM_WITH_PRODUCT", "CONFUSE_GCD_WITH_LCM"],
+      "itemStatus": "REVIEWED",
+      "isReTest": true
+    },
+    {
+      "id": "ITEM-RETEST-INT-01",
+      "primaryNodeId": "NODE-MATH-6-INT-01",
+      "nodeIds": ["NODE-MATH-6-INT-01"],
+      "type": "MULTIPLE_CHOICE",
+      "cognitiveDemand": "PROCEDURE",
+      "prompt": "[Kiểm Tra Lại] Bội chung nhỏ nhất của hai số 9 và 15, BCNN(9, 15), là:",
+      "options": [
+        { "id": "A", "text": "45" },
+        { "id": "B", "text": "3" },
+        { "id": "C", "text": "90" },
+        { "id": "D", "text": "135" }
+      ],
+      "correctAnswer": "A",
+      "rationale": "9 = 3^2; 15 = 3 * 5. BCNN(9, 15) = 3^2 * 5 = 45.",
+      "distractorRationales": {
+        "B": "ƯCLN(9, 15) = 3.",
+        "C": "45 * 2 = 90.",
+        "D": "9 * 15 = 135."
+      },
+      "misconceptionTags": ["CONFUSE_GCD_WITH_LCM", "CONFUSE_LCM_WITH_PRODUCT"],
+      "itemStatus": "REVIEWED",
+      "isReTest": true
+    },
+    {
+      "id": "ITEM-RETEST-FRAC-SAME-01",
+      "primaryNodeId": "NODE-MATH-4-FRAC-01",
+      "nodeIds": ["NODE-MATH-4-FRAC-01"],
+      "type": "MULTIPLE_CHOICE",
+      "cognitiveDemand": "RECALL",
+      "prompt": "[Kiểm Tra Lại] Tính: \\frac{5}{18} + \\frac{7}{18}",
+      "options": [
+        { "id": "A", "text": "\\frac{2}{3}" },
+        { "id": "B", "text": "\\frac{12}{36}" },
+        { "id": "C", "text": "\\frac{1}{3}" },
+        { "id": "D", "text": "\\frac{12}{18}" }
+      ],
+      "correctAnswer": "A",
+      "rationale": "(5 + 7)/18 = 12/18 = 2/3 (rút gọn tối giản bằng cách chia cả tử và mẫu cho 6).",
+      "distractorRationales": {
+        "B": "Cộng mẫu với mẫu: (5+7)/(18+18) = 12/36.",
+        "C": "Rút gọn 12/36 = 1/3 từ ngộ nhận cộng mẫu.",
+        "D": "Tính đúng 12/18 nhưng chưa rút gọn tối giản."
+      },
+      "misconceptionTags": ["ADD_DENOMINATORS_IN_SAME_DENOM", "UNSIMPLIFIED_RESULT"],
+      "itemStatus": "REVIEWED",
+      "isReTest": true
+    }
+  ]
+}
