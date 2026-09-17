@@ -9,16 +9,19 @@
       {
         "sourceId": "SRC-VN-MOET-MATH-2018",
         "tier": "TIER_A_CURRICULUM_AUTHORITY",
-        "pageNumber": 32,
+        "printedPage": 32,
+        "locatorStatus": "UNVERIFIED",
         "sectionLocator": "Chương trình môn Toán Lớp 4 — Yêu cầu cần đạt về Phân số"
       },
       {
         "sourceId": "SRC-NXBGD-KNTT-MATH6-T2",
-        "tier": "TIER_B_APPROVED_LEARNING_SOURCE",
+        "tier": "TIER_B1_MOET_APPROVED_TEXTBOOK",
         "bookSeries": "Kết nối tri thức với cuộc sống",
         "chapterLocator": "Chương VI: Phân số",
         "lessonLocator": "Bài 23: Mở rộng phân số. Phân số bằng nhau",
-        "pageNumber": 5,
+        "printedPage": 5,
+        "viewerPage": 6,
+        "locatorStatus": "UNVERIFIED",
         "citationText": "SGK Toán 6 Tập 2, tr. 5 (Khái niệm phân số và phân số bằng nhau)"
       }
     ],
@@ -34,30 +37,36 @@
       {
         "sourceId": "SRC-VN-MOET-MATH-2018",
         "tier": "TIER_A_CURRICULUM_AUTHORITY",
-        "pageNumber": 38,
+        "printedPage": 38,
+        "locatorStatus": "UNVERIFIED",
         "sectionLocator": "Chương trình môn Toán Lớp 5 — YCCĐ Quy đồng mẫu số"
       },
       {
         "sourceId": "SRC-NXBGD-KNTT-MATH6-T2",
-        "tier": "TIER_B_APPROVED_LEARNING_SOURCE",
+        "tier": "TIER_B1_MOET_APPROVED_TEXTBOOK",
         "bookSeries": "Kết nối tri thức với cuộc sống",
         "chapterLocator": "Chương VI: Phân số",
         "lessonLocator": "Bài 25: Phép cộng và phép trừ phân số",
-        "pageNumber": 16,
+        "printedPage": 16,
+        "viewerPage": 17,
+        "locatorStatus": "UNVERIFIED",
         "citationText": "SGK Toán 6 Tập 2, tr. 16 (Quy tắc quy đồng mẫu số trước khi cộng)"
       },
       {
         "sourceId": "SRC-NXBGD-KNTT-MATH6-SGV-T2",
-        "tier": "TIER_B_APPROVED_LEARNING_SOURCE",
+        "tier": "TIER_B2_NXBGD_PUBLISHER_RESOURCE",
         "bookSeries": "Kết nối tri thức với cuộc sống",
         "lessonLocator": "Bài 25: Phép cộng và phép trừ phân số",
-        "pageNumber": 32,
+        "printedPage": 32,
+        "viewerPage": 33,
+        "locatorStatus": "UNVERIFIED",
         "citationText": "SGV Toán 6 Tập 2, tr. 32-33 (Ôn tập kiến thức quy đồng mẫu số từ Lớp 5)"
       },
       {
         "sourceId": "SRC-NXBGD-KNTT-MATH6-TRAIN-SLIDES-ARITHMETIC",
-        "tier": "TIER_B_PEDAGOGICAL_SOURCE",
+        "tier": "TIER_B3_PEDAGOGICAL_TRAINING_RESOURCE",
         "sectionLocator": "Phần 2: Số học — Chuyên đề Dạy học Phân số",
+        "locatorStatus": "UNVERIFIED",
         "citationText": "Slide bồi dưỡng giáo viên NXBGD (Khắc phục mô thức nhầm lẫn cộng cả tử và mẫu)"
       }
     ],
@@ -73,30 +82,36 @@
       {
         "sourceId": "SRC-VN-MOET-MATH-2018",
         "tier": "TIER_A_CURRICULUM_AUTHORITY",
-        "pageNumber": 50,
+        "printedPage": 50,
+        "locatorStatus": "UNVERIFIED",
         "sectionLocator": "Mục V. Chương trình môn Toán Lớp 6 — Phép tính phân số"
       },
       {
         "sourceId": "SRC-NXBGD-KNTT-MATH6-T2",
-        "tier": "TIER_B_APPROVED_LEARNING_SOURCE",
+        "tier": "TIER_B1_MOET_APPROVED_TEXTBOOK",
         "bookSeries": "Kết nối tri thức với cuộc sống",
         "chapterLocator": "Chương VI: Phân số",
         "lessonLocator": "Bài 25: Phép cộng và phép trừ phân số",
-        "pageNumber": 16,
+        "printedPage": 16,
+        "viewerPage": 17,
+        "locatorStatus": "UNVERIFIED",
         "citationText": "SGK Toán 6 Tập 2, tr. 16 (Cộng hai phân số không cùng mẫu)"
       },
       {
         "sourceId": "SRC-NXBGD-KNTT-MATH6-SGV-T2",
-        "tier": "TIER_B_APPROVED_LEARNING_SOURCE",
+        "tier": "TIER_B2_NXBGD_PUBLISHER_RESOURCE",
         "bookSeries": "Kết nối tri thức với cuộc sống",
         "lessonLocator": "Bài 25",
-        "pageNumber": 33,
+        "printedPage": 33,
+        "viewerPage": 34,
+        "locatorStatus": "UNVERIFIED",
         "citationText": "SGV Toán 6 Tập 2, tr. 33 (Tổ chức hoạt động cộng hai phân số khác mẫu)"
       },
       {
         "sourceId": "SRC-NXBGD-KNTT-MATH6-TRAIN-DOC",
-        "tier": "TIER_B_PEDAGOGICAL_SOURCE",
+        "tier": "TIER_B3_PEDAGOGICAL_TRAINING_RESOURCE",
         "sectionLocator": "Mục 2.3 — Phương pháp hình thành quy tắc cộng trừ phân số",
+        "locatorStatus": "UNVERIFIED",
         "citationText": "Tài liệu tập huấn giáo viên Toán 6 NXBGD"
       }
     ],
@@ -112,16 +127,19 @@
       {
         "sourceId": "SRC-VN-MOET-MATH-2018",
         "tier": "TIER_A_CURRICULUM_AUTHORITY",
-        "pageNumber": 50,
+        "printedPage": 50,
+        "locatorStatus": "UNVERIFIED",
         "sectionLocator": "Mục V. Chương trình môn Toán Lớp 6"
       },
       {
         "sourceId": "SRC-NXBGD-KNTT-MATH6-T2",
-        "tier": "TIER_B_APPROVED_LEARNING_SOURCE",
+        "tier": "TIER_B1_MOET_APPROVED_TEXTBOOK",
         "bookSeries": "Kết nối tri thức với cuộc sống",
         "chapterLocator": "Chương VI: Phân số",
         "lessonLocator": "Bài 25",
-        "pageNumber": 18,
+        "printedPage": 18,
+        "viewerPage": 19,
+        "locatorStatus": "UNVERIFIED",
         "citationText": "SGK Toán 6 Tập 2, tr. 18 (Bài toán thực tế chia diện tích và đo lường)"
       }
     ],

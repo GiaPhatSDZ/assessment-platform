@@ -27,10 +27,14 @@ export type CoverageStatus =
 
 export type SourceTier =
   | "TIER_A_CURRICULUM_AUTHORITY"
-  | "TIER_B_APPROVED_LEARNING_SOURCE"
-  | "TIER_B_PEDAGOGICAL_SOURCE"
+  | "TIER_B1_MOET_APPROVED_TEXTBOOK"
+  | "TIER_B2_NXBGD_PUBLISHER_RESOURCE"
+  | "TIER_B3_PEDAGOGICAL_TRAINING_RESOURCE"
   | "TIER_C_INTERNAL_REVIEWED"
-  | "TIER_D_AI_DRAFT";
+  | "TIER_D_AI_DRAFT"
+  // Legacy aliases maintained for backward compatibility
+  | "TIER_B_APPROVED_LEARNING_SOURCE"
+  | "TIER_B_PEDAGOGICAL_SOURCE";
 
 export type SourceType =
   | "OFFICIAL_CURRICULUM"
@@ -51,6 +55,30 @@ export type ResourceType =
   | "TRAINING_SLIDE"
   | "INTERNAL_LESSON"
   | "INTERNAL_ITEM";
+
+export type LocatorStatus =
+  | "UNVERIFIED"
+  | "SOURCE_VIEWER_CONFIRMED"
+  | "HUMAN_VERIFIED";
+
+export interface LocatorEvidenceRecord {
+  sourceId: string;
+  printedPage?: number;
+  viewerPage?: number;
+  chapterLocator?: string;
+  lessonLocator?: string;
+  locatorStatus: LocatorStatus;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  evidenceFingerprint?: string;
+  notes?: string;
+}
+
+export interface RemoteViewerInventory {
+  totalPages?: number;
+  haveCoverPage?: boolean;
+  notes?: string;
+}
 
 export interface SourceRights {
   redistribution: boolean;
@@ -73,8 +101,23 @@ export interface SourceRef {
   lessonLocator?: string;
   sectionLocator?: string;
   pageNumber?: number | string;
+  printedPage?: number | string;
+  viewerPage?: number | string;
+  locatorStatus?: LocatorStatus;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  evidenceFingerprint?: string;
   citationText?: string;
 }
+
+export type RemoteVerificationStatus =
+  | "UNVERIFIED"
+  | "URL_REACHABLE"
+  | "METADATA_VERIFIED"
+  | "VIEWER_INVENTORY_VERIFIED"
+  | "LOCATOR_HUMAN_VERIFIED"
+  | "TLS_VERIFICATION_FAILED"
+  | "UNREACHABLE";
 
 export interface SourceDocument {
   id: string;
@@ -97,6 +140,46 @@ export interface SourceDocument {
   curriculumStatus?: CurriculumLegalStatus;
   rights?: SourceRights;
   rightsNotes?: string;
+  authorityChain?: string[];
+  verificationStatus?: RemoteVerificationStatus;
+  httpStatus?: number;
+  canonicalTitle?: string;
+  remoteViewerInventory?: RemoteViewerInventory;
+  remoteResponseFingerprint?: string;
+  canonicalMetadataFingerprint?: string;
+  fingerprint?: string;
+}
+
+export class SelfPromotionForbiddenError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "SelfPromotionForbiddenError";
+  }
+}
+
+export function assertCannotSelfPromote(record: {
+  authoringOrigin?: string;
+  reviewState: ReviewState;
+  reviewedBy?: string;
+  reviewedAt?: string;
+}): void {
+  if (
+    record.authoringOrigin === "AI_ASSISTED" &&
+    (record.reviewState === "INTERNAL_REVIEWED" ||
+      record.reviewState === "SUBJECT_EXPERT_REVIEWED" ||
+      record.reviewState === "PILOTED")
+  ) {
+    if (
+      !record.reviewedBy ||
+      record.reviewedBy.trim() === "" ||
+      record.reviewedBy.includes("AI_") ||
+      !record.reviewedAt
+    ) {
+      throw new SelfPromotionForbiddenError(
+        `Self-promotion violation: AI_ASSISTED content cannot be marked as '${record.reviewState}' without a verified human reviewer signature and reviewedAt timestamp.`
+      );
+    }
+  }
 }
 
 export type RichContent =
@@ -216,8 +299,10 @@ export interface PublicationManifest {
   manifestVersion: string;
   subjectId: string;
   gradeOrAgeBand: string;
-  publishedAt: string;
-  publishedBy: string;
+  manifestCreatedAt?: string;
+  reviewStatus?: ReviewState | "PENDING_HUMAN_CONTROLLER_AUDIT";
+  publishedAt: string | null;
+  publishedBy: string | null;
   publicationScope: PublicationScope;
   sourceDocumentIds: string[];
   learningOutcomeCount: number;

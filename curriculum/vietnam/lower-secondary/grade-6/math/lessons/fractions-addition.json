@@ -64,24 +64,29 @@
       "tier": "TIER_A_CURRICULUM_AUTHORITY",
       "documentNumber": "32/2018/TT-BGDĐT",
       "sectionLocator": "Mục V. Chương trình môn Toán lớp 6",
-      "pageNumber": 50,
+      "printedPage": 50,
+      "locatorStatus": "UNVERIFIED",
       "citationText": "Chương trình GDPT 2018 Môn Toán, Mục V, Lớp 6"
     },
     {
       "sourceId": "SRC-NXBGD-KNTT-MATH6-T2",
-      "tier": "TIER_B_APPROVED_LEARNING_SOURCE",
+      "tier": "TIER_B1_MOET_APPROVED_TEXTBOOK",
       "bookSeries": "Kết nối tri thức với cuộc sống",
       "chapterLocator": "Chương VI: Phân số",
       "lessonLocator": "Bài 25: Phép cộng và phép trừ phân số",
-      "pageNumber": "15-18",
+      "printedPage": "15-18",
+      "viewerPage": "16-19",
+      "locatorStatus": "UNVERIFIED",
       "citationText": "SGK Toán 6 Tập 2, Chương VI, Bài 25, tr. 15-18 (Quy tắc và ví dụ mẫu cộng hai phân số không cùng mẫu)"
     },
     {
       "sourceId": "SRC-NXBGD-KNTT-MATH6-SGV-T2",
-      "tier": "TIER_B_APPROVED_LEARNING_SOURCE",
+      "tier": "TIER_B2_NXBGD_PUBLISHER_RESOURCE",
       "bookSeries": "Kết nối tri thức với cuộc sống",
       "lessonLocator": "Bài 25: Phép cộng và phép trừ phân số",
-      "pageNumber": "32-34",
+      "printedPage": "32-34",
+      "viewerPage": "33-35",
+      "locatorStatus": "UNVERIFIED",
       "citationText": "SGV Toán 6 Tập 2, tr. 32-34 (Tiến trình hướng dẫn học sinh tìm BCNN để quy đồng)"
     }
   ],

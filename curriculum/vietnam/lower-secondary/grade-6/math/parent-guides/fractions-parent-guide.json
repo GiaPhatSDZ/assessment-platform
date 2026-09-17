@@ -54,27 +54,32 @@
         "tier": "TIER_A_CURRICULUM_AUTHORITY",
         "documentNumber": "32/2018/TT-BGDĐT",
         "sectionLocator": "Mục V - Chương trình môn Toán lớp 6",
-        "pageNumber": 50
+        "printedPage": 50,
+        "locatorStatus": "UNVERIFIED"
       },
       {
         "sourceId": "SRC-NXBGD-KNTT-MATH6-SGV-T2",
-        "tier": "TIER_B_APPROVED_LEARNING_SOURCE",
+        "tier": "TIER_B2_NXBGD_PUBLISHER_RESOURCE",
         "bookSeries": "Kết nối tri thức với cuộc sống",
         "lessonLocator": "Bài 25: Phép cộng và phép trừ phân số",
-        "pageNumber": "32-33",
+        "printedPage": "32-33",
+        "viewerPage": "33-34",
+        "locatorStatus": "UNVERIFIED",
         "citationText": "SGV Toán 6 Tập 2, tr. 32-33 (Lưu ý sư phạm về ngộ nhận cộng tử với tử, mẫu với mẫu)"
       },
       {
         "sourceId": "SRC-NXBGD-KNTT-MATH6-TRAIN-DOC",
-        "tier": "TIER_B_PEDAGOGICAL_SOURCE",
+        "tier": "TIER_B3_PEDAGOGICAL_TRAINING_RESOURCE",
         "bookSeries": "Kết nối tri thức với cuộc sống",
         "sectionLocator": "Mục 2.3 — Phương pháp hình thành quy tắc cộng trừ phân số",
+        "locatorStatus": "UNVERIFIED",
         "citationText": "Tài liệu tập huấn giáo viên Toán 6 NXBGD (Gợi ý trực quan hóa và câu hỏi phát vấn)"
       },
       {
         "sourceId": "SRC-NXBGD-KNTT-MATH6-TRAIN-SLIDES-ARITHMETIC",
-        "tier": "TIER_B_PEDAGOGICAL_SOURCE",
+        "tier": "TIER_B3_PEDAGOGICAL_TRAINING_RESOURCE",
         "sectionLocator": "Phần 2: Số học — Chuyên đề Phân số",
+        "locatorStatus": "UNVERIFIED",
         "citationText": "Slide bồi dưỡng giáo viên NXBGD (Mô hình sư phạm giải thích bản chất mẫu số chung)"
       }
     ],

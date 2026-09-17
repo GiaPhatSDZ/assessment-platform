@@ -2,16 +2,21 @@
   "manifestVersion": "1.0.0",
   "subjectId": "math",
   "gradeOrAgeBand": "grade-6",
-  "publishedAt": "2026-09-17T00:00:00Z",
-  "publishedBy": "PENDING_HUMAN_CONTROLLER_AUDIT",
+  "manifestCreatedAt": "2026-09-17T23:20:00.000Z",
+  "reviewStatus": "PENDING_HUMAN_CONTROLLER_AUDIT",
+  "publishedAt": null,
+  "publishedBy": null,
   "publicationScope": "DRAFT",
   "sourceDocumentIds": [
     "SRC-VN-MOET-GEP-2018",
     "SRC-VN-MOET-MATH-2018",
+    "SRC-VN-MOET-AMEND-20-2021",
+    "SRC-VN-MOET-AMEND-13-2022",
+    "SRC-VN-MOET-VBHN-10-2022",
     "SRC-NXBGD-KNTT-MATH6-T1",
     "SRC-NXBGD-KNTT-MATH6-T2",
     "SRC-NXBGD-KNTT-MATH6-SGV-T2",
-    "SRC-NXBGD-KNTT-MATH6-SBT-T2",
+    "SRC-NXBGD-KNTT-MATH6-VBT-T2",
     "SRC-NXBGD-KNTT-MATH6-TRAIN-DOC",
     "SRC-NXBGD-KNTT-MATH6-TRAIN-SLIDES-ARITHMETIC"
   ],
@@ -19,5 +24,5 @@
   "knowledgeNodeCount": 4,
   "lessonCount": 1,
   "questionItemCount": 6,
-  "checksum": "a6efa5d023b64755ac7fd37354775000bbcf945cf5b74a8d76c1abd76c3b06eb"
+  "checksum": "ad94786874a62dee223db37a53a04e3e372ec3784b03ddf9c7dd228d5046e839"
 }
