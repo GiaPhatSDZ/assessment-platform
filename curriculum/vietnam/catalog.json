@@ -1,0 +1,956 @@
+{
+  "version": "1.0.0",
+  "jurisdiction": "VN",
+  "status": "STRUCTURAL_CATALOG",
+  "preschool": {
+    "scope": [
+      "mau-giao-3-4",
+      "mau-giao-4-5",
+      "mau-giao-5-6"
+    ],
+    "releases": [
+      {
+        "id": "current-national",
+        "status": "CURRENT_NATIONAL",
+        "domains": "SOURCE_REQUIRED_BEFORE_POPULATION"
+      },
+      {
+        "id": "pilot",
+        "status": "PILOT",
+        "domains": "SOURCE_REQUIRED_BEFORE_POPULATION"
+      }
+    ]
+  },
+  "grades": [
+    {
+      "grade": 1,
+      "mandatory": [
+        {
+          "id": "vietnamese",
+          "name_vi": "Tiếng Việt",
+          "kind": "mandatory"
+        },
+        {
+          "id": "math",
+          "name_vi": "Toán",
+          "kind": "mandatory"
+        },
+        {
+          "id": "ethics",
+          "name_vi": "Đạo đức",
+          "kind": "mandatory"
+        },
+        {
+          "id": "nature_society",
+          "name_vi": "Tự nhiên và Xã hội",
+          "kind": "mandatory"
+        },
+        {
+          "id": "physical_education",
+          "name_vi": "Giáo dục thể chất",
+          "kind": "mandatory"
+        },
+        {
+          "id": "arts",
+          "name_vi": "Nghệ thuật (Âm nhạc, Mĩ thuật)",
+          "kind": "mandatory"
+        },
+        {
+          "id": "experiential",
+          "name_vi": "Hoạt động trải nghiệm",
+          "kind": "mandatory"
+        }
+      ],
+      "optional": [
+        {
+          "id": "ethnic_minority_language",
+          "name_vi": "Tiếng dân tộc thiểu số",
+          "kind": "optional"
+        },
+        {
+          "id": "foreign_language_1",
+          "name_vi": "Ngoại ngữ 1",
+          "kind": "optional"
+        }
+      ]
+    },
+    {
+      "grade": 2,
+      "mandatory": [
+        {
+          "id": "vietnamese",
+          "name_vi": "Tiếng Việt",
+          "kind": "mandatory"
+        },
+        {
+          "id": "math",
+          "name_vi": "Toán",
+          "kind": "mandatory"
+        },
+        {
+          "id": "ethics",
+          "name_vi": "Đạo đức",
+          "kind": "mandatory"
+        },
+        {
+          "id": "nature_society",
+          "name_vi": "Tự nhiên và Xã hội",
+          "kind": "mandatory"
+        },
+        {
+          "id": "physical_education",
+          "name_vi": "Giáo dục thể chất",
+          "kind": "mandatory"
+        },
+        {
+          "id": "arts",
+          "name_vi": "Nghệ thuật (Âm nhạc, Mĩ thuật)",
+          "kind": "mandatory"
+        },
+        {
+          "id": "experiential",
+          "name_vi": "Hoạt động trải nghiệm",
+          "kind": "mandatory"
+        }
+      ],
+      "optional": [
+        {
+          "id": "ethnic_minority_language",
+          "name_vi": "Tiếng dân tộc thiểu số",
+          "kind": "optional"
+        },
+        {
+          "id": "foreign_language_1",
+          "name_vi": "Ngoại ngữ 1",
+          "kind": "optional"
+        }
+      ]
+    },
+    {
+      "grade": 3,
+      "mandatory": [
+        {
+          "id": "vietnamese",
+          "name_vi": "Tiếng Việt",
+          "kind": "mandatory"
+        },
+        {
+          "id": "math",
+          "name_vi": "Toán",
+          "kind": "mandatory"
+        },
+        {
+          "id": "foreign_language_1",
+          "name_vi": "Ngoại ngữ 1",
+          "kind": "mandatory"
+        },
+        {
+          "id": "ethics",
+          "name_vi": "Đạo đức",
+          "kind": "mandatory"
+        },
+        {
+          "id": "nature_society",
+          "name_vi": "Tự nhiên và Xã hội",
+          "kind": "mandatory"
+        },
+        {
+          "id": "informatics_technology",
+          "name_vi": "Tin học và Công nghệ",
+          "kind": "mandatory"
+        },
+        {
+          "id": "physical_education",
+          "name_vi": "Giáo dục thể chất",
+          "kind": "mandatory"
+        },
+        {
+          "id": "arts",
+          "name_vi": "Nghệ thuật (Âm nhạc, Mĩ thuật)",
+          "kind": "mandatory"
+        },
+        {
+          "id": "experiential",
+          "name_vi": "Hoạt động trải nghiệm",
+          "kind": "mandatory"
+        }
+      ],
+      "optional": [
+        {
+          "id": "ethnic_minority_language",
+          "name_vi": "Tiếng dân tộc thiểu số",
+          "kind": "optional"
+        }
+      ]
+    },
+    {
+      "grade": 4,
+      "mandatory": [
+        {
+          "id": "vietnamese",
+          "name_vi": "Tiếng Việt",
+          "kind": "mandatory"
+        },
+        {
+          "id": "math",
+          "name_vi": "Toán",
+          "kind": "mandatory"
+        },
+        {
+          "id": "foreign_language_1",
+          "name_vi": "Ngoại ngữ 1",
+          "kind": "mandatory"
+        },
+        {
+          "id": "ethics",
+          "name_vi": "Đạo đức",
+          "kind": "mandatory"
+        },
+        {
+          "id": "history_geography",
+          "name_vi": "Lịch sử và Địa lí",
+          "kind": "mandatory"
+        },
+        {
+          "id": "science",
+          "name_vi": "Khoa học",
+          "kind": "mandatory"
+        },
+        {
+          "id": "informatics_technology",
+          "name_vi": "Tin học và Công nghệ",
+          "kind": "mandatory"
+        },
+        {
+          "id": "physical_education",
+          "name_vi": "Giáo dục thể chất",
+          "kind": "mandatory"
+        },
+        {
+          "id": "arts",
+          "name_vi": "Nghệ thuật (Âm nhạc, Mĩ thuật)",
+          "kind": "mandatory"
+        },
+        {
+          "id": "experiential",
+          "name_vi": "Hoạt động trải nghiệm",
+          "kind": "mandatory"
+        }
+      ],
+      "optional": [
+        {
+          "id": "ethnic_minority_language",
+          "name_vi": "Tiếng dân tộc thiểu số",
+          "kind": "optional"
+        }
+      ]
+    },
+    {
+      "grade": 5,
+      "mandatory": [
+        {
+          "id": "vietnamese",
+          "name_vi": "Tiếng Việt",
+          "kind": "mandatory"
+        },
+        {
+          "id": "math",
+          "name_vi": "Toán",
+          "kind": "mandatory"
+        },
+        {
+          "id": "foreign_language_1",
+          "name_vi": "Ngoại ngữ 1",
+          "kind": "mandatory"
+        },
+        {
+          "id": "ethics",
+          "name_vi": "Đạo đức",
+          "kind": "mandatory"
+        },
+        {
+          "id": "history_geography",
+          "name_vi": "Lịch sử và Địa lí",
+          "kind": "mandatory"
+        },
+        {
+          "id": "science",
+          "name_vi": "Khoa học",
+          "kind": "mandatory"
+        },
+        {
+          "id": "informatics_technology",
+          "name_vi": "Tin học và Công nghệ",
+          "kind": "mandatory"
+        },
+        {
+          "id": "physical_education",
+          "name_vi": "Giáo dục thể chất",
+          "kind": "mandatory"
+        },
+        {
+          "id": "arts",
+          "name_vi": "Nghệ thuật (Âm nhạc, Mĩ thuật)",
+          "kind": "mandatory"
+        },
+        {
+          "id": "experiential",
+          "name_vi": "Hoạt động trải nghiệm",
+          "kind": "mandatory"
+        }
+      ],
+      "optional": [
+        {
+          "id": "ethnic_minority_language",
+          "name_vi": "Tiếng dân tộc thiểu số",
+          "kind": "optional"
+        }
+      ]
+    },
+    {
+      "grade": 6,
+      "mandatory": [
+        {
+          "id": "literature",
+          "name_vi": "Ngữ văn",
+          "kind": "mandatory"
+        },
+        {
+          "id": "math",
+          "name_vi": "Toán",
+          "kind": "mandatory"
+        },
+        {
+          "id": "foreign_language_1",
+          "name_vi": "Ngoại ngữ 1",
+          "kind": "mandatory"
+        },
+        {
+          "id": "civic_education",
+          "name_vi": "Giáo dục công dân",
+          "kind": "mandatory"
+        },
+        {
+          "id": "history_geography",
+          "name_vi": "Lịch sử và Địa lí",
+          "kind": "mandatory"
+        },
+        {
+          "id": "natural_science",
+          "name_vi": "Khoa học tự nhiên",
+          "kind": "mandatory"
+        },
+        {
+          "id": "technology",
+          "name_vi": "Công nghệ",
+          "kind": "mandatory"
+        },
+        {
+          "id": "informatics",
+          "name_vi": "Tin học",
+          "kind": "mandatory"
+        },
+        {
+          "id": "physical_education",
+          "name_vi": "Giáo dục thể chất",
+          "kind": "mandatory"
+        },
+        {
+          "id": "arts",
+          "name_vi": "Nghệ thuật (Âm nhạc, Mĩ thuật)",
+          "kind": "mandatory"
+        },
+        {
+          "id": "experiential_career",
+          "name_vi": "Hoạt động trải nghiệm, hướng nghiệp",
+          "kind": "mandatory"
+        },
+        {
+          "id": "local_education",
+          "name_vi": "Nội dung giáo dục của địa phương",
+          "kind": "mandatory"
+        }
+      ],
+      "optional": [
+        {
+          "id": "ethnic_minority_language",
+          "name_vi": "Tiếng dân tộc thiểu số",
+          "kind": "optional"
+        },
+        {
+          "id": "foreign_language_2",
+          "name_vi": "Ngoại ngữ 2",
+          "kind": "optional"
+        }
+      ]
+    },
+    {
+      "grade": 7,
+      "mandatory": [
+        {
+          "id": "literature",
+          "name_vi": "Ngữ văn",
+          "kind": "mandatory"
+        },
+        {
+          "id": "math",
+          "name_vi": "Toán",
+          "kind": "mandatory"
+        },
+        {
+          "id": "foreign_language_1",
+          "name_vi": "Ngoại ngữ 1",
+          "kind": "mandatory"
+        },
+        {
+          "id": "civic_education",
+          "name_vi": "Giáo dục công dân",
+          "kind": "mandatory"
+        },
+        {
+          "id": "history_geography",
+          "name_vi": "Lịch sử và Địa lí",
+          "kind": "mandatory"
+        },
+        {
+          "id": "natural_science",
+          "name_vi": "Khoa học tự nhiên",
+          "kind": "mandatory"
+        },
+        {
+          "id": "technology",
+          "name_vi": "Công nghệ",
+          "kind": "mandatory"
+        },
+        {
+          "id": "informatics",
+          "name_vi": "Tin học",
+          "kind": "mandatory"
+        },
+        {
+          "id": "physical_education",
+          "name_vi": "Giáo dục thể chất",
+          "kind": "mandatory"
+        },
+        {
+          "id": "arts",
+          "name_vi": "Nghệ thuật (Âm nhạc, Mĩ thuật)",
+          "kind": "mandatory"
+        },
+        {
+          "id": "experiential_career",
+          "name_vi": "Hoạt động trải nghiệm, hướng nghiệp",
+          "kind": "mandatory"
+        },
+        {
+          "id": "local_education",
+          "name_vi": "Nội dung giáo dục của địa phương",
+          "kind": "mandatory"
+        }
+      ],
+      "optional": [
+        {
+          "id": "ethnic_minority_language",
+          "name_vi": "Tiếng dân tộc thiểu số",
+          "kind": "optional"
+        },
+        {
+          "id": "foreign_language_2",
+          "name_vi": "Ngoại ngữ 2",
+          "kind": "optional"
+        }
+      ]
+    },
+    {
+      "grade": 8,
+      "mandatory": [
+        {
+          "id": "literature",
+          "name_vi": "Ngữ văn",
+          "kind": "mandatory"
+        },
+        {
+          "id": "math",
+          "name_vi": "Toán",
+          "kind": "mandatory"
+        },
+        {
+          "id": "foreign_language_1",
+          "name_vi": "Ngoại ngữ 1",
+          "kind": "mandatory"
+        },
+        {
+          "id": "civic_education",
+          "name_vi": "Giáo dục công dân",
+          "kind": "mandatory"
+        },
+        {
+          "id": "history_geography",
+          "name_vi": "Lịch sử và Địa lí",
+          "kind": "mandatory"
+        },
+        {
+          "id": "natural_science",
+          "name_vi": "Khoa học tự nhiên",
+          "kind": "mandatory"
+        },
+        {
+          "id": "technology",
+          "name_vi": "Công nghệ",
+          "kind": "mandatory"
+        },
+        {
+          "id": "informatics",
+          "name_vi": "Tin học",
+          "kind": "mandatory"
+        },
+        {
+          "id": "physical_education",
+          "name_vi": "Giáo dục thể chất",
+          "kind": "mandatory"
+        },
+        {
+          "id": "arts",
+          "name_vi": "Nghệ thuật (Âm nhạc, Mĩ thuật)",
+          "kind": "mandatory"
+        },
+        {
+          "id": "experiential_career",
+          "name_vi": "Hoạt động trải nghiệm, hướng nghiệp",
+          "kind": "mandatory"
+        },
+        {
+          "id": "local_education",
+          "name_vi": "Nội dung giáo dục của địa phương",
+          "kind": "mandatory"
+        }
+      ],
+      "optional": [
+        {
+          "id": "ethnic_minority_language",
+          "name_vi": "Tiếng dân tộc thiểu số",
+          "kind": "optional"
+        },
+        {
+          "id": "foreign_language_2",
+          "name_vi": "Ngoại ngữ 2",
+          "kind": "optional"
+        }
+      ]
+    },
+    {
+      "grade": 9,
+      "mandatory": [
+        {
+          "id": "literature",
+          "name_vi": "Ngữ văn",
+          "kind": "mandatory"
+        },
+        {
+          "id": "math",
+          "name_vi": "Toán",
+          "kind": "mandatory"
+        },
+        {
+          "id": "foreign_language_1",
+          "name_vi": "Ngoại ngữ 1",
+          "kind": "mandatory"
+        },
+        {
+          "id": "civic_education",
+          "name_vi": "Giáo dục công dân",
+          "kind": "mandatory"
+        },
+        {
+          "id": "history_geography",
+          "name_vi": "Lịch sử và Địa lí",
+          "kind": "mandatory"
+        },
+        {
+          "id": "natural_science",
+          "name_vi": "Khoa học tự nhiên",
+          "kind": "mandatory"
+        },
+        {
+          "id": "technology",
+          "name_vi": "Công nghệ",
+          "kind": "mandatory"
+        },
+        {
+          "id": "informatics",
+          "name_vi": "Tin học",
+          "kind": "mandatory"
+        },
+        {
+          "id": "physical_education",
+          "name_vi": "Giáo dục thể chất",
+          "kind": "mandatory"
+        },
+        {
+          "id": "arts",
+          "name_vi": "Nghệ thuật (Âm nhạc, Mĩ thuật)",
+          "kind": "mandatory"
+        },
+        {
+          "id": "experiential_career",
+          "name_vi": "Hoạt động trải nghiệm, hướng nghiệp",
+          "kind": "mandatory"
+        },
+        {
+          "id": "local_education",
+          "name_vi": "Nội dung giáo dục của địa phương",
+          "kind": "mandatory"
+        }
+      ],
+      "optional": [
+        {
+          "id": "ethnic_minority_language",
+          "name_vi": "Tiếng dân tộc thiểu số",
+          "kind": "optional"
+        },
+        {
+          "id": "foreign_language_2",
+          "name_vi": "Ngoại ngữ 2",
+          "kind": "optional"
+        }
+      ]
+    },
+    {
+      "grade": 10,
+      "mandatory": [
+        {
+          "id": "literature",
+          "name_vi": "Ngữ văn",
+          "kind": "mandatory"
+        },
+        {
+          "id": "math",
+          "name_vi": "Toán",
+          "kind": "mandatory"
+        },
+        {
+          "id": "foreign_language_1",
+          "name_vi": "Ngoại ngữ 1",
+          "kind": "mandatory"
+        },
+        {
+          "id": "history",
+          "name_vi": "Lịch sử",
+          "kind": "mandatory"
+        },
+        {
+          "id": "physical_education",
+          "name_vi": "Giáo dục thể chất",
+          "kind": "mandatory"
+        },
+        {
+          "id": "national_defense_security",
+          "name_vi": "Giáo dục quốc phòng và an ninh",
+          "kind": "mandatory"
+        },
+        {
+          "id": "experiential_career",
+          "name_vi": "Hoạt động trải nghiệm, hướng nghiệp",
+          "kind": "mandatory"
+        },
+        {
+          "id": "local_education",
+          "name_vi": "Nội dung giáo dục của địa phương",
+          "kind": "mandatory"
+        }
+      ],
+      "electives": [
+        {
+          "id": "geography",
+          "name_vi": "Địa lí",
+          "kind": "elective"
+        },
+        {
+          "id": "economic_legal_education",
+          "name_vi": "Giáo dục kinh tế và pháp luật",
+          "kind": "elective"
+        },
+        {
+          "id": "physics",
+          "name_vi": "Vật lí",
+          "kind": "elective"
+        },
+        {
+          "id": "chemistry",
+          "name_vi": "Hóa học",
+          "kind": "elective"
+        },
+        {
+          "id": "biology",
+          "name_vi": "Sinh học",
+          "kind": "elective"
+        },
+        {
+          "id": "technology",
+          "name_vi": "Công nghệ",
+          "kind": "elective"
+        },
+        {
+          "id": "informatics",
+          "name_vi": "Tin học",
+          "kind": "elective"
+        },
+        {
+          "id": "music",
+          "name_vi": "Âm nhạc",
+          "kind": "elective"
+        },
+        {
+          "id": "fine_arts",
+          "name_vi": "Mĩ thuật",
+          "kind": "elective"
+        }
+      ],
+      "elective_rule": {
+        "choose": 4,
+        "from": 9
+      },
+      "optional": [
+        {
+          "id": "ethnic_minority_language",
+          "name_vi": "Tiếng dân tộc thiểu số",
+          "kind": "optional"
+        },
+        {
+          "id": "foreign_language_2",
+          "name_vi": "Ngoại ngữ 2",
+          "kind": "optional"
+        }
+      ],
+      "specialized_topic_clusters": {
+        "choose": 3,
+        "note": "Store actual school/student selections; source/version required."
+      }
+    },
+    {
+      "grade": 11,
+      "mandatory": [
+        {
+          "id": "literature",
+          "name_vi": "Ngữ văn",
+          "kind": "mandatory"
+        },
+        {
+          "id": "math",
+          "name_vi": "Toán",
+          "kind": "mandatory"
+        },
+        {
+          "id": "foreign_language_1",
+          "name_vi": "Ngoại ngữ 1",
+          "kind": "mandatory"
+        },
+        {
+          "id": "history",
+          "name_vi": "Lịch sử",
+          "kind": "mandatory"
+        },
+        {
+          "id": "physical_education",
+          "name_vi": "Giáo dục thể chất",
+          "kind": "mandatory"
+        },
+        {
+          "id": "national_defense_security",
+          "name_vi": "Giáo dục quốc phòng và an ninh",
+          "kind": "mandatory"
+        },
+        {
+          "id": "experiential_career",
+          "name_vi": "Hoạt động trải nghiệm, hướng nghiệp",
+          "kind": "mandatory"
+        },
+        {
+          "id": "local_education",
+          "name_vi": "Nội dung giáo dục của địa phương",
+          "kind": "mandatory"
+        }
+      ],
+      "electives": [
+        {
+          "id": "geography",
+          "name_vi": "Địa lí",
+          "kind": "elective"
+        },
+        {
+          "id": "economic_legal_education",
+          "name_vi": "Giáo dục kinh tế và pháp luật",
+          "kind": "elective"
+        },
+        {
+          "id": "physics",
+          "name_vi": "Vật lí",
+          "kind": "elective"
+        },
+        {
+          "id": "chemistry",
+          "name_vi": "Hóa học",
+          "kind": "elective"
+        },
+        {
+          "id": "biology",
+          "name_vi": "Sinh học",
+          "kind": "elective"
+        },
+        {
+          "id": "technology",
+          "name_vi": "Công nghệ",
+          "kind": "elective"
+        },
+        {
+          "id": "informatics",
+          "name_vi": "Tin học",
+          "kind": "elective"
+        },
+        {
+          "id": "music",
+          "name_vi": "Âm nhạc",
+          "kind": "elective"
+        },
+        {
+          "id": "fine_arts",
+          "name_vi": "Mĩ thuật",
+          "kind": "elective"
+        }
+      ],
+      "elective_rule": {
+        "choose": 4,
+        "from": 9
+      },
+      "optional": [
+        {
+          "id": "ethnic_minority_language",
+          "name_vi": "Tiếng dân tộc thiểu số",
+          "kind": "optional"
+        },
+        {
+          "id": "foreign_language_2",
+          "name_vi": "Ngoại ngữ 2",
+          "kind": "optional"
+        }
+      ],
+      "specialized_topic_clusters": {
+        "choose": 3,
+        "note": "Store actual school/student selections; source/version required."
+      }
+    },
+    {
+      "grade": 12,
+      "mandatory": [
+        {
+          "id": "literature",
+          "name_vi": "Ngữ văn",
+          "kind": "mandatory"
+        },
+        {
+          "id": "math",
+          "name_vi": "Toán",
+          "kind": "mandatory"
+        },
+        {
+          "id": "foreign_language_1",
+          "name_vi": "Ngoại ngữ 1",
+          "kind": "mandatory"
+        },
+        {
+          "id": "history",
+          "name_vi": "Lịch sử",
+          "kind": "mandatory"
+        },
+        {
+          "id": "physical_education",
+          "name_vi": "Giáo dục thể chất",
+          "kind": "mandatory"
+        },
+        {
+          "id": "national_defense_security",
+          "name_vi": "Giáo dục quốc phòng và an ninh",
+          "kind": "mandatory"
+        },
+        {
+          "id": "experiential_career",
+          "name_vi": "Hoạt động trải nghiệm, hướng nghiệp",
+          "kind": "mandatory"
+        },
+        {
+          "id": "local_education",
+          "name_vi": "Nội dung giáo dục của địa phương",
+          "kind": "mandatory"
+        }
+      ],
+      "electives": [
+        {
+          "id": "geography",
+          "name_vi": "Địa lí",
+          "kind": "elective"
+        },
+        {
+          "id": "economic_legal_education",
+          "name_vi": "Giáo dục kinh tế và pháp luật",
+          "kind": "elective"
+        },
+        {
+          "id": "physics",
+          "name_vi": "Vật lí",
+          "kind": "elective"
+        },
+        {
+          "id": "chemistry",
+          "name_vi": "Hóa học",
+          "kind": "elective"
+        },
+        {
+          "id": "biology",
+          "name_vi": "Sinh học",
+          "kind": "elective"
+        },
+        {
+          "id": "technology",
+          "name_vi": "Công nghệ",
+          "kind": "elective"
+        },
+        {
+          "id": "informatics",
+          "name_vi": "Tin học",
+          "kind": "elective"
+        },
+        {
+          "id": "music",
+          "name_vi": "Âm nhạc",
+          "kind": "elective"
+        },
+        {
+          "id": "fine_arts",
+          "name_vi": "Mĩ thuật",
+          "kind": "elective"
+        }
+      ],
+      "elective_rule": {
+        "choose": 4,
+        "from": 9
+      },
+      "optional": [
+        {
+          "id": "ethnic_minority_language",
+          "name_vi": "Tiếng dân tộc thiểu số",
+          "kind": "optional"
+        },
+        {
+          "id": "foreign_language_2",
+          "name_vi": "Ngoại ngữ 2",
+          "kind": "optional"
+        }
+      ],
+      "specialized_topic_clusters": {
+        "choose": 3,
+        "note": "Store actual school/student selections; source/version required."
+      }
+    }
+  ],
+  "coverage_note": "Catalog presence does not imply content completion."
+}

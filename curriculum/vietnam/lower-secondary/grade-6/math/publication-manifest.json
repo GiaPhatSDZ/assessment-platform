@@ -1,0 +1,16 @@
+{
+  "manifestVersion": "1.0.0",
+  "subjectId": "math",
+  "gradeOrAgeBand": "grade-6",
+  "publishedAt": "2026-09-17T00:00:00Z",
+  "publishedBy": "AI_SCHOOL_EDITORIAL_BOARD",
+  "publicationScope": "BETA",
+  "sourceDocumentIds": [
+    "SRC-VN-MOET-MATH-2018"
+  ],
+  "learningOutcomeCount": 2,
+  "knowledgeNodeCount": 4,
+  "lessonCount": 1,
+  "questionItemCount": 6,
+  "checksum": "sha256-g6-math-fractions-vertical-slice-v1"
+}

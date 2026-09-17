@@ -1,0 +1,71 @@
+{
+  "id": "LESSON-MATH-6-FRAC-01",
+  "nodeIds": ["NODE-MATH-6-FRAC-03", "NODE-MATH-5-FRAC-02"],
+  "title": "Phép cộng hai phân số khác mẫu số",
+  "version": "1.0.0",
+  "learnerText": [
+    {
+      "type": "text",
+      "value": "Để cộng hai phân số có mẫu số khác nhau, ta không thể cộng ngay các tử số với nhau. Bước đầu tiên và quan trọng nhất là quy đồng mẫu số để đưa hai phân số về cùng một mẫu số chung."
+    },
+    {
+      "type": "block_math",
+      "latex": "\\frac{a}{m} + \\frac{b}{m} = \\frac{a+b}{m}",
+      "spokenText": "Phân số a phần m cộng phân số b phần m bằng phân số a cộng b tất cả trên m."
+    },
+    {
+      "type": "text",
+      "value": "Quy tắc 3 bước thực hiện: Bước 1: Tìm mẫu số chung (thường là BCNN của các mẫu số). Bước 2: Tìm thừa số phụ và quy đồng từng phân số. Bước 3: Cộng các tử số với nhau và giữ nguyên mẫu số chung, sau đó rút gọn về phân số tối giản nếu có thể."
+    }
+  ],
+  "workedExamples": [
+    {
+      "prompt": [
+        {
+          "type": "text",
+          "value": "Tính giá trị của biểu thức sau:"
+        },
+        {
+          "type": "block_math",
+          "latex": "\\frac{3}{8} + \\frac{5}{12}",
+          "spokenText": "ba phần tám cộng năm phần mười hai"
+        }
+      ],
+      "steps": [
+        {
+          "type": "text",
+          "value": "Bước 1: Tìm mẫu số chung. Ta có BCNN(8, 12) = 24."
+        },
+        {
+          "type": "text",
+          "value": "Bước 2: Tìm thừa số phụ: 24 : 8 = 3 và 24 : 12 = 2. Quy đồng:"
+        },
+        {
+          "type": "block_math",
+          "latex": "\\frac{3}{8} = \\frac{3 \\times 3}{8 \\times 3} = \\frac{9}{24}, \\quad \\frac{5}{12} = \\frac{5 \\times 2}{12 \\times 2} = \\frac{10}{24}",
+          "spokenText": "ba phần tám bằng chín phần hai mươi tư, năm phần mười hai bằng mười phần hai mươi tư"
+        },
+        {
+          "type": "text",
+          "value": "Bước 3: Thực hiện phép cộng các tử số:"
+        },
+        {
+          "type": "block_math",
+          "latex": "\\frac{9}{24} + \\frac{10}{24} = \\frac{9 + 10}{24} = \\frac{19}{24}",
+          "spokenText": "chín phần hai mươi tư cộng mười phần hai mươi tư bằng mười chín phần hai mươi tư"
+        }
+      ],
+      "finalAnswer": "19/24"
+    }
+  ],
+  "approvedSourceRefs": [
+    {
+      "sourceId": "SRC-VN-MOET-MATH-2018",
+      "documentNumber": "32/2018/TT-BGDĐT",
+      "citationText": "SGK Toán 6 Tập 2 — Chương Phân số"
+    }
+  ],
+  "ageOrGradeFit": ["6"],
+  "reviewState": "INTERNAL_REVIEWED",
+  "publicationState": "PUBLISHED_BETA"
+}

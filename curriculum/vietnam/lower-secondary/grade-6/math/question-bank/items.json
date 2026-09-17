@@ -1,0 +1,364 @@
+[
+  {
+    "id": "ITEM-G6-FRAC-01",
+    "primaryNodeId": "NODE-MATH-6-FRAC-03",
+    "supportingNodeIds": ["NODE-MATH-5-FRAC-02"],
+    "type": "MULTIPLE_CHOICE",
+    "cognitiveDemand": "APPLY",
+    "prompt": [
+      {
+        "type": "text",
+        "value": "Tính giá trị của phép tính sau:"
+      },
+      {
+        "type": "block_math",
+        "latex": "\\frac{3}{8} + \\frac{5}{12}",
+        "spokenText": "3 phần 8 cộng 5 phần 12"
+      }
+    ],
+    "options": [
+      {
+        "id": "opt-1",
+        "content": [{ "type": "inline_math", "latex": "\\frac{19}{24}", "spokenText": "19 phần 24" }],
+        "isCorrect": true
+      },
+      {
+        "id": "opt-2",
+        "content": [{ "type": "inline_math", "latex": "\\frac{8}{20}", "spokenText": "8 phần 20" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-ADD-DENOM"
+      },
+      {
+        "id": "opt-3",
+        "content": [{ "type": "inline_math", "latex": "\\frac{2}{5}", "spokenText": "2 phần 5" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-ADD-DENOM"
+      },
+      {
+        "id": "opt-4",
+        "content": [{ "type": "inline_math", "latex": "\\frac{11}{24}", "spokenText": "11 phần 24" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-EXPANSION"
+      }
+    ],
+    "correctAnswer": "opt-1",
+    "rationale": "Mẫu số chung nhỏ nhất của 8 và 12 là 24. Ta có 3/8 = 9/24 và 5/12 = 10/24. Tổng là 9/24 + 10/24 = 19/24.",
+    "distractorRationales": {
+      "opt-2": "Ngộ nhận cộng thẳng tử với tử (3+5=8) và mẫu với mẫu (8+12=20).",
+      "opt-3": "Ngộ nhận cộng thẳng tử với tử và mẫu với mẫu rồi rút gọn 8/20 = 2/5.",
+      "opt-4": "Lỗi sai thừa số phụ khi nhân tử số."
+    },
+    "misconceptionTags": ["MISCON-ADD-DENOM", "MISCON-EXPANSION"],
+    "sourceRefs": [
+      {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "documentNumber": "32/2018/TT-BGDĐT"
+      }
+    ],
+    "authoringOrigin": "HUMAN",
+    "itemMaturity": "REVIEWED",
+    "reviewState": "INTERNAL_REVIEWED",
+    "publicationState": "PUBLISHED_BETA",
+    "version": "1.0.0"
+  },
+  {
+    "id": "ITEM-G6-FRAC-02",
+    "primaryNodeId": "NODE-MATH-6-FRAC-03",
+    "supportingNodeIds": ["NODE-MATH-5-FRAC-02"],
+    "type": "MULTIPLE_CHOICE",
+    "cognitiveDemand": "UNDERSTAND",
+    "prompt": [
+      {
+        "type": "text",
+        "value": "Mẫu số chung nhỏ nhất của hai phân số 1/6 và 3/8 là bao nhiêu?"
+      }
+    ],
+    "options": [
+      {
+        "id": "opt-1",
+        "content": [{ "type": "text", "value": "24" }],
+        "isCorrect": true
+      },
+      {
+        "id": "opt-2",
+        "content": [{ "type": "text", "value": "48" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-COMMON-MULTIPLE"
+      },
+      {
+        "id": "opt-3",
+        "content": [{ "type": "text", "value": "14" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-ADD-DENOM"
+      },
+      {
+        "id": "opt-4",
+        "content": [{ "type": "text", "value": "2" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-GCD-INSTEAD-LCM"
+      }
+    ],
+    "correctAnswer": "opt-1",
+    "rationale": "BCNN(6, 8) = 24. 48 là mẫu số chung nhưng chưa phải nhỏ nhất.",
+    "distractorRationales": {
+      "opt-2": "Lấy tích 6 x 8 = 48 (chưa tối ưu mẫu số chung nhỏ nhất).",
+      "opt-3": "Cộng hai mẫu số 6 + 8 = 14.",
+      "opt-4": "Nhầm ƯCLN là 2 thay vì BCNN."
+    },
+    "misconceptionTags": ["MISCON-COMMON-MULTIPLE", "MISCON-ADD-DENOM"],
+    "sourceRefs": [
+      {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "documentNumber": "32/2018/TT-BGDĐT"
+      }
+    ],
+    "authoringOrigin": "HUMAN",
+    "itemMaturity": "REVIEWED",
+    "reviewState": "INTERNAL_REVIEWED",
+    "publicationState": "PUBLISHED_BETA",
+    "version": "1.0.0"
+  },
+  {
+    "id": "ITEM-G6-FRAC-03",
+    "primaryNodeId": "NODE-MATH-6-FRAC-03",
+    "supportingNodeIds": ["NODE-MATH-5-FRAC-02"],
+    "type": "MULTIPLE_CHOICE",
+    "cognitiveDemand": "APPLY",
+    "prompt": [
+      {
+        "type": "text",
+        "value": "Tính giá trị của biểu thức sau:"
+      },
+      {
+        "type": "block_math",
+        "latex": "\\frac{1}{4} + \\frac{2}{3}",
+        "spokenText": "1 phần 4 cộng 2 phần 3"
+      }
+    ],
+    "options": [
+      {
+        "id": "opt-1",
+        "content": [{ "type": "inline_math", "latex": "\\frac{11}{12}", "spokenText": "11 phần 12" }],
+        "isCorrect": true
+      },
+      {
+        "id": "opt-2",
+        "content": [{ "type": "inline_math", "latex": "\\frac{3}{7}", "spokenText": "3 phần 7" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-ADD-DENOM"
+      },
+      {
+        "id": "opt-3",
+        "content": [{ "type": "inline_math", "latex": "\\frac{5}{12}", "spokenText": "5 phần 12" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-EXPANSION"
+      },
+      {
+        "id": "opt-4",
+        "content": [{ "type": "inline_math", "latex": "\\frac{7}{12}", "spokenText": "7 phần 12" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-EXPANSION"
+      }
+    ],
+    "correctAnswer": "opt-1",
+    "rationale": "Mẫu chung là 12. 1/4 = 3/12 và 2/3 = 8/12. Tổng là 3/12 + 8/12 = 11/12.",
+    "distractorRationales": {
+      "opt-2": "Cộng thẳng tử với tử (1+2=3) và mẫu với mẫu (4+3=7).",
+      "opt-3": "Sai sót trong bước nhân thừa số phụ.",
+      "opt-4": "Quên nhân thừa số phụ cho phân số thứ hai."
+    },
+    "misconceptionTags": ["MISCON-ADD-DENOM"],
+    "sourceRefs": [
+      {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "documentNumber": "32/2018/TT-BGDĐT"
+      }
+    ],
+    "authoringOrigin": "HUMAN",
+    "itemMaturity": "REVIEWED",
+    "reviewState": "INTERNAL_REVIEWED",
+    "publicationState": "PUBLISHED_BETA",
+    "version": "1.0.0"
+  },
+  {
+    "id": "ITEM-G6-FRAC-04",
+    "primaryNodeId": "NODE-MATH-6-FRAC-03",
+    "supportingNodeIds": ["NODE-MATH-5-FRAC-02"],
+    "type": "MULTIPLE_CHOICE",
+    "cognitiveDemand": "APPLY",
+    "prompt": [
+      {
+        "type": "text",
+        "value": "Tính giá trị của phép tính:"
+      },
+      {
+        "type": "block_math",
+        "latex": "\\frac{1}{6} + \\frac{3}{8}",
+        "spokenText": "1 phần 6 cộng 3 phần 8"
+      }
+    ],
+    "options": [
+      {
+        "id": "opt-1",
+        "content": [{ "type": "inline_math", "latex": "\\frac{13}{24}", "spokenText": "13 phần 24" }],
+        "isCorrect": true
+      },
+      {
+        "id": "opt-2",
+        "content": [{ "type": "inline_math", "latex": "\\frac{4}{14}", "spokenText": "4 phần 14" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-ADD-DENOM"
+      },
+      {
+        "id": "opt-3",
+        "content": [{ "type": "inline_math", "latex": "\\frac{2}{7}", "spokenText": "2 phần 7" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-ADD-DENOM"
+      },
+      {
+        "id": "opt-4",
+        "content": [{ "type": "inline_math", "latex": "\\frac{10}{24}", "spokenText": "10 phần 24" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-EXPANSION"
+      }
+    ],
+    "correctAnswer": "opt-1",
+    "rationale": "Mẫu chung là 24. 1/6 = 4/24 và 3/8 = 9/24. Tổng là 4/24 + 9/24 = 13/24.",
+    "distractorRationales": {
+      "opt-2": "Cộng thẳng tử và mẫu (1+3=4, 6+8=14).",
+      "opt-3": "Cộng thẳng rồi rút gọn 4/14 = 2/7.",
+      "opt-4": "Tính sai tử số."
+    },
+    "misconceptionTags": ["MISCON-ADD-DENOM"],
+    "sourceRefs": [
+      {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "documentNumber": "32/2018/TT-BGDĐT"
+      }
+    ],
+    "authoringOrigin": "HUMAN",
+    "itemMaturity": "REVIEWED",
+    "reviewState": "INTERNAL_REVIEWED",
+    "publicationState": "PUBLISHED_BETA",
+    "version": "1.0.0"
+  },
+  {
+    "id": "ITEM-G6-FRAC-05",
+    "primaryNodeId": "NODE-MATH-6-FRAC-04",
+    "supportingNodeIds": ["NODE-MATH-6-FRAC-03"],
+    "type": "MULTIPLE_CHOICE",
+    "cognitiveDemand": "TRANSFER",
+    "prompt": [
+      {
+        "type": "text",
+        "value": "Một bể nước có hai vòi cùng chảy vào. Trong một giờ, vòi thứ nhất chảy được 1/3 bể, vòi thứ hai chảy được 2/5 bể. Hỏi trong một giờ cả hai vòi chảy được bao nhiêu phần bể?"
+      }
+    ],
+    "options": [
+      {
+        "id": "opt-1",
+        "content": [{ "type": "inline_math", "latex": "\\frac{11}{15}", "spokenText": "11 phần 15" }],
+        "isCorrect": true
+      },
+      {
+        "id": "opt-2",
+        "content": [{ "type": "inline_math", "latex": "\\frac{3}{8}", "spokenText": "3 phần 8" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-ADD-DENOM"
+      },
+      {
+        "id": "opt-3",
+        "content": [{ "type": "inline_math", "latex": "\\frac{7}{15}", "spokenText": "7 phần 15" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-EXPANSION"
+      },
+      {
+        "id": "opt-4",
+        "content": [{ "type": "inline_math", "latex": "\\frac{2}{15}", "spokenText": "2 phần 15" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-OPERATOR-CONFUSION"
+      }
+    ],
+    "correctAnswer": "opt-1",
+    "rationale": "Cần tính 1/3 + 2/5. Mẫu chung là 15: 1/3 = 5/15 và 2/5 = 6/15. Tổng = 5/15 + 6/15 = 11/15 bể.",
+    "distractorRationales": {
+      "opt-2": "Cộng thẳng 1+2=3 và 3+5=8.",
+      "opt-3": "Sai trong bước nhân thừa số phụ.",
+      "opt-4": "Nhầm sang phép nhân phân số (1x2)/(3x5) = 2/15."
+    },
+    "misconceptionTags": ["MISCON-ADD-DENOM", "MISCON-OPERATOR-CONFUSION"],
+    "sourceRefs": [
+      {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "documentNumber": "32/2018/TT-BGDĐT"
+      }
+    ],
+    "authoringOrigin": "HUMAN",
+    "itemMaturity": "REVIEWED",
+    "reviewState": "INTERNAL_REVIEWED",
+    "publicationState": "PUBLISHED_BETA",
+    "version": "1.0.0"
+  },
+  {
+    "id": "ITEM-G6-FRAC-06",
+    "primaryNodeId": "NODE-MATH-6-FRAC-03",
+    "supportingNodeIds": ["NODE-MATH-5-FRAC-02"],
+    "type": "MULTIPLE_CHOICE",
+    "cognitiveDemand": "APPLY",
+    "prompt": [
+      {
+        "type": "text",
+        "value": "Tính giá trị của phép tính:"
+      },
+      {
+        "type": "block_math",
+        "latex": "\\frac{2}{5} + \\frac{1}{10}",
+        "spokenText": "2 phần 5 cộng 1 phần 10"
+      }
+    ],
+    "options": [
+      {
+        "id": "opt-1",
+        "content": [{ "type": "inline_math", "latex": "\\frac{1}{2}", "spokenText": "1 phần 2" }],
+        "isCorrect": true
+      },
+      {
+        "id": "opt-2",
+        "content": [{ "type": "inline_math", "latex": "\\frac{3}{15}", "spokenText": "3 phần 15" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-ADD-DENOM"
+      },
+      {
+        "id": "opt-3",
+        "content": [{ "type": "inline_math", "latex": "\\frac{5}{10}", "spokenText": "5 phần 10" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-NOT-SIMPLIFIED"
+      },
+      {
+        "id": "opt-4",
+        "content": [{ "type": "inline_math", "latex": "\\frac{3}{10}", "spokenText": "3 phần 10" }],
+        "isCorrect": false,
+        "misconceptionTag": "MISCON-EXPANSION"
+      }
+    ],
+    "correctAnswer": "opt-1",
+    "rationale": "Mẫu chung là 10. 2/5 = 4/10. Tổng = 4/10 + 1/10 = 5/10 = 1/2 (đã rút gọn tối giản).",
+    "distractorRationales": {
+      "opt-2": "Cộng thẳng tử và mẫu (2+1=3, 5+10=15).",
+      "opt-3": "Chưa rút gọn phân số về tối giản.",
+      "opt-4": "Quên nhân thừa số phụ của 2/5 (lấy 2+1=3 trên 10)."
+    },
+    "misconceptionTags": ["MISCON-ADD-DENOM"],
+    "sourceRefs": [
+      {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "documentNumber": "32/2018/TT-BGDĐT"
+      }
+    ],
+    "authoringOrigin": "HUMAN",
+    "itemMaturity": "REVIEWED",
+    "reviewState": "INTERNAL_REVIEWED",
+    "publicationState": "PUBLISHED_BETA",
+    "version": "1.0.0"
+  }
+]

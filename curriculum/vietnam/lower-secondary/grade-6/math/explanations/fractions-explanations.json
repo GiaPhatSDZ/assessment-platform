@@ -1,0 +1,96 @@
+[
+  {
+    "itemId": "ITEM-G6-FRAC-01",
+    "shortExplanation": [
+      {
+        "type": "text",
+        "value": "Muốn cộng hai phân số khác mẫu số, ta quy đồng mẫu số hai phân số rồi cộng các tử số và giữ nguyên mẫu số chung."
+      }
+    ],
+    "stepByStep": [
+      {
+        "type": "text",
+        "value": "Bước 1: Tìm mẫu số chung nhỏ nhất của 8 và 12. Ta có BCNN(8, 12) = 24."
+      },
+      {
+        "type": "text",
+        "value": "Bước 2: Tìm thừa số phụ: 24 : 8 = 3 và 24 : 12 = 2."
+      },
+      {
+        "type": "text",
+        "value": "Bước 3: Quy đồng mẫu số:"
+      },
+      {
+        "type": "block_math",
+        "latex": "\\frac{3}{8} = \\frac{3 \\times 3}{8 \\times 3} = \\frac{9}{24}",
+        "spokenText": "3 phần 8 bằng 9 phần 24"
+      },
+      {
+        "type": "block_math",
+        "latex": "\\frac{5}{12} = \\frac{5 \\times 2}{12 \\times 2} = \\frac{10}{24}",
+        "spokenText": "5 phần 12 bằng 10 phần 24"
+      },
+      {
+        "type": "text",
+        "value": "Bước 4: Cộng hai phân số cùng mẫu số:"
+      },
+      {
+        "type": "block_math",
+        "latex": "\\frac{9}{24} + \\frac{10}{24} = \\frac{9 + 10}{24} = \\frac{19}{24}",
+        "spokenText": "9 phần 24 cộng 10 phần 24 bằng 19 phần 24"
+      }
+    ],
+    "commonMistakeExplanation": [
+      {
+        "type": "text",
+        "value": "Sai lầm phổ biến: Cộng trực tiếp tử với tử và mẫu với mẫu (3+5)/(8+12) = 8/20. Đây là lỗi sai bản chất vì các phần phân số chưa có cùng kích thước đơn vị đo."
+      }
+    ],
+    "sourceRefs": [
+      {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "documentNumber": "32/2018/TT-BGDĐT",
+        "sectionLocator": "Mục V - Chương trình môn Toán lớp 6"
+      }
+    ],
+    "reviewState": "INTERNAL_REVIEWED",
+    "publicationState": "PUBLISHED_BETA"
+  },
+  {
+    "itemId": "ITEM-G6-FRAC-02",
+    "shortExplanation": [
+      {
+        "type": "text",
+        "value": "Mẫu số chung nhỏ nhất của hai phân số chính là Bội chung nhỏ nhất (BCNN) của hai mẫu số."
+      }
+    ],
+    "stepByStep": [
+      {
+        "type": "text",
+        "value": "Bước 1: Phân tích 6 và 8 ra thừa số nguyên tố: 6 = 2 × 3; 8 = 2³."
+      },
+      {
+        "type": "text",
+        "value": "Bước 2: BCNN(6, 8) = 2³ × 3 = 8 × 3 = 24."
+      },
+      {
+        "type": "text",
+        "value": "Vậy mẫu số chung nhỏ nhất cần tìm là 24."
+      }
+    ],
+    "commonMistakeExplanation": [
+      {
+        "type": "text",
+        "value": "Sai lầm: Lấy 6 × 8 = 48 làm mẫu chung. 48 là mẫu chung nhưng chưa phải nhỏ nhất, dẫn đến tính toán cồng kềnh."
+      }
+    ],
+    "sourceRefs": [
+      {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "documentNumber": "32/2018/TT-BGDĐT"
+      }
+    ],
+    "reviewState": "INTERNAL_REVIEWED",
+    "publicationState": "PUBLISHED_BETA"
+  }
+]

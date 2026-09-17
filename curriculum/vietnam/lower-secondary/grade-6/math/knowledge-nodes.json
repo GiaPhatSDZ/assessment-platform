@@ -1,0 +1,34 @@
+[
+  {
+    "id": "NODE-MATH-4-FRAC-01",
+    "learningOutcomeIds": ["LO-MATH-5-DENOM-01"],
+    "label": "Khái niệm phân số & rút gọn phân số",
+    "description": "Nhận biết phân số biểu diễn số phần bằng nhau của đơn vị; tìm ước chung lớn nhất để rút gọn phân số về tối giản.",
+    "type": "CONCEPT",
+    "reviewState": "INTERNAL_REVIEWED"
+  },
+  {
+    "id": "NODE-MATH-5-FRAC-02",
+    "learningOutcomeIds": ["LO-MATH-5-DENOM-01"],
+    "label": "Quy đồng mẫu số hai phân số",
+    "description": "Tìm mẫu số chung (thông qua bội chung nhỏ nhất) và nhân cả tử và mẫu với thừa số phụ tương ứng.",
+    "type": "PROCEDURE",
+    "reviewState": "INTERNAL_REVIEWED"
+  },
+  {
+    "id": "NODE-MATH-6-FRAC-03",
+    "learningOutcomeIds": ["LO-MATH-6-FRAC-01"],
+    "label": "Phép cộng phân số khác mẫu số",
+    "description": "Quy đồng mẫu số các phân số rồi cộng các tử số với nhau và giữ nguyên mẫu số chung.",
+    "type": "PROCEDURE",
+    "reviewState": "INTERNAL_REVIEWED"
+  },
+  {
+    "id": "NODE-MATH-6-FRAC-04",
+    "learningOutcomeIds": ["LO-MATH-6-FRAC-01"],
+    "label": "Vận dụng giải toán thực tế về phân số",
+    "description": "Ứng dụng phép cộng và trừ phân số để giải quyết các tình huống chia tài nguyên, đo lường trong thực tiễn.",
+    "type": "APPLICATION",
+    "reviewState": "INTERNAL_REVIEWED"
+  }
+]

@@ -1,0 +1,60 @@
+[
+  {
+    "nodeId": "NODE-MATH-6-FRAC-03",
+    "parentSummary": "Cộng hai phân số khác mẫu số là kỹ năng chuyển đổi hai đại lượng có đơn vị chia khác nhau về cùng một đơn vị chia chung trước khi gộp số lượng.",
+    "whatChildNeedsToUnderstand": [
+      "Mẫu số biểu thị số phần bằng nhau được chia ra từ một đơn vị.",
+      "Không thể cộng trực tiếp các phần khi kích thước mỗi phần khác nhau.",
+      "Quy đồng mẫu số là bước cắt nhỏ các phần để chúng có kích thước hoàn toàn bằng nhau."
+    ],
+    "commonDifficulties": [
+      "Học sinh có xu hướng cộng gộp cả tử số với tử số và mẫu số với mẫu số (ví dụ: 1/2 + 1/3 = 2/5).",
+      "Quên nhân tử số với thừa số phụ tương ứng sau khi đổi mẫu số.",
+      "Gặp khó khăn khi tìm bội chung nhỏ nhất của hai mẫu số."
+    ],
+    "questionsToAskChild": [
+      "Nếu con có 1/2 cái bánh pizza và 1/4 cái bánh pizza, hai miếng bánh này có bằng nhau không?",
+      "Làm thế nào để chia miếng 1/2 thành các miếng 1/4 giống miếng kia?",
+      "Tại sao chúng ta phải tìm mẫu số chung trước khi cộng?"
+    ],
+    "hintsWithoutGivingAnswer": [
+      "Con hãy vẽ một hình chữ nhật biểu thị phân số thứ nhất, rồi xem có thể chia nhỏ nó thành bao nhiêu phần bằng mẫu số kia.",
+      "Hãy nhớ lại: Muốn cộng được thì các miếng bánh phải cùng kích cỡ.",
+      "Tìm số nhỏ nhất mà cả hai mẫu số đều chia hết nhé."
+    ],
+    "everydayExamples": [
+      "Gộp nửa cốc nước (1/2) và một phần tư cốc nước (1/4): Ta chia nửa cốc thành 2 phần tư, tổng cộng là 3 phần tư cốc nước.",
+      "Hai bạn cùng góp tiền mua pizza: một bạn góp 1/3 hộp bánh, bạn kia góp 1/6 hộp bánh."
+    ],
+    "fullParentSolutionGuide": [
+      {
+        "type": "text",
+        "value": "Hướng dẫn đầy đủ cho phụ huynh: Để giúp con làm bài toán 3/8 + 5/12:"
+      },
+      {
+        "type": "text",
+        "value": "1. Hỏi con: 8 và 12 cùng chia hết cho những số nào? Bội chung nhỏ nhất là 24."
+      },
+      {
+        "type": "text",
+        "value": "2. Cùng con tìm thừa số phụ: 24 : 8 = 3; 24 : 12 = 2."
+      },
+      {
+        "type": "text",
+        "value": "3. Nhắc con nhân cả tử và mẫu: (3x3)/(8x3) = 9/24; (5x2)/(12x2) = 10/24."
+      },
+      {
+        "type": "text",
+        "value": "4. Thực hiện phép cộng tử số: 9 + 10 = 19, giữ nguyên mẫu số 24. Kết quả: 19/24."
+      }
+    ],
+    "sourceRefs": [
+      {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "documentNumber": "32/2018/TT-BGDĐT",
+        "sectionLocator": "Mục V - Chương trình môn Toán lớp 6"
+      }
+    ],
+    "reviewState": "INTERNAL_REVIEWED"
+  }
+]

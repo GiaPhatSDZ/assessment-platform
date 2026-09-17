@@ -1,0 +1,22 @@
+[
+  {
+    "id": "SRC-VN-MOET-GEP-2018",
+    "authority": "Bộ Giáo dục và Đào tạo Việt Nam",
+    "title": "Chương trình Giáo dục Phổ thông 2018 — Chương trình Tổng thể",
+    "documentNumber": "Thông tư 32/2018/TT-BGDĐT",
+    "sourceType": "OFFICIAL_CURRICULUM",
+    "retrievedAt": "2026-09-17",
+    "curriculumStatus": "CURRENT_NATIONAL",
+    "rightsNotes": "Văn bản quy phạm pháp luật nhà nước Việt Nam, trích dẫn hợp lệ."
+  },
+  {
+    "id": "SRC-VN-MOET-MATH-2018",
+    "authority": "Bộ Giáo dục và Đào tạo Việt Nam",
+    "title": "Chương trình Giáo dục Phổ thông Môn Toán (Ban hành kèm Thông tư 32/2018/TT-BGDĐT)",
+    "documentNumber": "Thông tư 32/2018/TT-BGDĐT",
+    "sourceType": "OFFICIAL_CURRICULUM",
+    "retrievedAt": "2026-09-17",
+    "curriculumStatus": "CURRENT_NATIONAL",
+    "rightsNotes": "Chuẩn đầu ra yêu cầu cần đạt chính thức môn Toán."
+  }
+]
