@@ -6,11 +6,11 @@ import { evaluateSession } from "@/src/domain/diagnostic/engine";
 import { detectKnowledgeGap, GapReport } from "@/src/domain/diagnostic/gap-engine";
 import { generateLearningPack, LearningPack } from "@/src/domain/remediation/learning-pack";
 import { ItemAttempt, NodeMasteryState } from "@/src/domain/diagnostic/types";
-import { DiagnosticWorkspace } from "./DiagnosticWorkspace";
-import { GapReportView } from "../remediation/GapReportView";
+import { FocusDiagnosticWorkspace } from "@/components/v4/diagnostic/FocusDiagnosticWorkspace";
+import { GapInsightView } from "@/components/v4/remediation/GapInsightView";
 import { LearningPackView } from "../remediation/LearningPackView";
 import { RetestWorkspace } from "../remediation/RetestWorkspace";
-import { AppShell } from "../layout/AppShell";
+import { AppShell } from "@/components/v4/layout/AppShell";
 
 type FlowPhase = "DIAGNOSTIC" | "GAP_REPORT" | "LEARNING_PACK" | "RETEST";
 
@@ -45,45 +45,57 @@ export function Grade6FractionsDiagnosticFlow() {
     setPhase("GAP_REPORT");
   };
 
-  return (
-    <AppShell>
-      <div className="py-6">
-        {phase === "DIAGNOSTIC" && (
-          <DiagnosticWorkspace
-            items={initialItems}
-            subjectTitle="Toán Lớp 6"
-            topicTitle="Phép cộng phân số khác mẫu số"
-            onComplete={handleDiagnosticComplete}
-          />
-        )}
+  if (phase === "DIAGNOSTIC") {
+    return (
+      <AppShell mode="FOCUS" focusTitle="Toán Lớp 6 · Khảo sát mắt xích" focusExitHref="/learn">
+        <FocusDiagnosticWorkspace
+          items={initialItems}
+          subjectTitle="Toán Lớp 6"
+          topicTitle="Phép cộng phân số khác mẫu số"
+          onComplete={handleDiagnosticComplete}
+        />
+      </AppShell>
+    );
+  }
 
-        {phase === "GAP_REPORT" && gapReport && (
-          <GapReportView
-            report={gapReport}
-            graph={graph}
-            nodeStates={sessionNodeStates}
-            onProceedToLearningPack={() => setPhase("LEARNING_PACK")}
-            onRetestDirectly={() => setPhase("RETEST")}
-          />
-        )}
+  if (phase === "GAP_REPORT" && gapReport) {
+    return (
+      <AppShell mode="INSIGHT">
+        <GapInsightView
+          report={gapReport}
+          graph={graph}
+          nodeStates={sessionNodeStates}
+          onProceedToLearningPack={() => setPhase("LEARNING_PACK")}
+          onRetestDirectly={() => setPhase("RETEST")}
+        />
+      </AppShell>
+    );
+  }
 
-        {phase === "LEARNING_PACK" && learningPack && (
-          <LearningPackView
-            pack={learningPack}
-            onProceedToRetest={() => setPhase("RETEST")}
-            onBackToReport={() => setPhase("GAP_REPORT")}
-          />
-        )}
+  if (phase === "LEARNING_PACK" && learningPack) {
+    return (
+      <AppShell mode="INSIGHT">
+        <LearningPackView
+          pack={learningPack}
+          onProceedToRetest={() => setPhase("RETEST")}
+          onBackToReport={() => setPhase("GAP_REPORT")}
+        />
+      </AppShell>
+    );
+  }
 
-        {phase === "RETEST" && gapReport && learningPack && (
-          <RetestWorkspace
-            reTestItems={reTestItems}
-            targetNodeId={gapReport.targetNodeId}
-            targetNodeLabel={gapReport.targetNodeLabel}
-            learningPackId={learningPack.id}
-          />
-        )}
-      </div>
-    </AppShell>
-  );
+  if (phase === "RETEST" && gapReport && learningPack) {
+    return (
+      <AppShell mode="FOCUS" focusTitle="Toán Lớp 6 · Kiểm tra lại sau khi ôn" focusExitHref="/learn">
+        <RetestWorkspace
+          reTestItems={reTestItems}
+          targetNodeId={gapReport.targetNodeId}
+          targetNodeLabel={gapReport.targetNodeLabel}
+          learningPackId={learningPack.id}
+        />
+      </AppShell>
+    );
+  }
+
+  return null;
 }

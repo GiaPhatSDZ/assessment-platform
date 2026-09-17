@@ -6,6 +6,6 @@ test.describe("E2E Smoke Suite", () => {
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
       "Tìm đúng chỗ con đang hổng"
     );
-    await expect(page.getByText("AI School V3").first()).toBeVisible();
+    await expect(page.getByText("AI School").first()).toBeVisible();
   });
 });

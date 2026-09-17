@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Be_Vietnam_Pro } from "next/font/google";
+import { Be_Vietnam_Pro, Lora } from "next/font/google";
 import { siteConfig } from "@/src/config/site";
 import "./globals.css";
 import "katex/dist/katex.min.css";
@@ -8,6 +8,13 @@ const beVietnamPro = Be_Vietnam_Pro({
   subsets: ["vietnamese", "latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-be-vietnam-pro",
+  display: "swap",
+});
+
+const lora = Lora({
+  subsets: ["vietnamese", "latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-lora",
   display: "swap",
 });
 
@@ -50,8 +57,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={beVietnamPro.variable}>
-      <body className="min-h-screen flex flex-col bg-warm-50/60 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-edu-100 selection:text-edu-900">
+    <html lang="vi" className={`${beVietnamPro.variable} ${lora.variable}`}>
+      <body className="min-h-screen flex flex-col bg-canvas text-ink font-sans antialiased selection:bg-brand-soft selection:text-brand-dark">
         {children}
       </body>
     </html>

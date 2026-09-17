@@ -1,0 +1,35 @@
+{
+  "version": "4.0.0",
+  "fonts": {
+    "display": "Lora",
+    "ui": "Be Vietnam Pro"
+  },
+  "colors": {
+    "canvas": "#F5F1E8",
+    "surface": "#FFFDF8",
+    "surfaceStrong": "#FFFFFF",
+    "ink": "#1D211D",
+    "inkMuted": "#677069",
+    "line": "#D8D5CC",
+    "brand": "#245B47",
+    "brandDark": "#143C2F",
+    "brandSoft": "#DDEBE3",
+    "accent": "#E9B44C",
+    "accentSoft": "#F8EAC1",
+    "danger": "#B6473A",
+    "dangerSoft": "#F5DDD7",
+    "info": "#315E9B",
+    "infoSoft": "#DDE8F6"
+  },
+  "radius": {
+    "app": 14,
+    "marketingWindow": 24,
+    "pill": 999
+  },
+  "maxWidths": {
+    "marketing": 1280,
+    "reading": 760,
+    "diagnostic": 820,
+    "insight": 1120
+  }
+}

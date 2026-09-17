@@ -11,9 +11,34 @@ const config: Config = {
     extend: {
       fontFamily: {
         sans: ["var(--font-be-vietnam-pro)", "system-ui", "-apple-system", "sans-serif"],
+        serif: ["var(--font-lora)", "Georgia", "serif"],
       },
       colors: {
-        // High-trust deep green / teal educational accents
+        // V4 Warm Editorial Palette
+        canvas: "#F5F1E8",
+        surface: "#FFFDF8",
+        surfaceStrong: "#FFFFFF",
+        ink: "#1D211D",
+        inkMuted: "#677069",
+        line: "#D8D5CC",
+        brand: {
+          DEFAULT: "#245B47",
+          dark: "#143C2F",
+          soft: "#DDEBE3",
+        },
+        accent: {
+          DEFAULT: "#E9B44C",
+          soft: "#F8EAC1",
+        },
+        danger: {
+          DEFAULT: "#B6473A",
+          soft: "#F5DDD7",
+        },
+        info: {
+          DEFAULT: "#315E9B",
+          soft: "#DDE8F6",
+        },
+        // Backwards-compatible V3 educational accents
         edu: {
           50: "#f0fdf9",
           100: "#ccfbf1",
@@ -39,6 +64,16 @@ const config: Config = {
           800: "#292524",
           900: "#1c1917",
         },
+      },
+      borderRadius: {
+        app: "14px",
+        marketingWindow: "24px",
+      },
+      maxWidth: {
+        marketing: "1280px",
+        reading: "760px",
+        diagnostic: "820px",
+        insight: "1120px",
       },
     },
   },
