@@ -21,6 +21,33 @@ export interface CreateSessionParams {
   referralCode?: string;
 }
 
+export interface AdminFunnelMetrics {
+  totalStarts: number;
+  totalCompletions: number;
+  completionRate: number; // 0..100
+  totalLeadRequests: number;
+  totalReportsGenerated: number;
+  leadConversionRate: number; // 0..100
+  referralBreakdown: Array<{
+    code: string;
+    starts: number;
+    completions: number;
+  }>;
+}
+
+export interface AdminSessionInspectionRecord {
+  id: string;
+  assessmentVersionId: string;
+  status: string;
+  referralCode?: string | null;
+  startedAt: string;
+  completedAt?: string | null;
+  dimensionScores?: Array<{
+    dimensionId: string;
+    normalizedScore: number;
+  }>;
+}
+
 export interface AssessmentRepository {
   createSession(params: CreateSessionParams): Promise<AssessmentSessionRecord>;
   loadOwnedSession(sessionId: string, visitorToken: string): Promise<AssessmentSessionRecord | null>;
@@ -39,4 +66,6 @@ export interface AssessmentRepository {
     email: string;
     displayName?: string | null;
   }): Promise<void>;
+  getAdminFunnelMetrics(): Promise<AdminFunnelMetrics>;
+  getAdminSessionList(limit?: number): Promise<AdminSessionInspectionRecord[]>;
 }

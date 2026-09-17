@@ -2,6 +2,8 @@ import {
   AssessmentRepository,
   AssessmentSessionRecord,
   CreateSessionParams,
+  AdminFunnelMetrics,
+  AdminSessionInspectionRecord,
 } from "../../application/assessment-repository";
 import { Answer, AssessmentScore } from "../../domain/assessment/types";
 import { getSupabaseAdminClient, isSupabaseAdminConfigured } from "./supabase-server";
@@ -290,6 +292,129 @@ export class SupabaseAssessmentRepository implements AssessmentRepository {
       },
       { onConflict: "id" }
     );
+  }
+
+  async getAdminFunnelMetrics(): Promise<AdminFunnelMetrics> {
+    if (!isSupabaseAdminConfigured()) {
+      return inMemoryAssessmentRepository.getAdminFunnelMetrics();
+    }
+
+    const supabase = this.getClient()!;
+
+    try {
+      const { count: totalStarts } = await supabase
+        .from("assessment_sessions")
+        .select("*", { count: "exact", head: true });
+
+      const { count: totalCompletions } = await supabase
+        .from("assessment_sessions")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "completed");
+
+      const { count: totalLeadRequests } = await supabase
+        .from("leads")
+        .select("*", { count: "exact", head: true });
+
+      const { count: totalReportsGenerated } = await supabase
+        .from("generated_reports")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "completed");
+
+      const starts = totalStarts || 0;
+      const completions = totalCompletions || 0;
+      const leads = totalLeadRequests || 0;
+      const reports = totalReportsGenerated || 0;
+
+      const completionRate = starts > 0 ? Math.round((completions / starts) * 1000) / 10 : 0;
+      const leadConversionRate =
+        completions > 0 ? Math.round((leads / completions) * 1000) / 10 : 0;
+
+      const { data: referralSessions } = await supabase
+        .from("assessment_sessions")
+        .select("referral_code, status");
+
+      const referralMap = new Map<string, { starts: number; completions: number }>();
+      for (const s of (referralSessions as Array<{ referral_code: string | null; status: string }>) || []) {
+        const code = s.referral_code || "DIRECT";
+        const existing = referralMap.get(code) || { starts: 0, completions: 0 };
+        existing.starts += 1;
+        if (s.status === "completed") {
+          existing.completions += 1;
+        }
+        referralMap.set(code, existing);
+      }
+
+      const referralBreakdown = Array.from(referralMap.entries()).map(([code, counts]) => ({
+        code,
+        starts: counts.starts,
+        completions: counts.completions,
+      }));
+
+      return {
+        totalStarts: starts,
+        totalCompletions: completions,
+        completionRate,
+        totalLeadRequests: leads,
+        totalReportsGenerated: reports,
+        leadConversionRate,
+        referralBreakdown,
+      };
+    } catch {
+      return inMemoryAssessmentRepository.getAdminFunnelMetrics();
+    }
+  }
+
+  async getAdminSessionList(limit: number = 50): Promise<AdminSessionInspectionRecord[]> {
+    if (!isSupabaseAdminConfigured()) {
+      return inMemoryAssessmentRepository.getAdminSessionList(limit);
+    }
+
+    const supabase = this.getClient()!;
+
+    try {
+      const { data, error } = await supabase
+        .from("assessment_sessions")
+        .select(`
+          id,
+          assessment_version_id,
+          status,
+          referral_code,
+          started_at,
+          completed_at,
+          assessment_results (dimensions)
+        `)
+        .order("started_at", { ascending: false })
+        .limit(limit);
+
+      if (error || !data) {
+        return inMemoryAssessmentRepository.getAdminSessionList(limit);
+      }
+
+      return data.map((session) => {
+        let dimensionScores: Array<{ dimensionId: string; normalizedScore: number }> | undefined;
+        if (session.assessment_results && session.assessment_results.length > 0) {
+          const res = session.assessment_results[0] as {
+            dimensions?: Array<{ dimensionId: string; normalizedScore: number }>;
+          };
+          dimensionScores = res.dimensions?.map((d) => ({
+            dimensionId: d.dimensionId,
+            normalizedScore: d.normalizedScore,
+          }));
+        }
+
+        return {
+          id: session.id,
+          assessmentVersionId: session.assessment_version_id,
+          status: session.status,
+          referralCode: session.referral_code,
+          startedAt: session.started_at,
+          completedAt: session.completed_at,
+          dimensionScores,
+        };
+      });
+    } catch {
+      return inMemoryAssessmentRepository.getAdminSessionList(limit);
+    }
   }
 }
 
