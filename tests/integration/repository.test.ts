@@ -100,4 +100,49 @@ describe("Assessment Repository & Anonymous Ownership Integration", () => {
     const attackerResult = await repo.loadOwnedResult(session.id, attackerToken);
     expect(attackerResult).toBeNull();
   });
+
+  it("claims anonymous sessions for authenticated user upon ownership verification", async () => {
+    const ownerToken = generateVisitorToken();
+    const otherToken = generateVisitorToken();
+
+    const session1 = await repo.createSession({
+      assessmentSlug: "ai-career-readiness",
+      assessmentVersion: 1,
+      visitorToken: ownerToken,
+    });
+    const session2 = await repo.createSession({
+      assessmentSlug: "ai-career-readiness",
+      assessmentVersion: 1,
+      visitorToken: otherToken,
+    });
+
+    const score: AssessmentScore = {
+      assessmentId: "asmt-ai-career-readiness-v1",
+      assessmentVersion: 1,
+      completeness: 1,
+      dimensions: [
+        { dimensionId: "analytical_thinking", rawScore: 10, normalizedScore: 80, evidenceQuestionIds: ["q1"] },
+      ],
+      scoringVersion: "1.0.0",
+    };
+    await repo.finalizeSession(session1.id, ownerToken, [{ questionId: "q1", optionId: "q1_opt5" }], score);
+
+    const userId = "usr_123456";
+    await repo.upsertUserProfile({ id: userId, email: "learner@example.com", displayName: "Minh An" });
+
+    // Claim sessions using owner's visitor token
+    const claimedCount = await repo.claimSessionsForUser(userId, ownerToken);
+    expect(claimedCount).toBe(1);
+
+    // Retrieve user sessions
+    const userSessions = await repo.getUserSessions(userId);
+    expect(userSessions).toHaveLength(1);
+    expect(userSessions[0].id).toBe(session1.id);
+    expect(userSessions[0].userId).toBe(userId);
+    expect(userSessions[0].result?.dimensions[0].normalizedScore).toBe(80);
+
+    // Verify other visitor's session was NOT claimed
+    const unclaimed = await repo.loadOwnedSession(session2.id, otherToken);
+    expect(unclaimed?.userId).toBeUndefined();
+  });
 });

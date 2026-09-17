@@ -82,10 +82,50 @@ export class InMemoryAssessmentRepository implements AssessmentRepository {
     return this.results.get(sessionId) || null;
   }
 
+  private userProfiles = new Map<string, { id: string; email: string; displayName?: string | null }>();
+
+  async upsertUserProfile(profile: {
+    id: string;
+    email: string;
+    displayName?: string | null;
+  }): Promise<void> {
+    this.userProfiles.set(profile.id, profile);
+  }
+
+  async claimSessionsForUser(userId: string, visitorToken: string): Promise<number> {
+    let claimedCount = 0;
+    for (const [_, session] of this.sessions.entries()) {
+      if (verifyVisitorTokenOwnership(visitorToken, session.visitorOwnerHash)) {
+        if (!session.userId) {
+          session.userId = userId;
+          claimedCount++;
+        }
+      }
+    }
+    return claimedCount;
+  }
+
+  async getUserSessions(userId: string): Promise<AssessmentSessionRecord[]> {
+    const userSessions: AssessmentSessionRecord[] = [];
+    for (const [_, session] of this.sessions.entries()) {
+      if (session.userId === userId) {
+        const result = this.results.get(session.id) || null;
+        userSessions.push({ ...session, result });
+      }
+    }
+    // Sort completed sessions first, newest first
+    return userSessions.sort((a, b) => {
+      const timeA = new Date(a.completedAt || a.startedAt).getTime();
+      const timeB = new Date(b.completedAt || b.startedAt).getTime();
+      return timeB - timeA;
+    });
+  }
+
   // Helper for test cleanup
   clear(): void {
     this.sessions.clear();
     this.results.clear();
+    this.userProfiles.clear();
   }
 }
 

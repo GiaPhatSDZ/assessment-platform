@@ -32,4 +32,11 @@ export interface AssessmentRepository {
     score: AssessmentScore
   ): Promise<AssessmentScore>;
   loadOwnedResult(sessionId: string, visitorToken: string): Promise<AssessmentScore | null>;
+  claimSessionsForUser(userId: string, visitorToken: string): Promise<number>;
+  getUserSessions(userId: string): Promise<AssessmentSessionRecord[]>;
+  upsertUserProfile(profile: {
+    id: string;
+    email: string;
+    displayName?: string | null;
+  }): Promise<void>;
 }

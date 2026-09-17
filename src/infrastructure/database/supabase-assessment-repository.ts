@@ -76,7 +76,11 @@ export class SupabaseAssessmentRepository implements AssessmentRepository {
       return null;
     }
 
-    const answers: Answer[] = (session.assessment_answers || []).map((a: any) => ({
+    const answers: Answer[] = ((session.assessment_answers as Array<{
+      question_id: string;
+      option_id: string;
+      answered_at: string;
+    }>) || []).map((a) => ({
       questionId: a.question_id,
       optionId: a.option_id,
       answeredAt: a.answered_at,
@@ -181,6 +185,111 @@ export class SupabaseAssessmentRepository implements AssessmentRepository {
     const session = await this.loadOwnedSession(sessionId, visitorToken);
     if (!session) return null;
     return session.result || inMemoryAssessmentRepository.loadOwnedResult(sessionId, visitorToken);
+  }
+
+  async claimSessionsForUser(userId: string, visitorToken: string): Promise<number> {
+    const memoryClaimed = await inMemoryAssessmentRepository.claimSessionsForUser(userId, visitorToken);
+
+    if (!isSupabaseAdminConfigured()) {
+      return memoryClaimed;
+    }
+
+    const supabase = this.getClient()!;
+    const visitorOwnerHash = hashVisitorToken(visitorToken);
+
+    const { data, error } = await supabase
+      .from("assessment_sessions")
+      .update({ user_id: userId })
+      .eq("visitor_owner_hash", visitorOwnerHash)
+      .is("user_id", null)
+      .select("id");
+
+    if (error || !data) {
+      return memoryClaimed;
+    }
+
+    return Math.max(data.length, memoryClaimed);
+  }
+
+  async getUserSessions(userId: string): Promise<AssessmentSessionRecord[]> {
+    if (!isSupabaseAdminConfigured()) {
+      return inMemoryAssessmentRepository.getUserSessions(userId);
+    }
+
+    const supabase = this.getClient()!;
+    const { data, error } = await supabase
+      .from("assessment_sessions")
+      .select(`
+        *,
+        assessment_answers (question_id, option_id, answered_at),
+        assessment_results (completeness, dimensions, scoring_version)
+      `)
+      .eq("user_id", userId)
+      .order("completed_at", { ascending: false });
+
+    if (error || !data) {
+      return inMemoryAssessmentRepository.getUserSessions(userId);
+    }
+
+    return data.map((session) => {
+      const answers: Answer[] = ((session.assessment_answers as Array<{
+        question_id: string;
+        option_id: string;
+        answered_at: string;
+      }>) || []).map((a) => ({
+        questionId: a.question_id,
+        optionId: a.option_id,
+        answeredAt: a.answered_at,
+      }));
+
+      let result: AssessmentScore | null = null;
+      if (session.assessment_results && session.assessment_results.length > 0) {
+        const r = session.assessment_results[0];
+        result = {
+          assessmentId: session.assessment_version_id,
+          assessmentVersion: 1,
+          completeness: Number(r.completeness),
+          dimensions: r.dimensions,
+          scoringVersion: r.scoring_version,
+        };
+      }
+
+      return {
+        id: session.id,
+        assessmentVersionId: session.assessment_version_id,
+        visitorOwnerHash: session.visitor_owner_hash,
+        userId: session.user_id,
+        referralCode: session.referral_code,
+        status: session.status,
+        answers,
+        startedAt: session.started_at,
+        completedAt: session.completed_at,
+        result,
+      };
+    });
+  }
+
+  async upsertUserProfile(profile: {
+    id: string;
+    email: string;
+    displayName?: string | null;
+  }): Promise<void> {
+    await inMemoryAssessmentRepository.upsertUserProfile(profile);
+
+    if (!isSupabaseAdminConfigured()) {
+      return;
+    }
+
+    const supabase = this.getClient()!;
+    await supabase.from("user_profiles").upsert(
+      {
+        id: profile.id,
+        email: profile.email,
+        display_name: profile.displayName || null,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "id" }
+    );
   }
 }
 
