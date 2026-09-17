@@ -3,30 +3,34 @@
     "id": "LO-MATH-6-FRAC-01",
     "gradeOrAgeBand": "6",
     "subjectId": "math",
-    "officialText": "Thực hiện được các phép tính: cộng, trừ, nhân, chia trong tập hợp số phân số; vận dụng được các tính chất giao hoán, kết hợp, phân phối trong tính toán.",
-    "normalizedSummary": "Cộng, trừ hai phân số khác mẫu số thông qua bước quy đồng mẫu số.",
+    "officialText": "Thực hiện được các phép tính: cộng, trừ, nhân, chia trong tập hợp các phân số; vận dụng được các tính chất giao hoán, kết hợp, phân phối của phép nhân đối với phép cộng trong tính toán.",
+    "normalizedSummary": "Cộng, trừ hai phân số khác mẫu số thông qua bước quy đồng mẫu số chung.",
     "sourceRefs": [
       {
         "sourceId": "SRC-VN-MOET-MATH-2018",
         "documentNumber": "32/2018/TT-BGDĐT",
-        "sectionLocator": "Phần Môn Toán Lớp 6 - Số học và Đại số"
+        "sectionLocator": "Mục V. Chương trình môn Toán Lớp 6 — Bảng Yêu cầu cần đạt về Phân số",
+        "pageNumber": 50,
+        "citationText": "Thông tư 32/2018/TT-BGDĐT, Chương trình môn Toán, Mục V, Lớp 6"
       }
     ],
-    "reviewState": "INTERNAL_REVIEWED"
+    "reviewState": "SOURCE_LINKED"
   },
   {
     "id": "LO-MATH-5-DENOM-01",
     "gradeOrAgeBand": "5",
     "subjectId": "math",
-    "officialText": "Thực hiện được quy đồng mẫu số hai phân số trong trường hợp có một mẫu số chia hết cho mẫu số kia hoặc tìm mẫu số chung đơn giản.",
-    "normalizedSummary": "Quy đồng mẫu số hai phân số để đưa về cùng một đơn vị đo lường phần bằng nhau.",
+    "officialText": "Thực hiện được quy đồng mẫu số hai phân số trong trường hợp có một mẫu số chia hết cho mẫu số kia.",
+    "normalizedSummary": "Quy đồng mẫu số hai phân số để đưa về cùng một đơn vị đo lường trước khi thực hiện phép tính.",
     "sourceRefs": [
       {
         "sourceId": "SRC-VN-MOET-MATH-2018",
         "documentNumber": "32/2018/TT-BGDĐT",
-        "sectionLocator": "Phần Môn Toán Lớp 5 - Phân số"
+        "sectionLocator": "Mục V. Chương trình môn Toán Lớp 5 — Yêu cầu cần đạt về Phân số",
+        "pageNumber": 38,
+        "citationText": "Thông tư 32/2018/TT-BGDĐT, Chương trình môn Toán, Mục V, Lớp 5"
       }
     ],
-    "reviewState": "INTERNAL_REVIEWED"
+    "reviewState": "SOURCE_LINKED"
   }
 ]

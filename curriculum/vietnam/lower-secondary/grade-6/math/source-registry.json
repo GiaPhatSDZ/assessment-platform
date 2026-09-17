@@ -3,20 +3,30 @@
     "id": "SRC-VN-MOET-GEP-2018",
     "authority": "Bộ Giáo dục và Đào tạo Việt Nam",
     "title": "Chương trình Giáo dục Phổ thông 2018 — Chương trình Tổng thể",
-    "documentNumber": "Thông tư 32/2018/TT-BGDĐT",
+    "documentNumber": "32/2018/TT-BGDĐT",
     "sourceType": "OFFICIAL_CURRICULUM",
+    "url": "https://moet.gov.vn/van-ban/van-ban-quan-ly/Pages/chi-tiet-van-ban.aspx?ItemID=1301",
+    "issuedAt": "2018-12-26",
+    "effectiveFrom": "2020-02-15",
+    "sourceVersion": "2018-12-26-TT32-GEP",
     "retrievedAt": "2026-09-17",
     "curriculumStatus": "CURRENT_NATIONAL",
-    "rightsNotes": "Văn bản quy phạm pháp luật nhà nước Việt Nam, trích dẫn hợp lệ."
+    "rightsNotes": "Văn bản quy phạm pháp luật nhà nước Việt Nam, trích dẫn hợp lệ.",
+    "localChecksum": "96b6d516ca47a19bb61cdb306e36b85662ef4f48b115b9357f7445bfd33f5305"
   },
   {
     "id": "SRC-VN-MOET-MATH-2018",
     "authority": "Bộ Giáo dục và Đào tạo Việt Nam",
     "title": "Chương trình Giáo dục Phổ thông Môn Toán (Ban hành kèm Thông tư 32/2018/TT-BGDĐT)",
-    "documentNumber": "Thông tư 32/2018/TT-BGDĐT",
+    "documentNumber": "32/2018/TT-BGDĐT",
     "sourceType": "OFFICIAL_CURRICULUM",
+    "url": "https://moet.gov.vn/van-ban/van-ban-quan-ly/Pages/chi-tiet-van-ban.aspx?ItemID=1301",
+    "issuedAt": "2018-12-26",
+    "effectiveFrom": "2020-02-15",
+    "sourceVersion": "2018-12-26-TT32-MATH",
     "retrievedAt": "2026-09-17",
     "curriculumStatus": "CURRENT_NATIONAL",
-    "rightsNotes": "Chuẩn đầu ra yêu cầu cần đạt chính thức môn Toán."
+    "rightsNotes": "Chuẩn đầu ra yêu cầu cần đạt chính thức môn Toán cấp THCS.",
+    "localChecksum": "f4c2847a9ef387c95e1e78553258c732049d5bf59b43e8869b2d88bbd6d37012"
   }
 ]

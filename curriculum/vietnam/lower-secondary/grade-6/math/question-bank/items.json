@@ -2,7 +2,9 @@
   {
     "id": "ITEM-G6-FRAC-01",
     "primaryNodeId": "NODE-MATH-6-FRAC-03",
-    "supportingNodeIds": ["NODE-MATH-5-FRAC-02"],
+    "supportingNodeIds": [
+      "NODE-MATH-5-FRAC-02"
+    ],
     "type": "MULTIPLE_CHOICE",
     "cognitiveDemand": "APPLY",
     "prompt": [
@@ -19,24 +21,48 @@
     "options": [
       {
         "id": "opt-1",
-        "content": [{ "type": "inline_math", "latex": "\\frac{19}{24}", "spokenText": "19 phần 24" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{19}{24}",
+            "spokenText": "19 phần 24"
+          }
+        ],
         "isCorrect": true
       },
       {
         "id": "opt-2",
-        "content": [{ "type": "inline_math", "latex": "\\frac{8}{20}", "spokenText": "8 phần 20" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{8}{20}",
+            "spokenText": "8 phần 20"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-ADD-DENOM"
       },
       {
         "id": "opt-3",
-        "content": [{ "type": "inline_math", "latex": "\\frac{2}{5}", "spokenText": "2 phần 5" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{2}{5}",
+            "spokenText": "2 phần 5"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-ADD-DENOM"
       },
       {
         "id": "opt-4",
-        "content": [{ "type": "inline_math", "latex": "\\frac{11}{24}", "spokenText": "11 phần 24" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{11}{24}",
+            "spokenText": "11 phần 24"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-EXPANSION"
       }
@@ -48,23 +74,28 @@
       "opt-3": "Ngộ nhận cộng thẳng tử với tử và mẫu với mẫu rồi rút gọn 8/20 = 2/5.",
       "opt-4": "Lỗi sai thừa số phụ khi nhân tử số."
     },
-    "misconceptionTags": ["MISCON-ADD-DENOM", "MISCON-EXPANSION"],
+    "misconceptionTags": [
+      "MISCON-ADD-DENOM",
+      "MISCON-EXPANSION"
+    ],
     "sourceRefs": [
       {
         "sourceId": "SRC-VN-MOET-MATH-2018",
         "documentNumber": "32/2018/TT-BGDĐT"
       }
     ],
-    "authoringOrigin": "HUMAN",
-    "itemMaturity": "REVIEWED",
-    "reviewState": "INTERNAL_REVIEWED",
-    "publicationState": "PUBLISHED_BETA",
+    "authoringOrigin": "AI_ASSISTED",
+    "itemMaturity": "DRAFT",
+    "reviewState": "AI_DRAFT",
+    "publicationState": "DRAFT",
     "version": "1.0.0"
   },
   {
     "id": "ITEM-G6-FRAC-02",
     "primaryNodeId": "NODE-MATH-6-FRAC-03",
-    "supportingNodeIds": ["NODE-MATH-5-FRAC-02"],
+    "supportingNodeIds": [
+      "NODE-MATH-5-FRAC-02"
+    ],
     "type": "MULTIPLE_CHOICE",
     "cognitiveDemand": "UNDERSTAND",
     "prompt": [
@@ -76,24 +107,44 @@
     "options": [
       {
         "id": "opt-1",
-        "content": [{ "type": "text", "value": "24" }],
+        "content": [
+          {
+            "type": "text",
+            "value": "24"
+          }
+        ],
         "isCorrect": true
       },
       {
         "id": "opt-2",
-        "content": [{ "type": "text", "value": "48" }],
+        "content": [
+          {
+            "type": "text",
+            "value": "48"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-COMMON-MULTIPLE"
       },
       {
         "id": "opt-3",
-        "content": [{ "type": "text", "value": "14" }],
+        "content": [
+          {
+            "type": "text",
+            "value": "14"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-ADD-DENOM"
       },
       {
         "id": "opt-4",
-        "content": [{ "type": "text", "value": "2" }],
+        "content": [
+          {
+            "type": "text",
+            "value": "2"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-GCD-INSTEAD-LCM"
       }
@@ -105,23 +156,28 @@
       "opt-3": "Cộng hai mẫu số 6 + 8 = 14.",
       "opt-4": "Nhầm ƯCLN là 2 thay vì BCNN."
     },
-    "misconceptionTags": ["MISCON-COMMON-MULTIPLE", "MISCON-ADD-DENOM"],
+    "misconceptionTags": [
+      "MISCON-COMMON-MULTIPLE",
+      "MISCON-ADD-DENOM"
+    ],
     "sourceRefs": [
       {
         "sourceId": "SRC-VN-MOET-MATH-2018",
         "documentNumber": "32/2018/TT-BGDĐT"
       }
     ],
-    "authoringOrigin": "HUMAN",
-    "itemMaturity": "REVIEWED",
-    "reviewState": "INTERNAL_REVIEWED",
-    "publicationState": "PUBLISHED_BETA",
+    "authoringOrigin": "AI_ASSISTED",
+    "itemMaturity": "DRAFT",
+    "reviewState": "AI_DRAFT",
+    "publicationState": "DRAFT",
     "version": "1.0.0"
   },
   {
     "id": "ITEM-G6-FRAC-03",
     "primaryNodeId": "NODE-MATH-6-FRAC-03",
-    "supportingNodeIds": ["NODE-MATH-5-FRAC-02"],
+    "supportingNodeIds": [
+      "NODE-MATH-5-FRAC-02"
+    ],
     "type": "MULTIPLE_CHOICE",
     "cognitiveDemand": "APPLY",
     "prompt": [
@@ -138,24 +194,48 @@
     "options": [
       {
         "id": "opt-1",
-        "content": [{ "type": "inline_math", "latex": "\\frac{11}{12}", "spokenText": "11 phần 12" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{11}{12}",
+            "spokenText": "11 phần 12"
+          }
+        ],
         "isCorrect": true
       },
       {
         "id": "opt-2",
-        "content": [{ "type": "inline_math", "latex": "\\frac{3}{7}", "spokenText": "3 phần 7" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{3}{7}",
+            "spokenText": "3 phần 7"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-ADD-DENOM"
       },
       {
         "id": "opt-3",
-        "content": [{ "type": "inline_math", "latex": "\\frac{5}{12}", "spokenText": "5 phần 12" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{5}{12}",
+            "spokenText": "5 phần 12"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-EXPANSION"
       },
       {
         "id": "opt-4",
-        "content": [{ "type": "inline_math", "latex": "\\frac{7}{12}", "spokenText": "7 phần 12" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{7}{12}",
+            "spokenText": "7 phần 12"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-EXPANSION"
       }
@@ -167,23 +247,27 @@
       "opt-3": "Sai sót trong bước nhân thừa số phụ.",
       "opt-4": "Quên nhân thừa số phụ cho phân số thứ hai."
     },
-    "misconceptionTags": ["MISCON-ADD-DENOM"],
+    "misconceptionTags": [
+      "MISCON-ADD-DENOM"
+    ],
     "sourceRefs": [
       {
         "sourceId": "SRC-VN-MOET-MATH-2018",
         "documentNumber": "32/2018/TT-BGDĐT"
       }
     ],
-    "authoringOrigin": "HUMAN",
-    "itemMaturity": "REVIEWED",
-    "reviewState": "INTERNAL_REVIEWED",
-    "publicationState": "PUBLISHED_BETA",
+    "authoringOrigin": "AI_ASSISTED",
+    "itemMaturity": "DRAFT",
+    "reviewState": "AI_DRAFT",
+    "publicationState": "DRAFT",
     "version": "1.0.0"
   },
   {
     "id": "ITEM-G6-FRAC-04",
     "primaryNodeId": "NODE-MATH-6-FRAC-03",
-    "supportingNodeIds": ["NODE-MATH-5-FRAC-02"],
+    "supportingNodeIds": [
+      "NODE-MATH-5-FRAC-02"
+    ],
     "type": "MULTIPLE_CHOICE",
     "cognitiveDemand": "APPLY",
     "prompt": [
@@ -200,24 +284,48 @@
     "options": [
       {
         "id": "opt-1",
-        "content": [{ "type": "inline_math", "latex": "\\frac{13}{24}", "spokenText": "13 phần 24" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{13}{24}",
+            "spokenText": "13 phần 24"
+          }
+        ],
         "isCorrect": true
       },
       {
         "id": "opt-2",
-        "content": [{ "type": "inline_math", "latex": "\\frac{4}{14}", "spokenText": "4 phần 14" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{4}{14}",
+            "spokenText": "4 phần 14"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-ADD-DENOM"
       },
       {
         "id": "opt-3",
-        "content": [{ "type": "inline_math", "latex": "\\frac{2}{7}", "spokenText": "2 phần 7" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{2}{7}",
+            "spokenText": "2 phần 7"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-ADD-DENOM"
       },
       {
         "id": "opt-4",
-        "content": [{ "type": "inline_math", "latex": "\\frac{10}{24}", "spokenText": "10 phần 24" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{10}{24}",
+            "spokenText": "10 phần 24"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-EXPANSION"
       }
@@ -229,23 +337,27 @@
       "opt-3": "Cộng thẳng rồi rút gọn 4/14 = 2/7.",
       "opt-4": "Tính sai tử số."
     },
-    "misconceptionTags": ["MISCON-ADD-DENOM"],
+    "misconceptionTags": [
+      "MISCON-ADD-DENOM"
+    ],
     "sourceRefs": [
       {
         "sourceId": "SRC-VN-MOET-MATH-2018",
         "documentNumber": "32/2018/TT-BGDĐT"
       }
     ],
-    "authoringOrigin": "HUMAN",
-    "itemMaturity": "REVIEWED",
-    "reviewState": "INTERNAL_REVIEWED",
-    "publicationState": "PUBLISHED_BETA",
+    "authoringOrigin": "AI_ASSISTED",
+    "itemMaturity": "DRAFT",
+    "reviewState": "AI_DRAFT",
+    "publicationState": "DRAFT",
     "version": "1.0.0"
   },
   {
     "id": "ITEM-G6-FRAC-05",
     "primaryNodeId": "NODE-MATH-6-FRAC-04",
-    "supportingNodeIds": ["NODE-MATH-6-FRAC-03"],
+    "supportingNodeIds": [
+      "NODE-MATH-6-FRAC-03"
+    ],
     "type": "MULTIPLE_CHOICE",
     "cognitiveDemand": "TRANSFER",
     "prompt": [
@@ -257,24 +369,48 @@
     "options": [
       {
         "id": "opt-1",
-        "content": [{ "type": "inline_math", "latex": "\\frac{11}{15}", "spokenText": "11 phần 15" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{11}{15}",
+            "spokenText": "11 phần 15"
+          }
+        ],
         "isCorrect": true
       },
       {
         "id": "opt-2",
-        "content": [{ "type": "inline_math", "latex": "\\frac{3}{8}", "spokenText": "3 phần 8" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{3}{8}",
+            "spokenText": "3 phần 8"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-ADD-DENOM"
       },
       {
         "id": "opt-3",
-        "content": [{ "type": "inline_math", "latex": "\\frac{7}{15}", "spokenText": "7 phần 15" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{7}{15}",
+            "spokenText": "7 phần 15"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-EXPANSION"
       },
       {
         "id": "opt-4",
-        "content": [{ "type": "inline_math", "latex": "\\frac{2}{15}", "spokenText": "2 phần 15" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{2}{15}",
+            "spokenText": "2 phần 15"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-OPERATOR-CONFUSION"
       }
@@ -286,23 +422,28 @@
       "opt-3": "Sai trong bước nhân thừa số phụ.",
       "opt-4": "Nhầm sang phép nhân phân số (1x2)/(3x5) = 2/15."
     },
-    "misconceptionTags": ["MISCON-ADD-DENOM", "MISCON-OPERATOR-CONFUSION"],
+    "misconceptionTags": [
+      "MISCON-ADD-DENOM",
+      "MISCON-OPERATOR-CONFUSION"
+    ],
     "sourceRefs": [
       {
         "sourceId": "SRC-VN-MOET-MATH-2018",
         "documentNumber": "32/2018/TT-BGDĐT"
       }
     ],
-    "authoringOrigin": "HUMAN",
-    "itemMaturity": "REVIEWED",
-    "reviewState": "INTERNAL_REVIEWED",
-    "publicationState": "PUBLISHED_BETA",
+    "authoringOrigin": "AI_ASSISTED",
+    "itemMaturity": "DRAFT",
+    "reviewState": "AI_DRAFT",
+    "publicationState": "DRAFT",
     "version": "1.0.0"
   },
   {
     "id": "ITEM-G6-FRAC-06",
     "primaryNodeId": "NODE-MATH-6-FRAC-03",
-    "supportingNodeIds": ["NODE-MATH-5-FRAC-02"],
+    "supportingNodeIds": [
+      "NODE-MATH-5-FRAC-02"
+    ],
     "type": "MULTIPLE_CHOICE",
     "cognitiveDemand": "APPLY",
     "prompt": [
@@ -319,24 +460,48 @@
     "options": [
       {
         "id": "opt-1",
-        "content": [{ "type": "inline_math", "latex": "\\frac{1}{2}", "spokenText": "1 phần 2" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{1}{2}",
+            "spokenText": "1 phần 2"
+          }
+        ],
         "isCorrect": true
       },
       {
         "id": "opt-2",
-        "content": [{ "type": "inline_math", "latex": "\\frac{3}{15}", "spokenText": "3 phần 15" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{3}{15}",
+            "spokenText": "3 phần 15"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-ADD-DENOM"
       },
       {
         "id": "opt-3",
-        "content": [{ "type": "inline_math", "latex": "\\frac{5}{10}", "spokenText": "5 phần 10" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{5}{10}",
+            "spokenText": "5 phần 10"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-NOT-SIMPLIFIED"
       },
       {
         "id": "opt-4",
-        "content": [{ "type": "inline_math", "latex": "\\frac{3}{10}", "spokenText": "3 phần 10" }],
+        "content": [
+          {
+            "type": "inline_math",
+            "latex": "\\frac{3}{10}",
+            "spokenText": "3 phần 10"
+          }
+        ],
         "isCorrect": false,
         "misconceptionTag": "MISCON-EXPANSION"
       }
@@ -348,17 +513,19 @@
       "opt-3": "Chưa rút gọn phân số về tối giản.",
       "opt-4": "Quên nhân thừa số phụ của 2/5 (lấy 2+1=3 trên 10)."
     },
-    "misconceptionTags": ["MISCON-ADD-DENOM"],
+    "misconceptionTags": [
+      "MISCON-ADD-DENOM"
+    ],
     "sourceRefs": [
       {
         "sourceId": "SRC-VN-MOET-MATH-2018",
         "documentNumber": "32/2018/TT-BGDĐT"
       }
     ],
-    "authoringOrigin": "HUMAN",
-    "itemMaturity": "REVIEWED",
-    "reviewState": "INTERNAL_REVIEWED",
-    "publicationState": "PUBLISHED_BETA",
+    "authoringOrigin": "AI_ASSISTED",
+    "itemMaturity": "DRAFT",
+    "reviewState": "AI_DRAFT",
+    "publicationState": "DRAFT",
     "version": "1.0.0"
   }
 ]

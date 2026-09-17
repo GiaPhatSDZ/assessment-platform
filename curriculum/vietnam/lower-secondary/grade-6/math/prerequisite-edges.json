@@ -3,24 +3,24 @@
     "prerequisiteNodeId": "NODE-MATH-4-FRAC-01",
     "targetNodeId": "NODE-MATH-5-FRAC-02",
     "strength": "REQUIRED",
-    "rationale": "Phải hiểu khái niệm phân số và phân số bằng nhau thì mới thực hiện được bước biến đổi quy đồng mẫu số.",
+    "rationale": "Cần hiểu khái niệm phân số và phân số bằng nhau trước khi thực hiện quy đồng mẫu số.",
     "evidenceType": "CURRICULUM_EXPLICIT",
-    "reviewState": "INTERNAL_REVIEWED"
+    "reviewState": "SOURCE_LINKED"
   },
   {
     "prerequisiteNodeId": "NODE-MATH-5-FRAC-02",
     "targetNodeId": "NODE-MATH-6-FRAC-03",
     "strength": "REQUIRED",
-    "rationale": "Không thể cộng hai phân số khác mẫu số nếu không quy đồng về cùng một mẫu số chung.",
+    "rationale": "Phép cộng phân số khác mẫu số bắt buộc phải quy đồng mẫu số về cùng mẫu số trước khi cộng tử.",
     "evidenceType": "CURRICULUM_EXPLICIT",
-    "reviewState": "INTERNAL_REVIEWED"
+    "reviewState": "SOURCE_LINKED"
   },
   {
     "prerequisiteNodeId": "NODE-MATH-6-FRAC-03",
     "targetNodeId": "NODE-MATH-6-FRAC-04",
     "strength": "REQUIRED",
-    "rationale": "Phải thành thạo thuật toán cộng hai phân số trước khi áp dụng vào các bài toán đố thực tiễn nhiều bước.",
+    "rationale": "Phải thành thạo quy tắc cộng trừ phân số trước khi giải bài toán vận dụng thực tế.",
     "evidenceType": "CURRICULUM_EXPLICIT",
-    "reviewState": "INTERNAL_REVIEWED"
+    "reviewState": "SOURCE_LINKED"
   }
 ]

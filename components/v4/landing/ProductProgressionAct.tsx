@@ -12,7 +12,7 @@ export function ProductProgressionAct() {
       title: "Chẩn đoán có trọng tâm",
       subtitle: "3 đến 5 câu hỏi được thiết kế khoa học",
       description:
-        "Bài chẩn đoán chỉ tập trung vào một chủ đề cụ thể. Các phương án sai được cài cắm ngộ nhận sư phạm điển hình để tìm chính xác mắt xích con đang bối rối.",
+        "Bài khảo sát chỉ tập trung vào một chủ đề cụ thể. Các phương án lựa chọn được xây dựng dựa trên mô thức nhầm lẫn sư phạm để nhận diện mắt xích học sinh đang vướng mắc.",
       icon: Compass,
       preview: {
         badge: "GIAO DIỆN TẬP TRUNG (FOCUS MODE)",
@@ -23,10 +23,10 @@ export function ProductProgressionAct() {
     },
     {
       stepNumber: "02",
-      title: "Khoanh vùng lỗ hổng gốc",
+      title: "Khoanh vùng mắt xích cần bổ trợ",
       subtitle: "Báo cáo bằng chứng, không phán xét",
       description:
-        "Hệ thống không đánh giá con học 'yếu' hay 'kém'. Báo cáo chỉ ra chính xác mắt xích nền tảng bị khuyết (ví dụ: cần củng cố bước tìm mẫu số chung).",
+        "Hệ thống không đánh giá học sinh học 'yếu' hay 'kém'. Báo cáo định vị mắt xích nền tảng có dấu hiệu chưa vững (ví dụ: cần củng cố bước tìm mẫu số chung).",
       icon: Layers,
       preview: {
         badge: "BÁO CÁO MẮT XÍCH (INSIGHT MODE)",

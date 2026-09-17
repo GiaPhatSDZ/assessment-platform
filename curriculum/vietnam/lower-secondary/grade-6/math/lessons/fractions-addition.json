@@ -62,10 +62,12 @@
     {
       "sourceId": "SRC-VN-MOET-MATH-2018",
       "documentNumber": "32/2018/TT-BGDĐT",
-      "citationText": "SGK Toán 6 Tập 2 — Chương Phân số"
+      "sectionLocator": "Mục V. Chương trình môn Toán lớp 6",
+      "citationText": "Chương trình GDPT 2018 Môn Toán, Mục V"
     }
   ],
   "ageOrGradeFit": ["6"],
-  "reviewState": "INTERNAL_REVIEWED",
-  "publicationState": "PUBLISHED_BETA"
+  "authoringOrigin": "AI_ASSISTED",
+  "reviewState": "AI_DRAFT",
+  "publicationState": "DRAFT"
 }

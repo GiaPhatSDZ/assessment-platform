@@ -43,7 +43,7 @@
     "commonMistakeExplanation": [
       {
         "type": "text",
-        "value": "Sai lầm phổ biến: Cộng trực tiếp tử với tử và mẫu với mẫu (3+5)/(8+12) = 8/20. Đây là lỗi sai bản chất vì các phần phân số chưa có cùng kích thước đơn vị đo."
+        "value": "Dấu hiệu nhầm lẫn thường gặp: Cộng trực tiếp tử với tử và mẫu với mẫu (3+5)/(8+12) = 8/20. Lỗi này xuất phát từ việc chưa chuyển đổi các phần phân số về cùng một đơn vị chia trước khi cộng gộp."
       }
     ],
     "sourceRefs": [
@@ -53,8 +53,8 @@
         "sectionLocator": "Mục V - Chương trình môn Toán lớp 6"
       }
     ],
-    "reviewState": "INTERNAL_REVIEWED",
-    "publicationState": "PUBLISHED_BETA"
+    "reviewState": "AI_DRAFT",
+    "publicationState": "DRAFT"
   },
   {
     "itemId": "ITEM-G6-FRAC-02",
@@ -81,7 +81,7 @@
     "commonMistakeExplanation": [
       {
         "type": "text",
-        "value": "Sai lầm: Lấy 6 × 8 = 48 làm mẫu chung. 48 là mẫu chung nhưng chưa phải nhỏ nhất, dẫn đến tính toán cồng kềnh."
+        "value": "Dấu hiệu nhầm lẫn: Lấy 6 × 8 = 48 làm mẫu chung. 48 là bội chung nhưng chưa phải là số nhỏ nhất, dẫn đến tính toán cồng kềnh."
       }
     ],
     "sourceRefs": [
@@ -90,7 +90,7 @@
         "documentNumber": "32/2018/TT-BGDĐT"
       }
     ],
-    "reviewState": "INTERNAL_REVIEWED",
-    "publicationState": "PUBLISHED_BETA"
+    "reviewState": "AI_DRAFT",
+    "publicationState": "DRAFT"
   }
 ]

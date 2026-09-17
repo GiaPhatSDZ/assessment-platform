@@ -78,11 +78,11 @@ export function generateLearningPack(gap: GapReport): LearningPack {
     : `Luyện tập thành thạo quy tắc và kỹ năng thực hiện '${gap.targetNodeLabel}'.`;
 
   const parentGuide = isPrereqGap
-    ? `Ba mẹ không cần phải tự dạy lại bài toán. Điểm mấu chốt: Con đang gặp vướng ở bước '${focusNodeLabel}' (chưa tìm đúng mẫu chung nhỏ nhất), chứ không phải con kém môn Toán. Hãy cho con xem 2 ví dụ mẫu có hướng dẫn dưới đây hoặc mở Gemini Notebook để con tự đối thoại học tập.`
-    : `Con đã nắm rất chắc các bước quy đồng mẫu số. Ba mẹ chỉ cần nhắc con kiểm tra lại khâu tính toán nhẩm và rút gọn phân số sau khi cộng.`;
+    ? `Ba mẹ không cần phải tự dạy lại bài toán từ đầu. Điểm mấu chốt: Con đang vướng ở bước '${focusNodeLabel}' (chưa tìm đúng mẫu số chung nhỏ nhất). Hãy cho con xem 2 ví dụ mẫu có hướng dẫn dưới đây; phụ huynh có thể tham khảo Trợ lý Phụ huynh (Parent Copilot / NotebookLM) để nhận bộ câu hỏi gợi ý phương pháp đồng hành cùng con mà không làm thay con.`
+    : `Con đã nắm vững các bước quy đồng mẫu số. Ba mẹ chỉ cần nhắc con kiểm tra lại khâu tính toán nhẩm và rút gọn phân số sau khi cộng.`;
 
   const learnerGuide = isPrereqGap
-    ? `Khi gặp bài cộng phân số khác mẫu như 3/8 + 5/12, sai lầm phổ biến nhất là vội lấy (3+5)/(8+12). Hãy nhớ: Ta không thể cộng trực tiếp khi các phần chia chưa cùng kích thước. Bước 1 luôn là tìm BCNN của 8 và 12 (bằng 24) để quy đồng!`
+    ? `Khi gặp bài cộng phân số khác mẫu như 3/8 + 5/12, nhầm lẫn thường gặp là vội lấy (3+5)/(8+12). Hãy nhớ: Ta không thể cộng trực tiếp khi các phần chia chưa cùng kích thước. Bước 1 luôn là tìm BCNN của 8 và 12 (bằng 24) để quy đồng!`
     : `Con thực hiện lần lượt 3 bước: 1. Tìm mẫu chung (BCNN) -> 2. Nhân cả tử và mẫu với thừa số phụ tương ứng -> 3. Giữ nguyên mẫu số chung, cộng tử số và rút gọn tối giản.`;
 
   const workedExamplePlan = [
@@ -97,16 +97,16 @@ export function generateLearningPack(gap: GapReport): LearningPack {
     "Bài tự luyện 3: Tính phép cộng 1/6 + 3/10 và rút gọn về phân số tối giản.",
   ];
 
-  const geminiNotebookPrompt = `Bạn là trợ lý học tập môn Toán bám sát Chương trình GDPT 2018 Bộ GD&ĐT Việt Nam.
-Mục tiêu: Giúp học sinh khắc phục lỗ hổng kiến thức: "${focusNodeLabel}".
+  const geminiNotebookPrompt = `Bạn là trợ lý sư phạm dành riêng cho phụ huynh/người giám hộ học sinh bám sát Chương trình GDPT 2018 Bộ GD&ĐT Việt Nam.
+Mục tiêu: Hỗ trợ phụ huynh phương pháp đồng hành cùng con củng cố mắt xích kiến thức: "${focusNodeLabel}".
 Quy tắc sư phạm:
 1. Chỉ dựa trên tài liệu học tập chuẩn được cung cấp trong notebook này.
-2. Không cho ngay đáp án bài toán. Hãy đặt câu hỏi gợi mở từng bước: "Để cộng được hai phân số này, bước đầu tiên con cần làm gì với hai mẫu số?".
-3. Nếu học sinh mắc lỗi cộng cả tử và mẫu: hãy dùng hình ảnh chiếc bánh pizza chia 8 phần và 12 phần để học sinh nhận ra sự khác biệt về kích thước mỗi phần.
-4. Ngôn từ ấm áp, khích lệ, rõ ràng, phù hợp học sinh lớp 6.`;
+2. Không giải bài hộ học sinh. Hướng dẫn phụ huynh đặt câu hỏi gợi mở cho con: "Để cộng được hai phân số này, bước đầu tiên con cần làm gì với hai mẫu số?".
+3. Gợi ý ví dụ trực quan đời thường (như chia bánh, chia cốc nước) để phụ huynh giúp con cảm nhận bản chất quy đồng trước khi áp dụng công thức.
+4. Ngôn từ ấm áp, rõ ràng, hỗ trợ phụ huynh kiên nhẫn đồng hành cùng con.`;
 
   const reTestCriteria = [
-    "Thực hiện chính xác bài toán tìm BCNN của hai mẫu số trong dưới 60 giây.",
+    "Thực hiện bài toán tìm BCNN của hai mẫu số đúng quy trình.",
     "Quy đồng mẫu số và tính đúng phép cộng hai phân số không cùng mẫu số.",
     "Rút gọn phân số kết quả về dạng tối giản.",
   ];
@@ -128,7 +128,7 @@ Quy tắc sư phạm:
     workedExamplePlan,
     practicePlan,
     geminiNotebookInstructions: {
-      suggestedTitle: `Sổ Học Tập Toán 6 — Ôn Luyện: ${focusNodeLabel}`,
+      suggestedTitle: `Sổ Đồng Hành Phụ Huynh Toán 6 — Hỗ Trợ: ${focusNodeLabel}`,
       suggestedSources: [
         "Trích lục Chương trình GDPT 2018 Môn Toán (Bộ GD&ĐT)",
         "Tài liệu hướng dẫn quy đồng mẫu số và tìm BCNN",

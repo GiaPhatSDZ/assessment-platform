@@ -19,7 +19,7 @@ describe("AI School V4 Art Direction & Visual Architecture Suite", () => {
 
     // Act 2: Prerequisite Tracing
     expect(
-      screen.getByRole("heading", { level: 2, name: /Một câu trả lời sai hiếm khi vì lười biếng/i })
+      screen.getByRole("heading", { level: 2, name: /Một câu trả lời chưa đúng thường phản ánh/i })
     ).toBeInTheDocument();
 
     // Act 3: Curriculum Stage Rail

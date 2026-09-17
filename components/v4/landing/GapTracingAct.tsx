@@ -25,10 +25,10 @@ export function GapTracingAct() {
       tag: "BƯỚC 2: PHÂN TÍCH ĐỒ THỊ TIÊN QUYẾT",
       title: "Hệ thống lần ngược cây tri thức",
       description:
-        "Thay vì trừ điểm, hệ thống đối chiếu với đồ thị tiên quyết chuẩn GDPT 2018. Lỗi 8/20 phản ánh chính xác ngộ nhận: Cộng thẳng tử với tử (3+5=8) và mẫu với mẫu (8+12=20).",
-      mathPrefix: "Ngộ nhận phổ biến:",
+        "Thay vì trừ điểm số đơn thuần, hệ thống đối chiếu với đồ thị tiên quyết chuẩn GDPT 2018. Lỗi 8/20 phản ánh dấu hiệu nhầm lẫn: Cộng thẳng tử với tử (3+5=8) và mẫu với mẫu (8+12=20).",
+      mathPrefix: "Mô thức nhầm lẫn quan sát được:",
       math: "\\frac{a}{b} + \\frac{c}{d} = \\frac{a+c}{b+d}",
-      insight: "Nguyên nhân: Con bỏ qua bước quy đồng vì chưa hiểu bản chất 'mẫu số biểu thị số phần bằng nhau'.",
+      insight: "Đặc điểm: Học sinh bỏ qua bước quy đồng vì chưa hiểu bản chất 'mẫu số biểu thị số phần bằng nhau'.",
       badWay: false,
     },
     {
@@ -56,20 +56,20 @@ export function GapTracingAct() {
             </span>
 
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-[44px] font-semibold text-ink leading-[1.1]">
-              Một câu trả lời sai hiếm khi vì lười biếng.
+              Một câu trả lời chưa đúng thường phản ánh mắt xích kiến thức chưa vững.
             </h2>
 
             <p className="text-base text-ink-muted leading-relaxed font-normal">
-              Toán học là một chuỗi mắt xích liên tục. Khi con gặp khó khăn ở lớp 6, nguyên nhân gốc rễ thường nằm ở một khái niệm nền tảng của lớp 4 hoặc lớp 5 chưa được hiểu trọn vẹn.
+              Toán học là một chuỗi mắt xích liên tục. Khi học sinh gặp khó khăn ở lớp 6, trở ngại thường liên quan đến một khái niệm tiên quyết ở lớp 4 hoặc lớp 5 chưa được củng cố đầy đủ.
             </p>
 
             <div className="p-4 rounded-app bg-canvas border border-line/60 space-y-2 text-xs">
               <div className="font-semibold text-ink flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-accent" />
-                Nguyên lý chẩn đoán chính xác:
+                Nguyên lý khảo sát theo đồ thị tiên quyết:
               </div>
               <p className="text-ink-muted leading-relaxed">
-                Mỗi phương án nhiễu trong bài chẩn đoán được thiết kế tương ứng với một ngộ nhận sư phạm điển hình, giúp khoanh vùng chính xác kiến thức tiên quyết bị khuyết.
+                Mỗi phương án nhiễu trong bài khảo sát được xây dựng dựa trên mô thức nhầm lẫn có căn cứ sư phạm, hỗ trợ khoanh vùng kiến thức tiên quyết cần củng cố.
               </p>
             </div>
           </div>

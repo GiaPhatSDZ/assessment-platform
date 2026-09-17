@@ -57,6 +57,7 @@ export interface SourceDocument {
   issuedAt?: string;
   effectiveFrom?: string;
   effectiveTo?: string;
+  sourceVersion?: string;
   retrievedAt: string;
   curriculumStatus?: CurriculumLegalStatus;
   rightsNotes?: string;
@@ -104,7 +105,8 @@ export interface Lesson {
   learnerText: RichContent[];
   workedExamples: { prompt: RichContent[]; steps: RichContent[]; finalAnswer: string }[];
   approvedSourceRefs: SourceRef[];
-  ageOrGradeFit: string[];
+  ageOrGradeFit?: string[];
+  authoringOrigin?: "HUMAN" | "AI_ASSISTED" | "ADAPTED_WITH_PERMISSION";
   reviewState: ReviewState;
   publicationState: PublicationState;
   version: string;
@@ -171,13 +173,15 @@ export interface ParentGuide {
   reviewState: ReviewState;
 }
 
+export type PublicationScope = "DRAFT" | "BETA" | "VERIFIED";
+
 export interface PublicationManifest {
   manifestVersion: string;
   subjectId: string;
   gradeOrAgeBand: string;
   publishedAt: string;
   publishedBy: string;
-  publicationScope: "BETA" | "VERIFIED";
+  publicationScope: PublicationScope;
   sourceDocumentIds: string[];
   learningOutcomeCount: number;
   knowledgeNodeCount: number;
@@ -188,8 +192,10 @@ export interface PublicationManifest {
 
 export interface SubjectCoverageRecord {
   grade: number | string;
+  stage?: string;
   subjectId: string;
   subjectNameVi: string;
+  kind?: string;
   sourceStatus: CoverageStatus;
   outcomesTotal: number;
   outcomesReviewed: number;

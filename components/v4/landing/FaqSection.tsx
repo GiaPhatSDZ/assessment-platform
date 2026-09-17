@@ -8,8 +8,8 @@ export function FaqSection() {
 
   const faqs = [
     {
-      q: "Bài chẩn đoán khác gì một bài thi thử hoặc kiểm tra thông thường?",
-      a: "Bài kiểm tra thông thường chỉ chấm điểm số (ví dụ: 6/10) và kết luận chung chung. Bài chẩn đoán của AI School sử dụng phương pháp lần vết tiên quyết: Mỗi đáp án sai được thiết kế tương ứng với một ngộ nhận sư phạm điển hình, từ đó tìm ra chính xác mắt xích con chưa nắm vững từ các lớp trước.",
+      q: "Bài khảo sát khác gì một bài thi thử hoặc kiểm tra thông thường?",
+      a: "Bài kiểm tra thông thường chỉ chấm điểm số (ví dụ: 6/10) và kết luận chung chung. Bài khảo sát của AI School sử dụng phương pháp đối soát tiên quyết: Mỗi đáp án được gắn với mô thức nhầm lẫn sư phạm có căn cứ, hỗ trợ định vị mắt xích kiến thức cần ôn tập từ các lớp trước.",
     },
     {
       q: "Hệ thống có sử dụng AI để sinh câu hỏi hoặc chấm điểm cảm tính không?",

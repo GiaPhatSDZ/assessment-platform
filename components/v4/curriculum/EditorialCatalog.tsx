@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { PrerequisiteTree } from "@/components/v3/curriculum/PrerequisiteTree";
 import { CurriculumService } from "@/src/application/curriculum/curriculum-service";
+import catalog from "@/curriculum/vietnam/catalog.json";
 import coverageRegistry from "@/curriculum/vietnam/coverage-registry.json";
-import { CoverageStatus } from "@/src/domain/content/schema";
+import { CoverageStatus, SubjectCoverageRecord } from "@/src/domain/content/schema";
 import {
   ArrowRight,
   BookCheck,
@@ -15,156 +16,39 @@ import {
   ListTree,
   CheckCircle2,
   Layers,
-  Database,
   ShieldCheck,
+  Search,
 } from "lucide-react";
 
 type StageId = "PRESCHOOL" | "PRIMARY" | "LOWER_SECONDARY" | "UPPER_SECONDARY";
 
-interface SubjectRow {
-  id: string;
-  subject: string;
-  topic: string;
-  code: string;
-  grade: number | string;
-  status: CoverageStatus;
-  yccd: string;
-  diagnosticHref?: string;
-  hasKnowledgeGraph?: boolean;
-}
-
-const CURRICULUM_DATA: Record<
+const STAGE_CONFIG: Record<
   StageId,
-  { name: string; ageRange: string; standard: string; rows: SubjectRow[] }
+  { label: string; range: string; stageKey: string; standard: string }
 > = {
   PRESCHOOL: {
-    name: "Mầm non (3 – 6 tuổi)",
-    ageRange: "3 – 6 tuổi",
-    standard: "Thông tư 28/2016/TT-BGDĐT & Đề án 2026 (Thí điểm)",
-    rows: [
-      {
-        id: "PRE-01",
-        subject: "Toán tiền học đường",
-        topic: "Nhận biết chữ số & tập đếm số lượng 1 – 10",
-        code: "PRE-MATH-COUNT-01",
-        grade: "5-6 tuổi",
-        status: "CONTENT_IN_REVIEW",
-        yccd: "Nhận biết các con số từ 1 đến 10, đếm số lượng đồ vật tương ứng trong phạm vi 10.",
-      },
-      {
-        id: "PRE-02",
-        subject: "Phát triển nhận thức",
-        topic: "Phân biệt không gian & hình học cơ bản",
-        code: "PRE-COG-GEO-01",
-        grade: "4-5 tuổi",
-        status: "SOURCE_INGESTED",
-        yccd: "Nhận biết hình vuông, tam giác, tròn qua đồ vật trực quan; phân biệt trên - dưới.",
-      },
-    ],
+    label: "Mầm non",
+    range: "3 – 6 tuổi",
+    stageKey: "preschool",
+    standard: "Thông tư 28/2016/TT-BGDĐT & Đề án đổi mới CTGDMN 2026",
   },
   PRIMARY: {
-    name: "Tiểu học",
-    ageRange: "Lớp 1 – 5",
+    label: "Tiểu học",
+    range: "Lớp 1 – 5",
+    stageKey: "primary",
     standard: "Thông tư 32/2018/TT-BGDĐT",
-    rows: [
-      {
-        id: "PRI-G4-FRAC",
-        subject: "Toán học",
-        topic: "Khái niệm phân số, phân số bằng nhau, rút gọn phân số",
-        code: "MATH-VN-G4-FRAC-01",
-        grade: 4,
-        status: "CONTENT_IN_REVIEW",
-        yccd: "Nhận biết khái niệm phân số là một hoặc nhiều phần bằng nhau của đơn vị; nhận biết phân số bằng nhau.",
-      },
-      {
-        id: "PRI-G5-DENOM",
-        subject: "Toán học",
-        topic: "Quy đồng mẫu số hai phân số",
-        code: "MATH-VN-G5-DENOM-01",
-        grade: 5,
-        status: "CONTENT_IN_REVIEW",
-        yccd: "Thực hiện được quy đồng mẫu số hai phân số trong trường hợp có mẫu số chung đơn giản.",
-      },
-      {
-        id: "PRI-G5-DEC",
-        subject: "Toán học",
-        topic: "Số thập phân và các phép tính với số thập phân",
-        code: "MATH-VN-G5-DEC-01",
-        grade: 5,
-        status: "OUTCOMES_EXTRACTED",
-        yccd: "Nhận biết số thập phân; thực hiện được các phép cộng, trừ, nhân, chia số thập phân.",
-      },
-    ],
   },
   LOWER_SECONDARY: {
-    name: "Trung học cơ sở (THCS)",
-    ageRange: "Lớp 6 – 9",
+    label: "Trung học cơ sở (THCS)",
+    range: "Lớp 6 – 9",
+    stageKey: "lower-secondary",
     standard: "Thông tư 32/2018/TT-BGDĐT",
-    rows: [
-      {
-        id: "SEC-G6-FRAC-ADD",
-        subject: "Toán học",
-        topic: "Phép cộng và trừ hai phân số khác mẫu số",
-        code: "MATH-VN-G6-NUM-001",
-        grade: 6,
-        status: "PUBLISHED",
-        yccd: "Thực hiện được phép cộng, trừ hai phân số khác mẫu số thông qua bước quy đồng mẫu số chung.",
-        diagnosticHref: "/diagnostic/math-grade6",
-        hasKnowledgeGraph: true,
-      },
-      {
-        id: "SEC-G6-NUM-GCD",
-        subject: "Toán học",
-        topic: "Ước chung lớn nhất & Bội chung nhỏ nhất",
-        code: "MATH-VN-G6-NUM-GCD",
-        grade: 6,
-        status: "DIAGNOSTIC_READY",
-        yccd: "Vận dụng được ƯCLN và BCNN vào các bài toán rút gọn phân số và tìm mẫu số chung.",
-      },
-      {
-        id: "SEC-G6-GEO-FLAT",
-        subject: "Toán học",
-        topic: "Hình học trực quan: Hình tam giác đều, hình vuông, lục giác đều",
-        code: "MATH-VN-G6-GEO-01",
-        grade: 6,
-        status: "OUTCOMES_EXTRACTED",
-        yccd: "Mô tả được các yếu tố cơ bản (cạnh, góc, đường chéo) của các hình phẳng quen thuộc.",
-      },
-      {
-        id: "SEC-G7-RATIONAL",
-        subject: "Toán học",
-        topic: "Tập hợp các số hữu tỉ và các phép tính",
-        code: "MATH-VN-G7-NUM-01",
-        grade: 7,
-        status: "SOURCE_INGESTED",
-        yccd: "Nhận biết được số hữu tỉ và biểu diễn số hữu tỉ trên trục số; thực hiện các phép tính trong Q.",
-      },
-    ],
   },
   UPPER_SECONDARY: {
-    name: "Trung học phổ thông (THPT)",
-    ageRange: "Lớp 10 – 12",
+    label: "Trung học phổ thông (THPT)",
+    range: "Lớp 10 – 12",
+    stageKey: "upper-secondary",
     standard: "Thông tư 32/2018/TT-BGDĐT",
-    rows: [
-      {
-        id: "HIGH-G10-FUNC",
-        subject: "Toán học",
-        topic: "Hàm số bậc nhất, bậc hai và đồ thị",
-        code: "MATH-VN-G10-ALG-01",
-        grade: 10,
-        status: "SOURCE_INGESTED",
-        yccd: "Chưa hỗ trợ trực tuyến; kế hoạch mở rộng sau khi hoàn thành chuẩn hóa cấp THCS.",
-      },
-      {
-        id: "HIGH-G12-CALC",
-        subject: "Toán học",
-        topic: "Ứng dụng đạo hàm để khảo sát và vẽ đồ thị hàm số",
-        code: "MATH-VN-G12-CALC-01",
-        grade: 12,
-        status: "NOT_INGESTED",
-        yccd: "Chưa nạp văn bản chương trình chính thức vào hệ thống.",
-      },
-    ],
   },
 };
 
@@ -218,99 +102,121 @@ function StatusBadge({ status }: { status: CoverageStatus }) {
 
 export function EditorialCatalog() {
   const [activeStage, setActiveStage] = useState<StageId>("LOWER_SECONDARY");
-  const [activeTab, setActiveTab] = useState<"SLICES" | "REGISTRY">("SLICES");
+  const [activeTab, setActiveTab] = useState<"STAGE_VIEW" | "FULL_REGISTRY">("STAGE_VIEW");
   const [showGraphDrawer, setShowGraphDrawer] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const currentStage = CURRICULUM_DATA[activeStage];
   const graph = CurriculumService.getFractionsKnowledgeGraph();
+  const currentStageConfig = STAGE_CONFIG[activeStage];
 
-  // Registry summary stats
+  // Derive counts dynamically from coverage registry
   const totalSubjects = coverageRegistry.length;
   const publishedCount = coverageRegistry.filter((r) => r.sourceStatus === "PUBLISHED").length;
-  const ingestedCount = coverageRegistry.filter((r) => r.sourceStatus === "SOURCE_INGESTED").length;
+  const inReviewCount = coverageRegistry.filter((r) => r.sourceStatus === "CONTENT_IN_REVIEW").length;
+  const notIngestedCount = coverageRegistry.filter((r) => r.sourceStatus === "NOT_INGESTED").length;
+
+  // Filter items for current stage from the authoritative registry
+  const stageRecords = useMemo(() => {
+    return (coverageRegistry as SubjectCoverageRecord[]).filter(
+      (r) => r.stage === currentStageConfig.stageKey
+    );
+  }, [currentStageConfig.stageKey]);
+
+  // Search filtered records for full table
+  const filteredRegistry = useMemo(() => {
+    if (!searchQuery.trim()) return coverageRegistry as SubjectCoverageRecord[];
+    const q = searchQuery.toLowerCase();
+    return (coverageRegistry as SubjectCoverageRecord[]).filter(
+      (r) =>
+        r.subjectNameVi.toLowerCase().includes(q) ||
+        r.subjectId.toLowerCase().includes(q) ||
+        String(r.grade).toLowerCase().includes(q)
+    );
+  }, [searchQuery]);
 
   return (
     <div className="space-y-10">
       {/* Editorial Catalog Header */}
       <div className="max-w-3xl space-y-3">
         <span className="text-xs font-semibold text-brand tracking-widest uppercase bg-brand-soft/60 px-3 py-1 rounded-pill">
-          Bản Đồ Kiến Thức Thực Chất K–12
+          Danh Mục Chương Trình Quốc Gia & Cây Tri Thức
         </span>
         <h1 className="font-serif text-3xl sm:text-5xl font-semibold text-ink leading-tight">
           Cây Tri Thức & Danh Mục Khảo Sát
         </h1>
         <p className="text-base text-ink-muted leading-relaxed font-normal">
-          Mỗi chủ đề đều có cơ sở pháp lý theo Thông tư 32/2018/TT-BGDĐT. Trạng thái phản ánh
-          trung thực 6 cấp độ thẩm định sư phạm của hệ thống.
+          Dữ liệu được kết xuất trực tiếp từ danh mục Chương trình GDPT 2018 và CTGDMN. Mọi trạng thái đều phản ánh trung thực mức độ kiểm duyệt học liệu thực tế.
         </p>
       </div>
 
-      {/* Honest Coverage Audit Banner */}
+      {/* Coverage Truth Audit Card */}
       <div className="rounded-app border border-line bg-surface p-5 sm:p-6 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line/50 pb-3">
           <div className="flex items-center gap-2 text-ink">
             <ShieldCheck className="h-5 w-5 text-brand" />
             <h3 className="font-semibold text-sm sm:text-base">
-              Cam kết tính chân thực về độ phủ chương trình (Coverage Truth)
+              Kiểm toán tính trung thực về độ phủ (Coverage Truth)
             </h3>
           </div>
-          <span className="text-2xs font-mono bg-canvas px-3 py-1 rounded-pill text-ink-muted border border-line/40">
-            Tổng số môn K–12: {totalSubjects} | Đã phát hành: {publishedCount}
-          </span>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-2xs font-mono bg-canvas px-3 py-1 rounded-pill text-ink-muted border border-line/40">
+              Tổng số môn: {totalSubjects}
+            </span>
+            <span className="text-2xs font-mono bg-amber-50 text-amber-900 border border-amber-200 px-3 py-1 rounded-pill">
+              Đang thẩm định: {inReviewCount}
+            </span>
+            <span className="text-2xs font-mono bg-stone-100 text-stone-600 border border-stone-200 px-3 py-1 rounded-pill">
+              Chưa nạp: {notIngestedCount}
+            </span>
+          </div>
         </div>
         <p className="text-xs text-ink-muted leading-relaxed">
-          <strong>Nguyên tắc bất di dịch:</strong> Thư mục tồn tại ≠ Nội dung sẵn sàng. Hệ thống
-          tuyệt đối không dùng AI tạo sinh bài học hoặc câu hỏi runtime cho học sinh. Chỉ có chủ đề
-          đã hoàn thành quy trình đối soát học liệu (như Lát cắt Toán 6 Phân số) mới được chuyển
-          sang trạng thái <span className="font-semibold text-emerald-700">PUBLISHED</span>.
+          <strong>Nguyên tắc đạo đức sư phạm:</strong> Hệ thống không tạo bài học hay câu hỏi bằng AI hàng loạt. Một môn học chỉ được phát hành khi đã hoàn tất quy trình đối soát học liệu từ nguồn văn bản pháp lý chính thức. Mọi dữ liệu hiển thị bên dưới đều được nạp trực tiếp từ danh mục và tệp tin thực tế trên đĩa.
         </p>
 
         {/* View Switcher Tabs */}
         <div className="flex items-center gap-2 pt-1">
           <button
             type="button"
-            onClick={() => setActiveTab("SLICES")}
+            onClick={() => setActiveTab("STAGE_VIEW")}
             className={`text-xs font-semibold px-4 py-2 rounded-lg transition-all ${
-              activeTab === "SLICES"
+              activeTab === "STAGE_VIEW"
                 ? "bg-brand text-white shadow-2xs"
                 : "bg-surfaceStrong text-ink-muted hover:text-ink border border-line/50"
             }`}
           >
-            Chủ đề mẫu đối soát (Vertical Slices)
+            Theo cấp học (Stage View)
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab("REGISTRY")}
+            onClick={() => setActiveTab("FULL_REGISTRY")}
             className={`text-xs font-semibold px-4 py-2 rounded-lg transition-all ${
-              activeTab === "REGISTRY"
+              activeTab === "FULL_REGISTRY"
                 ? "bg-brand text-white shadow-2xs"
                 : "bg-surfaceStrong text-ink-muted hover:text-ink border border-line/50"
             }`}
           >
-            Sổ đăng ký độ phủ toàn quốc ({totalSubjects} môn)
+            Sổ đăng ký toàn quốc ({totalSubjects} môn)
           </button>
         </div>
       </div>
 
-      {activeTab === "SLICES" ? (
-        /* Main Layout: Left Stage Rail (4 cols) + Right List Rows (8 cols) */
+      {activeTab === "STAGE_VIEW" ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           {/* Stage Rail */}
           <div className="lg:col-span-4 flex flex-row lg:flex-col gap-2.5 overflow-x-auto pb-2 lg:pb-0">
-            {(
-              [
-                { id: "PRESCHOOL", label: "Mầm non", range: "3 – 6 tuổi" },
-                { id: "PRIMARY", label: "Tiểu học", range: "Lớp 1 – 5" },
-                { id: "LOWER_SECONDARY", label: "THCS", range: "Lớp 6 – 9" },
-                { id: "UPPER_SECONDARY", label: "THPT", range: "Lớp 10 – 12" },
-              ] as const
-            ).map((s) => {
-              const isSelected = activeStage === s.id;
+            {(Object.keys(STAGE_CONFIG) as StageId[]).map((stageId) => {
+              const s = STAGE_CONFIG[stageId];
+              const isSelected = activeStage === stageId;
+              const countInStage = (coverageRegistry as SubjectCoverageRecord[]).filter(
+                (r) => r.stage === s.stageKey
+              ).length;
+
               return (
                 <button
-                  key={s.id}
+                  key={stageId}
                   type="button"
-                  onClick={() => setActiveStage(s.id)}
+                  onClick={() => setActiveStage(stageId)}
                   className={`w-full text-left p-4 sm:p-5 rounded-app transition-all border shrink-0 ${
                     isSelected
                       ? "bg-surface border-brand shadow-2xs text-ink"
@@ -323,60 +229,99 @@ export function EditorialCatalog() {
                       {s.range}
                     </span>
                   </div>
+                  <div className="text-2xs text-ink-muted mt-2 flex items-center justify-between">
+                    <span>{countInStage} môn trong danh mục</span>
+                  </div>
                 </button>
               );
             })}
           </div>
 
-          {/* Right Content Panel: Editorial List Rows */}
+          {/* Right Content Panel: Stage Subjects from Catalog & Registry */}
           <div className="lg:col-span-8 space-y-6">
             <div className="rounded-marketingWindow border border-line/70 bg-surface p-6 sm:p-8 space-y-6">
               <div className="border-b border-line/50 pb-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <h2 className="font-serif text-2xl font-bold text-ink">{currentStage.name}</h2>
+                  <h2 className="font-serif text-2xl font-bold text-ink">
+                    {currentStageConfig.label} ({currentStageConfig.range})
+                  </h2>
                   <span className="text-2xs font-mono font-medium text-ink-muted bg-canvas px-2.5 py-1 rounded border border-line/40">
-                    {currentStage.standard}
+                    {currentStageConfig.standard}
                   </span>
                 </div>
                 <p className="text-xs text-ink-muted mt-1">
-                  Danh sách các chủ đề đã được mã hóa vào đồ thị tri thức có hướng (DAG).
+                  Danh sách môn học kết xuất trực tiếp từ danh mục pháp lý. Trạng thái phản ánh mức độ hoàn thiện dữ liệu thực tế.
                 </p>
               </div>
 
-              {/* List Rows */}
+              {/* Subject List Rows */}
               <div className="space-y-3">
-                {currentStage.rows.map((row) => (
-                  <div
-                    key={row.id}
-                    className="rounded-app border border-line/60 bg-surfaceStrong p-4 sm:p-5 transition-all hover:border-line space-y-3"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-2xs font-mono font-semibold text-brand bg-brand-soft/60 px-2 py-0.5 rounded">
-                            {typeof row.grade === "number" ? `Lớp ${row.grade}` : row.grade}
-                          </span>
-                          <span className="text-2xs font-mono text-ink-muted">{row.code}</span>
+                {stageRecords.map((record, idx) => {
+                  const isGrade6Math = record.grade === 6 && record.subjectId === "math";
+
+                  return (
+                    <div
+                      key={`${record.grade}-${record.subjectId}-${idx}`}
+                      className="rounded-app border border-line/60 bg-surfaceStrong p-4 sm:p-5 transition-all hover:border-line space-y-3"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xs font-mono font-semibold text-brand bg-brand-soft/60 px-2 py-0.5 rounded">
+                              {typeof record.grade === "number" ? `Lớp ${record.grade}` : record.grade}
+                            </span>
+                            <span className="text-2xs font-mono text-ink-muted">{record.subjectId}</span>
+                            {record.kind && (
+                              <span className="text-2xs font-mono text-ink-muted border border-line/50 px-1.5 py-0.5 rounded">
+                                {record.kind === "mandatory"
+                                  ? "Bắt buộc"
+                                  : record.kind === "elective"
+                                  ? "Lựa chọn"
+                                  : "Tùy chọn"}
+                              </span>
+                            )}
+                          </div>
+                          <h3 className="font-serif text-lg font-bold text-ink mt-1">
+                            {record.subjectNameVi}
+                          </h3>
                         </div>
-                        <h3 className="font-serif text-lg font-bold text-ink mt-1">{row.topic}</h3>
+
+                        {/* Status Badge */}
+                        <div className="shrink-0">
+                          <StatusBadge status={record.sourceStatus} />
+                        </div>
                       </div>
 
-                      {/* Status Badge */}
-                      <div className="shrink-0">
-                        <StatusBadge status={row.status} />
+                      {/* Content metrics or status explanation */}
+                      <div className="text-xs text-ink-muted border-t border-line/40 pt-2.5 flex flex-wrap items-center gap-4">
+                        <span>
+                          Yêu cầu cần đạt:{" "}
+                          <strong className="text-ink font-mono">
+                            {record.outcomesReviewed}/{record.outcomesTotal}
+                          </strong>
+                        </span>
+                        <span>
+                          Đốt tri thức:{" "}
+                          <strong className="text-ink font-mono">
+                            {record.nodesReviewed}/{record.nodesTotal}
+                          </strong>
+                        </span>
+                        <span>
+                          Câu hỏi thẩm duyệt:{" "}
+                          <strong className="text-ink font-mono">{record.questionsReviewed}</strong>
+                        </span>
                       </div>
-                    </div>
 
-                    {/* YCCĐ Descriptor */}
-                    <p className="text-xs text-ink-muted leading-relaxed border-t border-line/40 pt-2.5">
-                      <span className="font-medium text-ink">Yêu cầu cần đạt: </span>
-                      {row.yccd}
-                    </p>
-
-                    {/* Interactive Action Bar if available */}
-                    {(row.diagnosticHref || row.hasKnowledgeGraph) && (
-                      <div className="flex flex-wrap items-center gap-3 pt-2">
-                        {row.hasKnowledgeGraph && (
+                      {/* Interactive Drawer & Diagnostic for vertical slice */}
+                      {isGrade6Math && (
+                        <div className="pt-2 flex flex-wrap items-center gap-3">
+                          <Link
+                            href="/diagnostic/math-grade6"
+                            className="inline-flex items-center gap-1.5 text-xs font-medium text-white bg-brand hover:bg-brand-dark px-3 py-1.5 rounded transition-colors"
+                          >
+                            <span>Làm bài chẩn đoán</span>
+                            <ArrowRight className="h-3.5 w-3.5" />
+                          </Link>
                           <button
                             type="button"
                             onClick={() => setShowGraphDrawer(!showGraphDrawer)}
@@ -384,24 +329,14 @@ export function EditorialCatalog() {
                           >
                             <Layers className="h-3.5 w-3.5" />
                             <span>
-                              {showGraphDrawer ? "Ẩn cây tri thức mẫu" : "Xem cây tri thức mẫu"}
+                              {showGraphDrawer ? "Ẩn cây tri thức tiên quyết" : "Xem cây tri thức tiên quyết mẫu (DAG)"}
                             </span>
                           </button>
-                        )}
-
-                        {row.diagnosticHref && (
-                          <Link
-                            href={row.diagnosticHref}
-                            className="inline-flex items-center gap-1 text-xs font-semibold rounded-lg bg-brand px-3.5 py-1.5 text-white hover:bg-brand-dark transition-colors shadow-2xs ml-auto"
-                          >
-                            <span>Làm bài chẩn đoán</span>
-                            <ArrowRight className="h-3 w-3" />
-                          </Link>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -414,8 +349,7 @@ export function EditorialCatalog() {
                       Cây Tri Thức Tiên Quyết: Phân Số Lớp 6
                     </h3>
                     <p className="text-xs text-ink-muted">
-                      Liên kết có hướng từ Lớp 4 (Khái niệm, Rút gọn) → Lớp 5 (Quy đồng) → Lớp 6
-                      (Cộng trừ khác mẫu).
+                      Đồ thị có hướng (DAG) liên kết từ Lớp 4 (Khái niệm phân số) $\rightarrow$ Lớp 5 (Quy đồng) $\rightarrow$ Lớp 6 (Cộng trừ khác mẫu).
                     </p>
                   </div>
                   <button
@@ -438,15 +372,22 @@ export function EditorialCatalog() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line/50 pb-4">
             <div>
               <h2 className="font-serif text-2xl font-bold text-ink">
-                Sổ Đăng Ký Độ Phủ Chương Trình Quốc Gia V1
+                Sổ Đăng Ký Độ Phủ Toàn Quốc
               </h2>
               <p className="text-xs text-ink-muted mt-1">
-                Theo dõi chính xác trạng thái của từng môn học từ Mẫu giáo 3–6 đến Lớp 12.
+                Theo dõi minh bạch trạng thái của toàn bộ {totalSubjects} môn học từ Mẫu giáo 3–6 đến Lớp 12.
               </p>
             </div>
-            <span className="text-xs font-mono font-medium text-ink-muted bg-canvas px-3 py-1.5 rounded border border-line/40">
-              139/139 Bản ghi đã kiểm soát
-            </span>
+            <div className="relative">
+              <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tìm môn học hoặc lớp..."
+                className="pl-9 pr-3 py-1.5 text-xs rounded-lg border border-line bg-surface text-ink focus:outline-none focus:border-brand"
+              />
+            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -464,7 +405,7 @@ export function EditorialCatalog() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-line/30 text-ink-muted">
-                {coverageRegistry.map((item, idx) => (
+                {filteredRegistry.map((item, idx) => (
                   <tr key={`${item.stage}-${item.grade}-${item.subjectId}-${idx}`} className="hover:bg-surfaceStrong/50">
                     <td className="py-2.5 px-3 font-mono font-medium text-ink">
                       {typeof item.grade === "number" ? `Lớp ${item.grade}` : item.grade}
@@ -472,12 +413,12 @@ export function EditorialCatalog() {
                     <td className="py-2.5 px-3 font-mono text-2xs">{item.subjectId}</td>
                     <td className="py-2.5 px-3 font-medium text-ink">{item.subjectNameVi}</td>
                     <td className="py-2.5 px-3 text-2xs">
-                      {"kind" in item && item.kind === "MANDATORY" ? (
+                      {item.kind === "mandatory" ? (
                         <span className="text-brand font-medium">Bắt buộc</span>
-                      ) : "kind" in item && item.kind === "ELECTIVE" ? (
-                        <span className="text-amber-700">Tự chọn</span>
+                      ) : item.kind === "elective" ? (
+                        <span className="text-amber-700">Lựa chọn</span>
                       ) : (
-                        <span className="text-stone-500">Mặc định</span>
+                        <span className="text-stone-500">Tùy chọn</span>
                       )}
                     </td>
                     <td className="py-2.5 px-3">

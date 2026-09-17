@@ -3,14 +3,15 @@
   "subjectId": "math",
   "gradeOrAgeBand": "grade-6",
   "publishedAt": "2026-09-17T00:00:00Z",
-  "publishedBy": "AI_SCHOOL_EDITORIAL_BOARD",
-  "publicationScope": "BETA",
+  "publishedBy": "PENDING_HUMAN_CONTROLLER_AUDIT",
+  "publicationScope": "DRAFT",
   "sourceDocumentIds": [
+    "SRC-VN-MOET-GEP-2018",
     "SRC-VN-MOET-MATH-2018"
   ],
   "learningOutcomeCount": 2,
   "knowledgeNodeCount": 4,
   "lessonCount": 1,
   "questionItemCount": 6,
-  "checksum": "sha256-g6-math-fractions-vertical-slice-v1"
+  "checksum": "d627e0a950e0981868f37ea84763e0cac66cf956074f6b541a509514419f3352"
 }

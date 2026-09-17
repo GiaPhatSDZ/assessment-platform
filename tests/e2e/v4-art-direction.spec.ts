@@ -28,7 +28,7 @@ test.describe("AI School V4 Art Direction & Responsive Layout Suites", () => {
 
       // Act 2: Prerequisite tracing section is present
       await expect(
-        page.getByRole("heading", { level: 2, name: /Một câu trả lời sai hiếm khi vì lười biếng/i })
+        page.getByRole("heading", { level: 2, name: /Một câu trả lời chưa đúng thường phản ánh/i })
       ).toBeVisible();
 
       // Act 3: Stage rail is present

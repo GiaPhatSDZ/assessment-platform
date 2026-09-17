@@ -89,7 +89,7 @@ export function GapInsightView({
         <div className="rounded-app bg-danger-soft/40 border border-danger/30 p-5 space-y-2">
           <div className="flex items-center gap-2 text-xs font-bold text-danger uppercase tracking-wider">
             <AlertCircle className="h-4 w-4" />
-            <span>Phân tích nguyên nhân gốc rễ</span>
+            <span>Phân tích liên kết tiên quyết</span>
           </div>
           <p className="text-xs sm:text-sm text-ink leading-relaxed font-medium">
             {report.explanation ||

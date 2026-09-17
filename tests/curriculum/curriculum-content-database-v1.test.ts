@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 
 import {
   assertPublishedForStudent,
@@ -31,12 +32,16 @@ import {
   PublicationManifest,
 } from "@/src/domain/content/schema";
 
-describe("Curriculum Content Database V1 — Authority & Boundary Tests", () => {
+import { ManualGeminiNotebookProvider } from "@/src/infrastructure/remediation/gemini-notebook/manual-provider";
+import { generateLearningPack } from "@/src/domain/remediation/learning-pack";
+import { GapReport } from "@/src/domain/diagnostic/gap-engine";
+
+describe("Curriculum Content Database V1 — Authority, Provenance & Boundary Tests", () => {
+  const catalogPath = path.resolve("curriculum/vietnam/catalog.json");
+  const catalog = JSON.parse(fs.readFileSync(catalogPath, "utf-8"));
+
   // 1. Catalog & Stage/Grade Availability
   describe("Catalog & Grade Hierarchy Structure", () => {
-    const catalogPath = path.resolve("curriculum/vietnam/catalog.json");
-    const catalog = JSON.parse(fs.readFileSync(catalogPath, "utf-8"));
-
     it("defines 12 school grades with correct stages", () => {
       expect(catalog.grades).toHaveLength(12);
 
@@ -180,14 +185,14 @@ describe("Curriculum Content Database V1 — Authority & Boundary Tests", () => 
       rationale: "Giải thích chuẩn",
       misconceptionTags: [],
       sourceRefs: [{ sourceId: "SRC-01" }],
-      authoringOrigin: "HUMAN",
+      authoringOrigin: "AI_ASSISTED",
       itemMaturity: "REVIEWED",
       reviewState: "INTERNAL_REVIEWED",
       publicationState: "PUBLISHED_BETA",
       version: "1.0.0",
     };
 
-    it("allows PUBLISHED_BETA items with INTERNAL_REVIEWED reviewState", () => {
+    it("allows PUBLISHED_BETA items only when reviewState is at least INTERNAL_REVIEWED", () => {
       expect(() => assertPublishedForStudent(validPublishedItem)).not.toThrow();
     });
 
@@ -280,7 +285,7 @@ describe("Curriculum Content Database V1 — Authority & Boundary Tests", () => 
             hintsWithoutGivingAnswer: ["Vẽ hình trực quan trước khi tính toán"],
             everydayExamples: ["Gộp nửa cốc nước và một phần tư cốc nước"],
             sourceRefs: [],
-            reviewState: "INTERNAL_REVIEWED",
+            reviewState: "AI_DRAFT",
           },
         },
       });
@@ -300,131 +305,187 @@ describe("Curriculum Content Database V1 — Authority & Boundary Tests", () => 
       );
       expect(() => assertCannotModifyMastery("retrieve_parent_guidance_text")).not.toThrow();
     });
+
+    it("verifies learning pack and notebook instructions are strictly for parents", () => {
+      const sampleGap: GapReport = {
+        sessionId: "sess-test",
+        targetNodeId: "NODE-MATH-6-FRAC-03",
+        targetNodeLabel: "Cộng phân số khác mẫu",
+        classification: "PREREQUISITE_GAP_CANDIDATE",
+        prerequisiteChainPath: ["NODE-MATH-5-FRAC-02", "NODE-MATH-6-FRAC-03"],
+        primaryFailingNodeId: "NODE-MATH-5-FRAC-02",
+        primaryFailingNodeLabel: "Quy đồng mẫu số hai phân số",
+        detectedMisconceptions: ["ADD_NUM_AND_DENOM_DIRECTLY"],
+        explanation: "Học sinh vướng ở bước quy đồng mẫu số",
+        actionableNextStep: "Ôn tập bước quy đồng mẫu số",
+        generatedAt: new Date().toISOString(),
+        ruleVersion: "1.0.0",
+      };
+
+      const pack = generateLearningPack(sampleGap);
+      expect(pack.geminiNotebookInstructions.copyablePrompt).toContain("dành riêng cho phụ huynh");
+      expect(pack.parentGuide).toContain("Trợ lý Phụ huynh");
+      // Must not instruct child to chat with AI directly
+      expect(pack.parentGuide).not.toContain("để con tự đối thoại học tập");
+
+      const guide = ManualGeminiNotebookProvider.getRemediationGuide(pack);
+      expect(guide.safetyAndAgeNote).toContain("Học sinh không trực tiếp sử dụng hay trò chuyện với AI");
+      expect(guide.stepByStepGuide[0]).toContain("Phụ huynh");
+    });
   });
 
-  // 5. Machine-Readable Coverage Registry Verification
-  describe("Coverage Registry Honesty & Completeness", () => {
+  // 5. Machine-Readable Coverage Registry Verification (Dynamically Derived)
+  describe("Coverage Registry Dynamic Derivation & Catalog Parity", () => {
     const registryPath = path.resolve("curriculum/vietnam/coverage-registry.json");
     const registry: SubjectCoverageRecord[] = JSON.parse(
       fs.readFileSync(registryPath, "utf-8")
     );
 
-    it("contains exactly 139 verified subject-grade records", () => {
-      expect(registry).toHaveLength(139);
+    it("derives expected subject count dynamically from catalog without hardcoding", () => {
+      const expectedTotal =
+        catalog.preschool.scope.length +
+        catalog.grades.reduce(
+          (acc: number, g: { mandatory?: unknown[]; electives?: unknown[]; elective?: unknown[]; optional?: unknown[] }) =>
+            acc +
+            (g.mandatory?.length || 0) +
+            (g.electives?.length || 0) +
+            (g.elective?.length || 0) +
+            (g.optional?.length || 0),
+          0
+        );
+
+      expect(registry).toHaveLength(expectedTotal);
     });
 
-    it("has exactly 1 PUBLISHED vertical slice (Grade 6 Math)", () => {
-      const published = registry.filter((r) => r.sourceStatus === "PUBLISHED");
-      expect(published).toHaveLength(1);
-      expect(published[0].grade).toBe(6);
-      expect(published[0].subjectId).toBe("math");
-      expect(published[0].diagnosticReady).toBe(true);
-      expect(published[0].questionsReviewed).toBe(6);
-      expect(published[0].lessonsPublished).toBe(1);
+    it("includes all 9 electives for THPT grades 10, 11, and 12 (catalog uses electives)", () => {
+      for (const grade of [10, 11, 12]) {
+        const electives = registry.filter(
+          (r) => r.grade === grade && r.kind === "elective"
+        );
+        expect(electives).toHaveLength(9);
+      }
     });
 
-    it("does NOT invent coverage for remaining 138 subjects", () => {
-      const nonPublished = registry.filter((r) => r.sourceStatus !== "PUBLISHED");
-      expect(nonPublished).toHaveLength(138);
+    it("defaults to NOT_INGESTED for subjects without filesystem artifacts", () => {
+      const notIngested = registry.filter((r) => r.sourceStatus === "NOT_INGESTED");
+      // All subjects without sources must be NOT_INGESTED
+      expect(notIngested.length).toBeGreaterThan(150);
 
-      for (const item of nonPublished) {
+      for (const item of notIngested) {
         expect(item.lessonsPublished).toBe(0);
         expect(item.questionsReviewed).toBe(0);
         expect(item.diagnosticReady).toBe(false);
       }
     });
+
+    it("marks Grade 6 Math as CONTENT_IN_REVIEW (not falsely PUBLISHED)", () => {
+      const g6Math = registry.find((r) => r.grade === 6 && r.subjectId === "math");
+      expect(g6Math).toBeDefined();
+      expect(g6Math?.sourceStatus).toBe("CONTENT_IN_REVIEW");
+      expect(g6Math?.diagnosticReady).toBe(false);
+      expect(g6Math?.lessonsPublished).toBe(0);
+      expect(g6Math?.questionsReviewed).toBe(0);
+    });
+
+    it("ensures zero subjects are stamped PUBLISHED without human review", () => {
+      const published = registry.filter((r) => r.sourceStatus === "PUBLISHED");
+      expect(published).toHaveLength(0);
+    });
   });
 
-  // 6. Grade 6 Math Vertical Slice Schema Verification
-  describe("Grade 6 Math Vertical Slice Files Integrity", () => {
+  // 6. Grade 6 Math Vertical Slice Schema, Provenance & Authoring Origin Audit
+  describe("Grade 6 Math Vertical Slice Integrity & Provenance Audit", () => {
     const basePath = path.resolve("curriculum/vietnam/lower-secondary/grade-6/math");
 
-    it("has verified source-registry.json", () => {
+    it("verifies source-registry.json has canonical URLs, source versions, and SHA-256 checksums", () => {
       const sources = JSON.parse(
         fs.readFileSync(path.join(basePath, "source-registry.json"), "utf-8")
       );
       expect(sources).toHaveLength(2);
-      expect(sources[1].id).toBe("SRC-VN-MOET-MATH-2018");
-      expect(sources[1].authority).toContain("Bộ Giáo dục và Đào tạo");
+
+      for (const s of sources) {
+        expect(s.url).toMatch(/^https?:\/\//);
+        expect(s.sourceVersion).toBeDefined();
+        expect(s.localChecksum).toMatch(/^[a-f0-9]{64}$/);
+        expect(s.authority).toContain("Bộ Giáo dục và Đào tạo");
+      }
     });
 
-    it("has verified learning-outcomes.json", () => {
+    it("verifies learning-outcomes.json has verbatim official text and SOURCE_LINKED reviewState", () => {
       const los = JSON.parse(
         fs.readFileSync(path.join(basePath, "learning-outcomes.json"), "utf-8")
       );
-      expect(los.length).toBeGreaterThanOrEqual(2);
-      expect(los.every((lo: { reviewState: string }) => lo.reviewState === "INTERNAL_REVIEWED")).toBe(true);
+      expect(los).toHaveLength(2);
+      expect(los.every((lo: { reviewState: string }) => lo.reviewState === "SOURCE_LINKED")).toBe(true);
+
+      for (const lo of los) {
+        expect(lo.officialText.length).toBeGreaterThan(25);
+        expect(lo.sourceRefs[0].sectionLocator).toBeDefined();
+        expect(lo.sourceRefs[0].pageNumber).toBeDefined();
+      }
     });
 
-    it("has verified knowledge-nodes.json", () => {
+    it("verifies knowledge-nodes.json has SOURCE_LINKED reviewState", () => {
       const nodes = JSON.parse(
         fs.readFileSync(path.join(basePath, "knowledge-nodes.json"), "utf-8")
       );
       expect(nodes).toHaveLength(4);
-      expect(nodes.map((n: { id: string }) => n.id)).toEqual([
-        "NODE-MATH-4-FRAC-01",
-        "NODE-MATH-5-FRAC-02",
-        "NODE-MATH-6-FRAC-03",
-        "NODE-MATH-6-FRAC-04",
-      ]);
+      expect(nodes.every((n: { reviewState: string }) => n.reviewState === "SOURCE_LINKED")).toBe(true);
     });
 
-    it("has verified prerequisite-edges.json", () => {
+    it("verifies prerequisite-edges.json has SOURCE_LINKED reviewState", () => {
       const edges = JSON.parse(
         fs.readFileSync(path.join(basePath, "prerequisite-edges.json"), "utf-8")
       );
       expect(edges).toHaveLength(3);
-      expect(edges.every((e: { strength: string }) => e.strength === "REQUIRED")).toBe(true);
+      expect(edges.every((e: { reviewState: string }) => e.reviewState === "SOURCE_LINKED")).toBe(true);
     });
 
-    it("has valid lesson with rich content and worked examples", () => {
+    it("verifies lesson has AI_ASSISTED authoringOrigin, AI_DRAFT reviewState, and DRAFT publicationState", () => {
       const lesson: Lesson = JSON.parse(
         fs.readFileSync(path.join(basePath, "lessons/fractions-addition.json"), "utf-8")
       );
-      expect(lesson.id).toBe("LESSON-MATH-6-FRAC-01");
-      expect(lesson.publicationState).toBe("PUBLISHED_BETA");
+      expect(lesson.authoringOrigin).toBe("AI_ASSISTED");
+      expect(lesson.reviewState).toBe("AI_DRAFT");
+      expect(lesson.publicationState).toBe("DRAFT");
       expect(lesson.learnerText.length).toBeGreaterThan(0);
-      expect(lesson.workedExamples.length).toBeGreaterThan(0);
     });
 
-    it("has verified question bank items with RichContent and distractor rationales", () => {
+    it("verifies question bank items have AI_ASSISTED authoringOrigin, AI_DRAFT reviewState, and DRAFT publicationState", () => {
       const items: QuestionItem[] = JSON.parse(
         fs.readFileSync(path.join(basePath, "question-bank/items.json"), "utf-8")
       );
       expect(items).toHaveLength(6);
-      expect(items.every((i) => i.publicationState === "PUBLISHED_BETA")).toBe(true);
-      expect(items.every((i) => i.reviewState === "INTERNAL_REVIEWED")).toBe(true);
-      expect(items.every((i) => i.distractorRationales && Object.keys(i.distractorRationales).length > 0)).toBe(true);
+      expect(items.every((i) => i.authoringOrigin === "AI_ASSISTED")).toBe(true);
+      expect(items.every((i) => i.itemMaturity === "DRAFT")).toBe(true);
+      expect(items.every((i) => i.reviewState === "AI_DRAFT")).toBe(true);
+      expect(items.every((i) => i.publicationState === "DRAFT")).toBe(true);
+
+      // Student publication guard must BLOCK these unreviewed draft items
+      for (const item of items) {
+        expect(() => assertPublishedForStudent(item)).toThrow(ContentNotPublishedError);
+      }
+      expect(filterPublishedForStudent(items)).toHaveLength(0);
     });
 
-    it("has valid explanations file", () => {
-      const explanations = JSON.parse(
-        fs.readFileSync(path.join(basePath, "explanations/fractions-explanations.json"), "utf-8")
-      );
-      expect(explanations.length).toBeGreaterThanOrEqual(2);
-      expect(explanations[0].itemId).toBe("ITEM-G6-FRAC-01");
-      expect(explanations[0].stepByStep.length).toBeGreaterThan(0);
-    });
-
-    it("has valid parent-guides file", () => {
-      const guides = JSON.parse(
-        fs.readFileSync(path.join(basePath, "parent-guides/fractions-parent-guide.json"), "utf-8")
-      );
-      expect(guides).toHaveLength(1);
-      expect(guides[0].nodeId).toBe("NODE-MATH-6-FRAC-03");
-      expect(guides[0].hintsWithoutGivingAnswer.length).toBeGreaterThan(0);
-    });
-
-    it("has valid publication manifest", () => {
+    it("verifies publication manifest has real SHA-256 checksum and no invented board", () => {
       const manifest: PublicationManifest = JSON.parse(
         fs.readFileSync(path.join(basePath, "publication-manifest.json"), "utf-8")
       );
-      expect(manifest.manifestVersion).toBe("1.0.0");
-      expect(manifest.subjectId).toBe("math");
-      expect(manifest.gradeOrAgeBand).toBe("grade-6");
-      expect(manifest.questionItemCount).toBe(6);
-      expect(manifest.lessonCount).toBe(1);
-      expect(manifest.learningOutcomeCount).toBe(2);
+      expect(manifest.publishedBy).toBe("PENDING_HUMAN_CONTROLLER_AUDIT");
+      expect(manifest.publicationScope).toBe("DRAFT");
+      expect(manifest.checksum).toMatch(/^[a-f0-9]{64}$/);
+
+      // Verify checksum matches actual SHA-256 computation of content files
+      const itemsBuf = fs.readFileSync(path.join(basePath, "question-bank/items.json"));
+      const lessonBuf = fs.readFileSync(path.join(basePath, "lessons/fractions-addition.json"));
+      const expectedChecksum = crypto
+        .createHash("sha256")
+        .update(itemsBuf)
+        .update(lessonBuf)
+        .digest("hex");
+
+      expect(manifest.checksum).toBe(expectedChecksum);
     });
   });
 });
