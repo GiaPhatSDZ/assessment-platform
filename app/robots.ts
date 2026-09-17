@@ -7,12 +7,21 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/assessment/ai-career-readiness", "/privacy", "/terms"],
+        allow: [
+          "/",
+          "/learn",
+          "/curriculum",
+          "/parent",
+          "/diagnostic/math-grade6",
+          "/privacy",
+          "/terms",
+        ],
         disallow: [
           "/admin",
           "/admin/*",
           "/dashboard",
           "/dashboard/*",
+          "/assessment/*",
           "/report/*",
           "/api/*",
           "/auth/*",

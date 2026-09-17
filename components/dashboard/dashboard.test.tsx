@@ -17,7 +17,9 @@ describe("ParticipantDashboard Component", () => {
     expect(screen.getByText(/Lịch Sử & Báo Cáo Đánh Giá/i)).toBeInTheDocument();
     expect(screen.getByText("participant@example.com")).toBeInTheDocument();
     expect(screen.getByText(/Bạn chưa có kết quả đánh giá nào/i)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Bắt đầu bài đánh giá ngay/i })).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("link", { name: /Bắt đầu chẩn đoán kiến thức/i }).length
+    ).toBeGreaterThan(0);
   });
 
   it("renders list of completed assessments with scores and links", () => {

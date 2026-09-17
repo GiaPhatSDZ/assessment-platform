@@ -6,28 +6,23 @@ describe("Landing Page Experience", () => {
   it("renders main heading H1, primary CTA, and core sections", () => {
     render(<HomePage />);
 
-    // H1 (V3 Knowledge Control)
+    // H1 (V3 Template 01)
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Con không chỉ cần học thêm."
+      "Tìm đúng chỗ con đang hổng"
     );
 
     // Primary CTA
-    const ctas = screen.getAllByRole("link", { name: /chẩn đoán/i });
+    const ctas = screen.getAllByRole("link", { name: /Bắt đầu kiểm tra kiến thức/i });
     expect(ctas.length).toBeGreaterThan(0);
-
-    // V3 Vertical Slice Section
-    expect(
-      screen.getByText(/Lát Cắt Mẫu Chuẩn Hóa Thực Tế/i)
-    ).toBeInTheDocument();
 
     // FAQ section
     expect(
-      screen.getByRole("heading", { level: 2, name: /Những Câu Hỏi Phụ Huynh Hay Thắc Mắc/i })
+      screen.getByRole("heading", { level: 2, name: /Giải Đáp Thắc Mắc Về Phương Pháp Chẩn Đoán/i })
     ).toBeInTheDocument();
 
-    // Privacy hint
+    // Privacy assurances
     expect(
-      screen.getAllByText(/Không yêu cầu Số điện thoại/i).length
+      screen.getAllByText(/Không số điện thoại bắt buộc/i).length
     ).toBeGreaterThan(0);
   });
 });

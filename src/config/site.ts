@@ -1,9 +1,10 @@
 export interface SiteConfig {
   name: string;
   shortName: string;
+  tagline: string;
   description: string;
   url: string;
-  defaultAssessmentSlug: string;
+  defaultDiagnosticSlug: string;
   supportEmail: string;
   locale: "vi";
   navItems: { label: string; href: string }[];
@@ -11,22 +12,25 @@ export interface SiteConfig {
 }
 
 export const siteConfig: SiteConfig = {
-  name: "Assessment Studio",
-  shortName: "Studio",
+  name: "AI School V3",
+  shortName: "AI School",
+  tagline: "Hệ Thống Kiểm Soát Lỗ Hổng Kiến Thức Chuẩn Bộ GD&ĐT",
   description:
-    "Nền tảng mở đánh giá năng lực nghề nghiệp và đo lường mức độ sẵn sàng AI với thuật toán chấm điểm khách quan, chuẩn xác và bảo mật.",
+    "Tìm đúng chỗ con đang hổng, học lại đúng phần cần thiết. Hệ thống lần theo cây tri thức tiên quyết, phát hiện lỗ hổng gốc rễ và cung cấp gói học liệu chuẩn Bộ GD&ĐT.",
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-  defaultAssessmentSlug: "ai-career-readiness",
-  supportEmail: "support@assessment-platform.local",
+  defaultDiagnosticSlug: "math-grade6",
+  supportEmail: "hotro@aischool.edu.vn",
   locale: "vi",
   navItems: [
     { label: "Trang chủ", href: "/" },
-    { label: "Bài đánh giá", href: "/assessment/ai-career-readiness" },
-    { label: "Bảng điều khiển", href: "/dashboard" },
+    { label: "Góc học tập", href: "/learn" },
+    { label: "Bản đồ chương trình", href: "/curriculum" },
+    { label: "Dành cho phụ huynh", href: "/parent" },
   ],
   footerLinks: [
     { label: "Chính sách bảo mật", href: "/privacy" },
-    { label: "Điều khoản sử dụng", href: "/terms" },
-    { label: "Kiến trúc hệ thống", href: "/admin" },
+    { label: "Điều khoản dịch vụ", href: "/terms" },
+    { label: "Bản đồ chương trình", href: "/curriculum" },
+    { label: "Dành cho phụ huynh", href: "/parent" },
   ],
 };

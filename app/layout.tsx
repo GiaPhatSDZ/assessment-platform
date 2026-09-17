@@ -1,38 +1,46 @@
 import type { Metadata } from "next";
+import { Be_Vietnam_Pro } from "next/font/google";
+import { siteConfig } from "@/src/config/site";
 import "./globals.css";
+import "katex/dist/katex.min.css";
+
+const beVietnamPro = Be_Vietnam_Pro({
+  subsets: ["vietnamese", "latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-be-vietnam-pro",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://assessment-platform.vercel.app"),
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: "Assessment Studio — Đánh Giá Độ Sẵn Sàng Nghề Nghiệp Trong Kỷ Nguyên AI",
-    template: "%s | Assessment Studio",
+    default: `${siteConfig.name} — ${siteConfig.tagline}`,
+    template: `%s | ${siteConfig.name}`,
   },
-  description:
-    "Nền tảng đánh giá năng lực nghề nghiệp kỷ nguyên AI: Thang đo toán học 4 chiều tất định, bảo mật ẩn danh tuyệt đối và kế hoạch phát triển kỹ năng 6 tuần.",
+  description: siteConfig.description,
   keywords: [
-    "đánh giá năng lực AI",
-    "độ sẵn sàng nghề nghiệp",
-    "tư duy phân tích",
-    "giải quyết vấn đề",
-    "kỹ năng thích ứng",
-    "assessment platform",
+    "kiểm soát lỗ hổng kiến thức",
+    "chẩn đoán năng lực học tập",
+    "toán lớp 6",
+    "chuẩn chương trình bộ giáo dục",
+    "cây tri thức tiên quyết",
+    "học bù có trọng tâm",
+    "ai school",
   ],
-  authors: [{ name: "Assessment Studio Core Team" }],
-  creator: "Assessment Studio",
+  authors: [{ name: "AI School Curriculum Research Group" }],
+  creator: siteConfig.name,
   openGraph: {
     type: "website",
     locale: "vi_VN",
     url: "/",
-    title: "Assessment Studio — Đánh Giá Độ Sẵn Sàng Nghề Nghiệp Trong Kỷ Nguyên AI",
-    description:
-      "Thực hiện bài đánh giá 10 câu hỏi để khám phá điểm số 4 chiều năng lực chuẩn xác và kế hoạch hành động cá nhân hóa.",
-    siteName: "Assessment Studio",
+    title: `${siteConfig.name} — ${siteConfig.tagline}`,
+    description: siteConfig.description,
+    siteName: siteConfig.name,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Assessment Studio — Đánh Giá Độ Sẵn Sàng Nghề Nghiệp Trong Kỷ Nguyên AI",
-    description:
-      "Nền tảng đánh giá năng lực nghề nghiệp kỷ nguyên AI với thuật toán tính điểm toán học khách quan.",
+    title: `${siteConfig.name} — ${siteConfig.tagline}`,
+    description: siteConfig.description,
   },
 };
 
@@ -42,8 +50,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi">
-      <body className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+    <html lang="vi" className={beVietnamPro.variable}>
+      <body className="min-h-screen flex flex-col bg-warm-50/60 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-edu-100 selection:text-edu-900">
         {children}
       </body>
     </html>

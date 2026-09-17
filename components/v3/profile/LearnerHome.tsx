@@ -1,0 +1,155 @@
+"use client";
+
+import React from "react";
+import Link from "next/link";
+import {
+  GraduationCap,
+  BookOpen,
+  ArrowRight,
+  ShieldCheck,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  Sparkles,
+  History,
+} from "lucide-react";
+
+interface LearnerHomeProps {
+  user?: {
+    displayName?: string | null;
+    email?: string | null;
+  };
+}
+
+export function LearnerHome({ user }: LearnerHomeProps) {
+  const learnerName = user?.displayName || user?.email || "Học sinh";
+
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8 space-y-8">
+      {/* Top Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-warm-200 pb-6 dark:border-slate-800">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-semibold text-edu-700 dark:text-edu-400">
+            <GraduationCap className="h-4 w-4" />
+            <span>Góc Học Tập Cá Nhân</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white mt-1">
+            Chào mừng trở lại, {learnerName}
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-0.5">
+            Theo dõi chính xác tiến trình làm chủ các mắt xích kiến thức chuẩn Bộ GD&ĐT.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Link
+            href="/learn/new"
+            className="inline-flex items-center gap-2 rounded-xl bg-edu-700 px-5 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-edu-800 transition active:scale-[0.98]"
+          >
+            <span>Bắt đầu chẩn đoán kiến thức</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+          <Link
+            href="/learn/history"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-warm-300 bg-white px-3.5 py-2.5 text-xs font-medium text-slate-700 shadow-xs hover:bg-warm-50 transition dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+          >
+            <History className="h-3.5 w-3.5" />
+            <span>Lịch sử</span>
+          </Link>
+        </div>
+      </div>
+
+      {/* Current Active Subject & Topic Status */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              Trạng thái chủ đề đang học
+            </h2>
+            <Link
+              href="/curriculum"
+              className="text-xs font-semibold text-edu-700 hover:text-edu-800 dark:text-edu-400"
+            >
+              Xem toàn bộ chương trình →
+            </Link>
+          </div>
+
+          <div className="rounded-2xl border border-warm-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+            <div className="flex items-center justify-between border-b border-warm-100 pb-3 dark:border-slate-800">
+              <div>
+                <div className="text-xs font-semibold text-edu-700 dark:text-edu-400">Toán Lớp 6 · Chương Số Học</div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white mt-0.5">
+                  Phép cộng phân số không cùng mẫu số
+                </h3>
+              </div>
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                <span>Đã có bằng chứng vững</span>
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+              <div className="p-2.5 rounded-xl bg-warm-50 border border-warm-200 dark:bg-slate-800/40 dark:border-slate-800">
+                <div className="text-slate-500 text-[11px]">BCNN (Lớp 6)</div>
+                <div className="font-bold text-emerald-700 mt-1">SECURE</div>
+              </div>
+              <div className="p-2.5 rounded-xl bg-warm-50 border border-warm-200 dark:bg-slate-800/40 dark:border-slate-800">
+                <div className="text-slate-500 text-[11px]">Cộng cùng mẫu (Lớp 4)</div>
+                <div className="font-bold text-emerald-700 mt-1">SECURE</div>
+              </div>
+              <div className="p-2.5 rounded-xl bg-warm-50 border border-warm-200 dark:bg-slate-800/40 dark:border-slate-800">
+                <div className="text-slate-500 text-[11px]">Quy đồng mẫu số</div>
+                <div className="font-bold text-emerald-700 mt-1">SECURE (Re-test)</div>
+              </div>
+              <div className="p-2.5 rounded-xl bg-warm-50 border border-warm-200 dark:bg-slate-800/40 dark:border-slate-800">
+                <div className="text-slate-500 text-[11px]">Cộng khác mẫu</div>
+                <div className="font-bold text-emerald-700 mt-1">SECURE (Re-test)</div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-1 text-xs text-slate-500">
+              <span>Độ tin cậy bằng chứng: <strong>HIGH (Re-test đối soát)</strong></span>
+              <Link
+                href="/diagnostic/math-grade6"
+                className="font-semibold text-edu-700 hover:text-edu-800 dark:text-edu-400"
+              >
+                Xem lại chẩn đoán này →
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar: Recommended Next Step */}
+        <div className="space-y-4">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            Hành động tiếp theo
+          </h2>
+
+          <div className="rounded-2xl border border-edu-200 bg-edu-50/50 p-5 shadow-xs space-y-3 dark:border-edu-900/60 dark:bg-edu-950/20">
+            <div className="flex items-center gap-2 text-edu-800 dark:text-edu-300 font-bold text-xs">
+              <Sparkles className="h-4 w-4" />
+              <span>Chẩn đoán chủ đề mới</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+              Bạn đã hoàn thành củng cố bài Phép cộng phân số. Hãy chọn thêm một chủ đề mới để hệ thống lập bản đồ năng lực chuẩn xác.
+            </p>
+            <Link
+              href="/learn/new"
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-edu-700 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-edu-800 transition"
+            >
+              <span>Chọn bài kiểm tra mới</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+
+          <div className="rounded-2xl border border-warm-200 bg-white p-4 shadow-xs text-xs space-y-2 dark:border-slate-800 dark:bg-slate-900">
+            <div className="font-bold text-slate-900 dark:text-white">Quy tắc chấm điểm V3:</div>
+            <p className="text-slate-500 leading-relaxed">
+              Hệ thống không tính điểm trung bình tổng quát <code>/100</code> mà ghi nhận trạng thái rời rạc cho từng nút kiến thức: <em>Đã vững, Cần học bù, hoặc Chưa chắc chắn</em>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

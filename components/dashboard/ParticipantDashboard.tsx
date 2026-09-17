@@ -48,10 +48,10 @@ export function ParticipantDashboard({ user, sessions }: ParticipantDashboardPro
 
           <div className="flex items-center gap-3">
             <Link
-              href="/assessment/ai-career-readiness"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition"
+              href="/learn/new"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-edu-700 px-4 py-2 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-edu-800 transition"
             >
-              <span>Làm bài đánh giá mới</span>
+              <span>Bắt đầu chẩn đoán kiến thức</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
 
@@ -143,10 +143,10 @@ export function ParticipantDashboard({ user, sessions }: ParticipantDashboardPro
               </p>
               <div className="mt-6">
                 <Link
-                  href="/assessment/ai-career-readiness"
-                  className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition"
+                  href="/learn/new"
+                  className="inline-flex items-center gap-2 rounded-xl bg-edu-700 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-edu-800 transition"
                 >
-                  <span>Bắt đầu bài đánh giá ngay</span>
+                  <span>Bắt đầu chẩn đoán kiến thức</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>

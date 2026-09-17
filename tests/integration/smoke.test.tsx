@@ -6,7 +6,7 @@ describe("Application Smoke Test", () => {
   it("renders HomePage heading", () => {
     render(<HomePage />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Con không chỉ cần học thêm"
+      "Tìm đúng chỗ con đang hổng"
     );
   });
 });
