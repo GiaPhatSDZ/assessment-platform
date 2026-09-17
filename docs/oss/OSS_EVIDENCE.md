@@ -1,8 +1,9 @@
 # Truthful Open-Source Evidence Tracker (OSS Evidence)
 
-**Repository Name:** `assessment-platform` / `Assessment Studio`  
+**Repository URL:** [https://github.com/GiaPhatSDZ/assessment-platform](https://github.com/GiaPhatSDZ/assessment-platform)  
 **License:** Apache License 2.0  
-**Current Version:** `v0.1.0`  
+**Current Version:** `v0.1.0` (Git Tag: `v0.1.0`)  
+**CI Workflow:** [GitHub Actions Run #35179203148](https://github.com/GiaPhatSDZ/assessment-platform/actions/runs/35179203148) (Passed)  
 **Last Updated:** 2026-09-17  
 
 ---
@@ -17,10 +18,11 @@
 | **Forks** | 0 | Verified on repository creation |
 | **Active Open Issues** | 0 | Clean tracker |
 | **Unit & Integration Tests** | 97 passing across 26 test files | `npm test` (Vitest v3.2.7) |
-| **E2E Test Suites** | 4 passing across 2 browsers | Playwright (Desktop Chromium, Mobile Chrome) |
+| **E2E Test Suites** | 12 passing across 2 browsers | Playwright (Desktop Chromium, Mobile Chrome) |
 | **TypeScript Strict Errors** | 0 | `npm run typecheck` (`tsc --noEmit`) |
 | **ESLint Warnings/Errors** | 0 | `npm run lint` |
-| **Production Build Status** | Vercel-ready / Clean build | `npm run build` |
+| **GitHub Actions CI** | PASS (Node 20.x, 22.x) | GitHub Actions Run #35179203148 |
+| **Production Build Status** | Vercel-ready / Clean build | `npm run build` (18 routes compiled) |
 
 ---
 

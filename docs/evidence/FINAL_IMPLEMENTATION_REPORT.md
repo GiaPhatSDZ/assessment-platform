@@ -4,7 +4,8 @@
 **Repository:** `assessment-platform` (`Assessment Studio`)  
 **Target Platform:** Next.js 15 (App Router), React 19, TypeScript 5.7, Tailwind CSS, Supabase, Vercel-Ready  
 **License:** Apache-2.0  
-**Overall Status:** COMPLETE — `PASS_WITH_OWNER_ACTIONS` (GitHub remote push awaiting owner token)  
+**GitHub Repository:** [https://github.com/GiaPhatSDZ/assessment-platform](https://github.com/GiaPhatSDZ/assessment-platform)  
+**Overall Status:** COMPLETE — `PASS` (GitHub Published & CI 100% Green)  
 
 ---
 
@@ -122,15 +123,11 @@ npm run build
 
 ## 6. Manual Actions for Project Owner
 
-1. **GitHub Remote Push**:
-   - The local Git repository on branch `main` contains the complete, coherent commit history.
-   - Run the following commands to link and push to your GitHub organization:
-     ```bash
-     git remote add origin https://github.com/<your-org>/assessment-platform.git
-     git push -u origin main
-     git tag v0.1.0
-     git push origin v0.1.0
-     ```
+1. **GitHub Repository (Published & CI Green)**:
+   - Repository: [https://github.com/GiaPhatSDZ/assessment-platform](https://github.com/GiaPhatSDZ/assessment-platform)
+   - Branch: `main`
+   - Release Tag: `v0.1.0`
+   - CI Workflow: [Run #35179203148](https://github.com/GiaPhatSDZ/assessment-platform/actions/runs/35179203148) (Passed on Node 20.x and 22.x)
 2. **Supabase Production Credentials**:
    - Create a project on [Supabase.com](https://supabase.com/).
    - Execute `supabase/migrations/20260917000001_initial_schema.sql` in the Supabase SQL Editor.
@@ -148,8 +145,8 @@ npm run build
 ## 7. Final Verification Status
 
 - **Working Directory:** `d:\giao_duc`
-- **Branch:** `main`
+- **Branch:** `main` (tracked on `origin/main`)
 - **Clean Clone Verified:** Yes (`docs/evidence/M10_CLEAN_CLONE.md`)
 - **Git Working Tree:** Clean (`git status --short` verified)
 - **Zero Secrets Committed:** Verified (no `.env`, no private keys in history)
-- **Status:** `PASS_WITH_OWNER_ACTIONS`
+- **Status:** `PASS`
