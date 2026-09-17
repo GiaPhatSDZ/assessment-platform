@@ -7,11 +7,17 @@
   "publicationScope": "DRAFT",
   "sourceDocumentIds": [
     "SRC-VN-MOET-GEP-2018",
-    "SRC-VN-MOET-MATH-2018"
+    "SRC-VN-MOET-MATH-2018",
+    "SRC-NXBGD-KNTT-MATH6-T1",
+    "SRC-NXBGD-KNTT-MATH6-T2",
+    "SRC-NXBGD-KNTT-MATH6-SGV-T2",
+    "SRC-NXBGD-KNTT-MATH6-SBT-T2",
+    "SRC-NXBGD-KNTT-MATH6-TRAIN-DOC",
+    "SRC-NXBGD-KNTT-MATH6-TRAIN-SLIDES-ARITHMETIC"
   ],
   "learningOutcomeCount": 2,
   "knowledgeNodeCount": 4,
   "lessonCount": 1,
   "questionItemCount": 6,
-  "checksum": "d627e0a950e0981868f37ea84763e0cac66cf956074f6b541a509514419f3352"
+  "checksum": "a6efa5d023b64755ac7fd37354775000bbcf945cf5b74a8d76c1abd76c3b06eb"
 }

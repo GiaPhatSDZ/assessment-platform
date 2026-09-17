@@ -397,17 +397,30 @@ describe("Curriculum Content Database V1 — Authority, Provenance & Boundary Te
   describe("Grade 6 Math Vertical Slice Integrity & Provenance Audit", () => {
     const basePath = path.resolve("curriculum/vietnam/lower-secondary/grade-6/math");
 
-    it("verifies source-registry.json has canonical URLs, source versions, and SHA-256 checksums", () => {
+    it("verifies source-registry.json has canonical URLs, source versions, and SHA-256 checksums for MOET and NXBGD", () => {
       const sources = JSON.parse(
         fs.readFileSync(path.join(basePath, "source-registry.json"), "utf-8")
       );
-      expect(sources).toHaveLength(2);
+      expect(sources.length).toBeGreaterThanOrEqual(8);
 
-      for (const s of sources) {
+      // Verify Tier A MOET curriculum sources
+      const moetSources = sources.filter((s: { sourceTier: string }) => s.sourceTier === "TIER_A_CURRICULUM_AUTHORITY");
+      expect(moetSources).toHaveLength(2);
+      for (const s of moetSources) {
         expect(s.url).toMatch(/^https?:\/\//);
         expect(s.sourceVersion).toBeDefined();
         expect(s.localChecksum).toMatch(/^[a-f0-9]{64}$/);
         expect(s.authority).toContain("Bộ Giáo dục và Đào tạo");
+      }
+
+      // Verify Tier B NXBGD approved learning & pedagogical sources
+      const nxbgdSources = sources.filter((s: { sourceTier: string }) => s.sourceTier?.startsWith("TIER_B"));
+      expect(nxbgdSources.length).toBeGreaterThanOrEqual(6);
+      for (const s of nxbgdSources) {
+        expect(s.url).toMatch(/^https?:\/\//);
+        expect(s.authority).toContain("Nhà xuất bản Giáo dục Việt Nam");
+        expect(s.rights.redistribution).toBe(false);
+        expect(s.rights.commercialReuse).toBe("NOT_GRANTED");
       }
     });
 

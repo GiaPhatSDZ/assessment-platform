@@ -25,12 +25,38 @@ export type CoverageStatus =
   | "DIAGNOSTIC_READY"
   | "PUBLISHED";
 
+export type SourceTier =
+  | "TIER_A_CURRICULUM_AUTHORITY"
+  | "TIER_B_APPROVED_LEARNING_SOURCE"
+  | "TIER_B_PEDAGOGICAL_SOURCE"
+  | "TIER_C_INTERNAL_REVIEWED"
+  | "TIER_D_AI_DRAFT";
+
 export type SourceType =
   | "OFFICIAL_CURRICULUM"
   | "OFFICIAL_GUIDANCE"
   | "APPROVED_TEXTBOOK_METADATA"
+  | "APPROVED_TEXTBOOK_SOURCE"
+  | "PEDAGOGICAL_TRAINING_RESOURCE"
   | "TRUSTED_LEARNING_RESOURCE"
   | "INTERNAL_REVIEWED_RESOURCE";
+
+export type ResourceType =
+  | "LEGAL_DOCUMENT"
+  | "CURRICULUM_STANDARD"
+  | "TEXTBOOK"
+  | "TEACHER_GUIDE"
+  | "WORKBOOK_SAMPLE"
+  | "TRAINING_DOCUMENT"
+  | "TRAINING_SLIDE"
+  | "INTERNAL_LESSON"
+  | "INTERNAL_ITEM";
+
+export interface SourceRights {
+  redistribution: boolean;
+  commercialReuse: "GRANTED" | "NOT_GRANTED" | "CONDITIONAL";
+  notes: string;
+}
 
 export type CurriculumLegalStatus =
   | "CURRENT_NATIONAL"
@@ -40,7 +66,11 @@ export type CurriculumLegalStatus =
 
 export interface SourceRef {
   sourceId: string;
+  tier?: SourceTier;
   documentNumber?: string;
+  bookSeries?: string;
+  chapterLocator?: string;
+  lessonLocator?: string;
   sectionLocator?: string;
   pageNumber?: number | string;
   citationText?: string;
@@ -52,6 +82,11 @@ export interface SourceDocument {
   title: string;
   documentNumber?: string;
   sourceType: SourceType;
+  sourceTier?: SourceTier;
+  resourceType?: ResourceType;
+  bookSeries?: string;
+  grade?: number | string;
+  subject?: string;
   url?: string;
   localChecksum?: string;
   issuedAt?: string;
@@ -60,6 +95,7 @@ export interface SourceDocument {
   sourceVersion?: string;
   retrievedAt: string;
   curriculumStatus?: CurriculumLegalStatus;
+  rights?: SourceRights;
   rightsNotes?: string;
 }
 
@@ -86,6 +122,7 @@ export interface KnowledgeNode {
   label: string;
   description: string;
   type: "FACT" | "CONCEPT" | "PROCEDURE" | "SKILL" | "APPLICATION" | "DEVELOPMENT";
+  sourceRefs?: SourceRef[];
   reviewState: ReviewState;
 }
 

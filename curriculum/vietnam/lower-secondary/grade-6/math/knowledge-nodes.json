@@ -5,6 +5,23 @@
     "label": "Khái niệm phân số & rút gọn phân số",
     "description": "Nhận biết phân số biểu diễn số phần bằng nhau của đơn vị; tìm ước chung lớn nhất để rút gọn phân số về tối giản.",
     "type": "CONCEPT",
+    "sourceRefs": [
+      {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "tier": "TIER_A_CURRICULUM_AUTHORITY",
+        "pageNumber": 32,
+        "sectionLocator": "Chương trình môn Toán Lớp 4 — Yêu cầu cần đạt về Phân số"
+      },
+      {
+        "sourceId": "SRC-NXBGD-KNTT-MATH6-T2",
+        "tier": "TIER_B_APPROVED_LEARNING_SOURCE",
+        "bookSeries": "Kết nối tri thức với cuộc sống",
+        "chapterLocator": "Chương VI: Phân số",
+        "lessonLocator": "Bài 23: Mở rộng phân số. Phân số bằng nhau",
+        "pageNumber": 5,
+        "citationText": "SGK Toán 6 Tập 2, tr. 5 (Khái niệm phân số và phân số bằng nhau)"
+      }
+    ],
     "reviewState": "SOURCE_LINKED"
   },
   {
@@ -13,6 +30,37 @@
     "label": "Quy đồng mẫu số hai phân số",
     "description": "Tìm mẫu số chung (thông qua bội chung nhỏ nhất) và nhân cả tử và mẫu với thừa số phụ tương ứng.",
     "type": "PROCEDURE",
+    "sourceRefs": [
+      {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "tier": "TIER_A_CURRICULUM_AUTHORITY",
+        "pageNumber": 38,
+        "sectionLocator": "Chương trình môn Toán Lớp 5 — YCCĐ Quy đồng mẫu số"
+      },
+      {
+        "sourceId": "SRC-NXBGD-KNTT-MATH6-T2",
+        "tier": "TIER_B_APPROVED_LEARNING_SOURCE",
+        "bookSeries": "Kết nối tri thức với cuộc sống",
+        "chapterLocator": "Chương VI: Phân số",
+        "lessonLocator": "Bài 25: Phép cộng và phép trừ phân số",
+        "pageNumber": 16,
+        "citationText": "SGK Toán 6 Tập 2, tr. 16 (Quy tắc quy đồng mẫu số trước khi cộng)"
+      },
+      {
+        "sourceId": "SRC-NXBGD-KNTT-MATH6-SGV-T2",
+        "tier": "TIER_B_APPROVED_LEARNING_SOURCE",
+        "bookSeries": "Kết nối tri thức với cuộc sống",
+        "lessonLocator": "Bài 25: Phép cộng và phép trừ phân số",
+        "pageNumber": 32,
+        "citationText": "SGV Toán 6 Tập 2, tr. 32-33 (Ôn tập kiến thức quy đồng mẫu số từ Lớp 5)"
+      },
+      {
+        "sourceId": "SRC-NXBGD-KNTT-MATH6-TRAIN-SLIDES-ARITHMETIC",
+        "tier": "TIER_B_PEDAGOGICAL_SOURCE",
+        "sectionLocator": "Phần 2: Số học — Chuyên đề Dạy học Phân số",
+        "citationText": "Slide bồi dưỡng giáo viên NXBGD (Khắc phục mô thức nhầm lẫn cộng cả tử và mẫu)"
+      }
+    ],
     "reviewState": "SOURCE_LINKED"
   },
   {
@@ -21,6 +69,37 @@
     "label": "Phép cộng phân số khác mẫu số",
     "description": "Quy đồng mẫu số các phân số rồi cộng các tử số với nhau và giữ nguyên mẫu số chung.",
     "type": "PROCEDURE",
+    "sourceRefs": [
+      {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "tier": "TIER_A_CURRICULUM_AUTHORITY",
+        "pageNumber": 50,
+        "sectionLocator": "Mục V. Chương trình môn Toán Lớp 6 — Phép tính phân số"
+      },
+      {
+        "sourceId": "SRC-NXBGD-KNTT-MATH6-T2",
+        "tier": "TIER_B_APPROVED_LEARNING_SOURCE",
+        "bookSeries": "Kết nối tri thức với cuộc sống",
+        "chapterLocator": "Chương VI: Phân số",
+        "lessonLocator": "Bài 25: Phép cộng và phép trừ phân số",
+        "pageNumber": 16,
+        "citationText": "SGK Toán 6 Tập 2, tr. 16 (Cộng hai phân số không cùng mẫu)"
+      },
+      {
+        "sourceId": "SRC-NXBGD-KNTT-MATH6-SGV-T2",
+        "tier": "TIER_B_APPROVED_LEARNING_SOURCE",
+        "bookSeries": "Kết nối tri thức với cuộc sống",
+        "lessonLocator": "Bài 25",
+        "pageNumber": 33,
+        "citationText": "SGV Toán 6 Tập 2, tr. 33 (Tổ chức hoạt động cộng hai phân số khác mẫu)"
+      },
+      {
+        "sourceId": "SRC-NXBGD-KNTT-MATH6-TRAIN-DOC",
+        "tier": "TIER_B_PEDAGOGICAL_SOURCE",
+        "sectionLocator": "Mục 2.3 — Phương pháp hình thành quy tắc cộng trừ phân số",
+        "citationText": "Tài liệu tập huấn giáo viên Toán 6 NXBGD"
+      }
+    ],
     "reviewState": "SOURCE_LINKED"
   },
   {
@@ -29,6 +108,23 @@
     "label": "Vận dụng giải toán thực tế về phân số",
     "description": "Ứng dụng phép cộng và trừ phân số để giải quyết các tình huống chia tài nguyên, đo lường trong thực tiễn.",
     "type": "APPLICATION",
+    "sourceRefs": [
+      {
+        "sourceId": "SRC-VN-MOET-MATH-2018",
+        "tier": "TIER_A_CURRICULUM_AUTHORITY",
+        "pageNumber": 50,
+        "sectionLocator": "Mục V. Chương trình môn Toán Lớp 6"
+      },
+      {
+        "sourceId": "SRC-NXBGD-KNTT-MATH6-T2",
+        "tier": "TIER_B_APPROVED_LEARNING_SOURCE",
+        "bookSeries": "Kết nối tri thức với cuộc sống",
+        "chapterLocator": "Chương VI: Phân số",
+        "lessonLocator": "Bài 25",
+        "pageNumber": 18,
+        "citationText": "SGK Toán 6 Tập 2, tr. 18 (Bài toán thực tế chia diện tích và đo lường)"
+      }
+    ],
     "reviewState": "SOURCE_LINKED"
   }
 ]

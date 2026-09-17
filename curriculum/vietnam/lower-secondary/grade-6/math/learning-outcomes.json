@@ -8,6 +8,7 @@
     "sourceRefs": [
       {
         "sourceId": "SRC-VN-MOET-MATH-2018",
+        "tier": "TIER_A_CURRICULUM_AUTHORITY",
         "documentNumber": "32/2018/TT-BGDĐT",
         "sectionLocator": "Mục V. Chương trình môn Toán Lớp 6 — Bảng Yêu cầu cần đạt về Phân số",
         "pageNumber": 50,
@@ -25,6 +26,7 @@
     "sourceRefs": [
       {
         "sourceId": "SRC-VN-MOET-MATH-2018",
+        "tier": "TIER_A_CURRICULUM_AUTHORITY",
         "documentNumber": "32/2018/TT-BGDĐT",
         "sectionLocator": "Mục V. Chương trình môn Toán Lớp 5 — Yêu cầu cần đạt về Phân số",
         "pageNumber": 38,
