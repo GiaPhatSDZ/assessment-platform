@@ -6,10 +6,12 @@ CONTROLLER REVIEW: PENDING
 ```
 
 **Milestone:** AI School Persistence V1  
+**Full Commit SHA:** `088dfa7e0e6669147e981b8ba91c16a5ca2b9d15`  
 **Baseline Commit:** `c7632e17ccd8c76353826bd01422be12c017d770`  
 **Date:** 2026-09-18  
 **Repository:** `GiaPhatSDZ/assessment-platform`  
-**Branch:** `main`
+**Branch:** `main`  
+**Commit URL:** `https://github.com/GiaPhatSDZ/assessment-platform/commit/088dfa7e0e6669147e981b8ba91c16a5ca2b9d15`
 
 ---
 
