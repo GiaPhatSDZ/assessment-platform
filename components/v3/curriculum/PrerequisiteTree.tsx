@@ -50,8 +50,13 @@ export function PrerequisiteTree({
         </span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {sortedNodes.map((node, index) => {
+      {sortedNodes.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-warm-200 dark:border-slate-800 p-6 text-center text-xs text-slate-500">
+          Đồ thị tri thức đang trong trạng thái thẩm định sư phạm (DRAFT / SOURCE_LINKED).
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {sortedNodes.map((node, index) => {
           const stateRecord = nodeStates[node.id];
           const state = stateRecord?.state || "NOT_ASSESSED";
           const isRootGap = node.id === rootGapNodeId;
@@ -110,7 +115,8 @@ export function PrerequisiteTree({
             </div>
           );
         })}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,9 +1,12 @@
 {
-  "id": "GRAPH-MATH-G6-FRACTIONS",
+  "id": "LEGACY-GRAPH-MATH-G6-FRACTIONS",
   "subjectId": "math",
   "topicId": "fractions",
-  "version": "1.0.0",
-  "updatedAt": "2026-09-17T12:00:00.000Z",
+  "version": "0.0.0-legacy",
+  "isAuthoritative": false,
+  "runtimeStatus": "RETIRED_FROM_ACTIVE_RUNTIME",
+  "notes": "RETIRED: Non-authoritative prototype graph containing unverified claims. Must not be used as production authority. Canonical graph truth is maintained in curriculum/vietnam/lower-secondary/grade-6/math/knowledge-nodes.json and prerequisite-edges.json.",
+  "status": "LEGACY_NON_AUTHORITATIVE",
   "nodes": [
     {
       "id": "NODE-MATH-4-FRAC-01",
@@ -15,7 +18,7 @@
       "grade": 4,
       "subjectId": "math",
       "topicId": "fractions_intro",
-      "status": "APPROVED"
+      "status": "LEGACY_NON_AUTHORITATIVE"
     },
     {
       "id": "NODE-MATH-6-INT-01",
@@ -27,7 +30,7 @@
       "grade": 6,
       "subjectId": "math",
       "topicId": "natural_numbers",
-      "status": "APPROVED"
+      "status": "LEGACY_NON_AUTHORITATIVE"
     },
     {
       "id": "NODE-MATH-6-FRAC-02",
@@ -39,7 +42,7 @@
       "grade": 6,
       "subjectId": "math",
       "topicId": "fractions",
-      "status": "APPROVED"
+      "status": "LEGACY_NON_AUTHORITATIVE"
     },
     {
       "id": "NODE-MATH-6-FRAC-03",
@@ -51,7 +54,7 @@
       "grade": 6,
       "subjectId": "math",
       "topicId": "fractions",
-      "status": "APPROVED"
+      "status": "LEGACY_NON_AUTHORITATIVE"
     }
   ],
   "edges": [
@@ -60,45 +63,45 @@
       "toNodeId": "NODE-MATH-6-FRAC-02",
       "strength": "REQUIRED",
       "rationale": "Kỹ thuật quy đồng mẫu số phân số chuẩn mực yêu cầu tìm mẫu số chung nhỏ nhất, chính là BCNN của các mẫu số.",
-      "evidence": "CURRICULUM_EXPLICIT",
+      "evidence": "LEGACY_UNVERIFIED",
       "sourceRefs": [
         {
           "sourceId": "SRC-VN-MOET-MATH-2018",
-          "clauseOrSection": "Lớp 6 - Số tự nhiên (trang 46)",
+          "clauseOrSection": "Lớp 6 - Số tự nhiên",
           "quote": "vận dụng được trong việc quy đồng mẫu số các phân số."
         }
       ],
-      "reviewStatus": "APPROVED"
+      "reviewStatus": "LEGACY_UNVERIFIED"
     },
     {
       "fromNodeId": "NODE-MATH-6-FRAC-02",
       "toNodeId": "NODE-MATH-6-FRAC-03",
       "strength": "REQUIRED",
       "rationale": "Để cộng hoặc trừ hai phân số khác mẫu số, bước đầu tiên bắt buộc là phải quy đồng mẫu số của chúng.",
-      "evidence": "CURRICULUM_EXPLICIT",
+      "evidence": "LEGACY_UNVERIFIED",
       "sourceRefs": [
         {
           "sourceId": "SRC-VN-MOET-MATH-2018",
-          "clauseOrSection": "Lớp 6 - Phân số (trang 48)",
+          "clauseOrSection": "Lớp 6 - Phân số",
           "quote": "Thực hiện được các phép tính cộng, trừ, nhân, chia đối với phân số."
         }
       ],
-      "reviewStatus": "APPROVED"
+      "reviewStatus": "LEGACY_UNVERIFIED"
     },
     {
       "fromNodeId": "NODE-MATH-4-FRAC-01",
       "toNodeId": "NODE-MATH-6-FRAC-03",
       "strength": "REQUIRED",
       "rationale": "Sau khi quy đồng mẫu số, phép tính trở thành cộng hai phân số cùng mẫu (giữ nguyên mẫu, cộng tử) vốn là năng lực nền từ Lớp 4.",
-      "evidence": "EXPERT_REVIEW",
+      "evidence": "LEGACY_UNVERIFIED",
       "sourceRefs": [
         {
           "sourceId": "SRC-VN-MOET-MATH-2018",
-          "clauseOrSection": "Lớp 4 - Số và phép tính (trang 32)",
+          "clauseOrSection": "Lớp 4 - Số và phép tính",
           "quote": "Thực hiện được phép cộng, phép trừ hai phân số có cùng mẫu số."
         }
       ],
-      "reviewStatus": "APPROVED"
+      "reviewStatus": "LEGACY_UNVERIFIED"
     }
   ]
 }

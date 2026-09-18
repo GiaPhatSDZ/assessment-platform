@@ -93,5 +93,7 @@
   "ageOrGradeFit": ["6"],
   "authoringOrigin": "AI_ASSISTED",
   "reviewState": "AI_DRAFT",
-  "publicationState": "DRAFT"
+  "publicationState": "DRAFT",
+  "itemMaturity": "DRAFT"
 }
+

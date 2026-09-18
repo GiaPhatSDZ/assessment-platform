@@ -3,6 +3,7 @@ import "server-only";
 import canonicalQuestionItems from "@/curriculum/vietnam/lower-secondary/grade-6/math/question-bank/items.json";
 import canonicalLessonData from "@/curriculum/vietnam/lower-secondary/grade-6/math/lessons/fractions-addition.json";
 import { filterPublishedForStudent, isPublishedForStudent } from "@/src/domain/content/publication-guard";
+import { KnowledgeGraph } from "@/src/domain/curriculum/types";
 import { DiagnosticItem } from "@/src/domain/diagnostic/types";
 
 export type ContentDeliveryStatus = "PUBLISHED" | "CONTENT_NOT_AVAILABLE";
@@ -24,6 +25,7 @@ export interface DiagnosticDeliveryDto {
   topicTitle: string;
   items: SanitizedDiagnosticItemDto[];
   reTestItems: SanitizedDiagnosticItemDto[];
+  graph?: KnowledgeGraph | null;
   reason?: string;
 }
 
@@ -99,6 +101,7 @@ export class StudentContentDeliveryService {
         topicTitle: "Phép cộng phân số khác mẫu số (Toán Lớp 6)",
         items: [],
         reTestItems: [],
+        graph: null,
         reason: "DRAFT_AWAITING_HUMAN_REVIEW",
       };
     }
@@ -110,7 +113,17 @@ export class StudentContentDeliveryService {
       topicTitle: "Phép cộng phân số khác mẫu số (Toán Lớp 6)",
       items: sanitized.filter((i) => !i.isReTest),
       reTestItems: sanitized.filter((i) => i.isReTest),
+      graph: null,
     };
+  }
+
+  /**
+   * Evaluates canonical knowledge graph for requested topic.
+   * Canonical knowledge-nodes.json and prerequisite-edges.json remain SOURCE_LINKED / unreviewed.
+   * Student runtime receives NO graph (returns null) when graph content has not reached required review state.
+   */
+  static getKnowledgeGraphDelivery(topicId: string = "math-grade6-fractions"): KnowledgeGraph | null {
+    return null;
   }
 
   /**

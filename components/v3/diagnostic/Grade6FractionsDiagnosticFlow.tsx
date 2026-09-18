@@ -15,6 +15,8 @@ import { RetestWorkspace } from "../remediation/RetestWorkspace";
 import { AppShell } from "@/components/v4/layout/AppShell";
 import { MathText } from "@/components/math/MathText";
 
+import { KnowledgeGraph } from "@/src/domain/curriculum/types";
+
 type FlowPhase = "DIAGNOSTIC" | "GAP_REPORT" | "LEARNING_PACK" | "RETEST";
 
 export interface Grade6FractionsDiagnosticFlowProps {
@@ -24,12 +26,13 @@ export interface Grade6FractionsDiagnosticFlowProps {
     topicTitle?: string;
     items: any[];
     reTestItems?: any[];
+    graph?: KnowledgeGraph | null;
     reason?: string;
   };
 }
 
 export function Grade6FractionsDiagnosticFlow({ delivery }: Grade6FractionsDiagnosticFlowProps = {}) {
-  const graph = CurriculumService.getFractionsKnowledgeGraph();
+  const graph = delivery?.graph || CurriculumService.getFractionsKnowledgeGraph();
   const initialItems = delivery ? delivery.items : CurriculumService.getInitialDiagnosticItems();
   const reTestItems = delivery?.reTestItems || CurriculumService.getReTestItems();
   const isAvailable = delivery ? delivery.status === "PUBLISHED" && initialItems.length > 0 : initialItems.length > 0;

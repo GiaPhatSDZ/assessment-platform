@@ -44,13 +44,14 @@ describe("R2.2.1 Server Delivery Boundary & Freeze Cleanup Suite", () => {
   // MANDATORY TEST A & B: Sentinels absent from client source and static chunks
   // =========================================================================
   describe("A & B: DRAFT Sentinels absent from client modules and production chunks", () => {
-    it("proves client-side curriculum-service and learning-pack do not import unpublished canonical JSON", () => {
+    it("proves client-side curriculum-service and learning-pack do not import unpublished canonical JSON or legacy graph", () => {
       const currServiceSource = fs.readFileSync(
         path.join(process.cwd(), "src/application/curriculum/curriculum-service.ts"),
         "utf-8"
       );
       expect(currServiceSource).not.toContain("question-bank/items.json");
       expect(currServiceSource).not.toContain("fractions-addition.json");
+      expect(currServiceSource).not.toContain("math-grade6-fractions.json");
 
       const learningPackSource = fs.readFileSync(
         path.join(process.cwd(), "src/domain/remediation/learning-pack.ts"),
@@ -58,9 +59,10 @@ describe("R2.2.1 Server Delivery Boundary & Freeze Cleanup Suite", () => {
       );
       expect(learningPackSource).not.toContain("question-bank/items.json");
       expect(learningPackSource).not.toContain("fractions-addition.json");
+      expect(learningPackSource).not.toContain("math-grade6-fractions.json");
     });
 
-    it("ensures canonical unpublished JSON is ONLY imported from modules marked with 'server-only'", () => {
+    it("ensures canonical unpublished JSON and graphs are ONLY imported from modules marked with 'server-only'", () => {
       const srcDir = path.join(process.cwd(), "src");
       const componentsDir = path.join(process.cwd(), "components");
 
@@ -84,8 +86,17 @@ describe("R2.2.1 Server Delivery Boundary & Freeze Cleanup Suite", () => {
         const content = fs.readFileSync(filePath, "utf-8");
         const importsDraftQuestionBank = content.includes("question-bank/items.json");
         const importsDraftLesson = content.includes("fractions-addition.json");
+        const importsLegacyGraph = content.includes("math-grade6-fractions.json");
+        const importsCanonicalNodes = content.includes("knowledge-nodes.json");
+        const importsCanonicalEdges = content.includes("prerequisite-edges.json");
 
-        if (importsDraftQuestionBank || importsDraftLesson) {
+        if (
+          importsDraftQuestionBank ||
+          importsDraftLesson ||
+          importsLegacyGraph ||
+          importsCanonicalNodes ||
+          importsCanonicalEdges
+        ) {
           // File MUST declare server-only
           expect(
             content.includes('import "server-only"') || content.includes("import 'server-only'")
@@ -94,7 +105,44 @@ describe("R2.2.1 Server Delivery Boundary & Freeze Cleanup Suite", () => {
       }
     });
 
-    it("verifies production static chunks (if built) do not contain DRAFT sentinels", () => {
+    it("verifies CurriculumService fails closed and returns empty graph for client runtime", () => {
+      const clientGraph = CurriculumService.getFractionsKnowledgeGraph();
+      expect(clientGraph.nodes).toHaveLength(0);
+      expect(clientGraph.edges).toHaveLength(0);
+    });
+
+    it("verifies canonical Grade 6 lesson has explicit itemMaturity: DRAFT and matches schema", () => {
+      const lessonRaw = fs.readFileSync(
+        path.join(process.cwd(), "curriculum/vietnam/lower-secondary/grade-6/math/lessons/fractions-addition.json"),
+        "utf-8"
+      );
+      const lesson = JSON.parse(lessonRaw);
+      expect(lesson.itemMaturity).toBe("DRAFT");
+      expect(lesson.reviewState).toBe("AI_DRAFT");
+      expect(lesson.publicationState).toBe("DRAFT");
+    });
+
+    it("verifies canonical knowledge nodes and prerequisite edges remain SOURCE_LINKED and unapproved", () => {
+      const nodesRaw = fs.readFileSync(
+        path.join(process.cwd(), "curriculum/vietnam/lower-secondary/grade-6/math/knowledge-nodes.json"),
+        "utf-8"
+      );
+      const nodes = JSON.parse(nodesRaw);
+      for (const node of nodes) {
+        expect(node.reviewState).toBe("SOURCE_LINKED");
+      }
+
+      const edgesRaw = fs.readFileSync(
+        path.join(process.cwd(), "curriculum/vietnam/lower-secondary/grade-6/math/prerequisite-edges.json"),
+        "utf-8"
+      );
+      const edges = JSON.parse(edgesRaw);
+      for (const edge of edges) {
+        expect(edge.reviewState).toBe("SOURCE_LINKED");
+      }
+    });
+
+    it("verifies production static chunks do not contain DRAFT sentinels or unpublished graph payloads", () => {
       const staticDir = path.join(process.cwd(), ".next/static");
       if (!fs.existsSync(staticDir)) {
         // Build has not run yet in this test step; skip static file scan
@@ -118,13 +166,29 @@ describe("R2.2.1 Server Delivery Boundary & Freeze Cleanup Suite", () => {
       const chunkFiles = scanChunkFiles(staticDir);
       expect(chunkFiles.length).toBeGreaterThan(0);
 
+      const draftSentinels = [
+        // Sentinel A: Question item ID
+        "ITEM-G6-FRAC-01",
+        // Sentinel B: Lesson pedagogical text
+        "LESSON-MATH-6-FRAC-01",
+        "Để cộng hai phân số có mẫu số khác nhau, ta không thể cộng ngay",
+        // Sentinel C: Legacy graph ID and payload
+        "GRAPH-MATH-G6-FRACTIONS",
+        "Cộng hai phân số có cùng mẫu số bằng cách cộng tử số với nhau",
+        "Tìm mẫu chung bằng BCNN của các mẫu số, tìm thừa số phụ",
+        "Quy đồng mẫu số hai phân số về cùng một mẫu dương rồi thực hiện phép cộng",
+        // Sentinel D: Canonical SOURCE_LINKED graph descriptions
+        "Nhận biết phân số biểu diễn số phần bằng nhau của đơn vị",
+        "Tìm mẫu số chung (thông qua bội chung nhỏ nhất) và nhân cả tử và mẫu",
+        "Cần hiểu khái niệm phân số và phân số bằng nhau trước khi thực hiện quy đồng",
+        "Phép cộng phân số khác mẫu số bắt buộc phải quy đồng mẫu số",
+      ];
+
       for (const chunkFile of chunkFiles) {
         const chunkContent = fs.readFileSync(chunkFile, "utf-8");
-        // Sentinel A: Question item ID
-        expect(chunkContent).not.toContain("ITEM-G6-FRAC-01");
-        // Sentinel B: Lesson pedagogical text
-        expect(chunkContent).not.toContain("LESSON-MATH-6-FRAC-01");
-        expect(chunkContent).not.toContain("Để cộng hai phân số có mẫu số khác nhau, ta không thể cộng ngay");
+        for (const sentinel of draftSentinels) {
+          expect(chunkContent).not.toContain(sentinel);
+        }
       }
     });
   });

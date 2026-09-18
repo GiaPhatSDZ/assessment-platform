@@ -16,7 +16,97 @@ describe("V3 Evidence-First Vertical Slice (End-to-End Integration)", () => {
     expect(moetMathSource).toBeDefined();
     expect(moetMathSource?.status).toBe("CURRENT_NATIONAL");
 
-    const graph = CurriculumService.getFractionsKnowledgeGraph();
+    // Client-side graph delivery fails closed when canonical graph is unreviewed
+    const clientGraph = CurriculumService.getFractionsKnowledgeGraph();
+    expect(clientGraph.nodes).toHaveLength(0);
+
+    // Test fixture graph to evaluate full diagnostic and remediation engine lifecycle
+    const graph = {
+      id: "GRAPH-TEST-FRAC",
+      subjectId: "math",
+      topicId: "fractions",
+      version: "1.0.0",
+      updatedAt: new Date().toISOString(),
+      nodes: [
+        {
+          id: "NODE-MATH-4-FRAC-01",
+          learningOutcomeId: "LO-VN-MATH-4-NUM-01",
+          code: "MATH.G4.FRAC.ADD_SAME",
+          label: "Cộng hai phân số cùng mẫu số",
+          description: "Cộng hai phân số có cùng mẫu số bằng cách cộng tử số với nhau và giữ nguyên mẫu số.",
+          kind: "PROCEDURE" as const,
+          grade: 4,
+          subjectId: "math",
+          topicId: "fractions_intro",
+          status: "APPROVED" as const,
+        },
+        {
+          id: "NODE-MATH-6-INT-01",
+          learningOutcomeId: "LO-VN-MATH-6-NUM-01",
+          code: "MATH.G6.INT.LCM",
+          label: "Tìm Bội chung nhỏ nhất (BCNN)",
+          description: "Tìm bội chung nhỏ nhất của hai hay nhiều số tự nhiên bằng cách phân tích ra thừa số nguyên tố.",
+          kind: "PROCEDURE" as const,
+          grade: 6,
+          subjectId: "math",
+          topicId: "natural_numbers",
+          status: "APPROVED" as const,
+        },
+        {
+          id: "NODE-MATH-6-FRAC-02",
+          learningOutcomeId: "LO-VN-MATH-6-NUM-02",
+          code: "MATH.G6.FRAC.COMMON_DENOM",
+          label: "Quy đồng mẫu số các phân số",
+          description: "Tìm mẫu chung bằng BCNN của các mẫu số, tìm thừa số phụ và nhân cả tử và mẫu với thừa số phụ tương ứng.",
+          kind: "PROCEDURE" as const,
+          grade: 6,
+          subjectId: "math",
+          topicId: "fractions",
+          status: "APPROVED" as const,
+        },
+        {
+          id: "NODE-MATH-6-FRAC-03",
+          learningOutcomeId: "LO-VN-MATH-6-NUM-03",
+          code: "MATH.G6.FRAC.ADD_SUB_UNLIKE",
+          label: "Cộng, trừ hai phân số không cùng mẫu số",
+          description: "Quy đồng mẫu số hai phân số về cùng một mẫu dương rồi thực hiện phép cộng, trừ tử số và giữ nguyên mẫu chung.",
+          kind: "APPLICATION" as const,
+          grade: 6,
+          subjectId: "math",
+          topicId: "fractions",
+          status: "APPROVED" as const,
+        },
+      ],
+      edges: [
+        {
+          fromNodeId: "NODE-MATH-6-INT-01",
+          toNodeId: "NODE-MATH-6-FRAC-02",
+          strength: "REQUIRED" as const,
+          rationale: "Kỹ thuật quy đồng mẫu số phân số chuẩn mực yêu cầu tìm mẫu số chung nhỏ nhất.",
+          evidence: "CURRICULUM_EXPLICIT" as const,
+          sourceRefs: [],
+          reviewStatus: "APPROVED" as const,
+        },
+        {
+          fromNodeId: "NODE-MATH-6-FRAC-02",
+          toNodeId: "NODE-MATH-6-FRAC-03",
+          strength: "REQUIRED" as const,
+          rationale: "Để cộng hoặc trừ hai phân số khác mẫu số, bước đầu tiên bắt buộc là phải quy đồng mẫu số.",
+          evidence: "CURRICULUM_EXPLICIT" as const,
+          sourceRefs: [],
+          reviewStatus: "APPROVED" as const,
+        },
+        {
+          fromNodeId: "NODE-MATH-4-FRAC-01",
+          toNodeId: "NODE-MATH-6-FRAC-03",
+          strength: "REQUIRED" as const,
+          rationale: "Sau khi quy đồng mẫu số, phép tính trở thành cộng hai phân số cùng mẫu.",
+          evidence: "EXPERT_REVIEW" as const,
+          sourceRefs: [],
+          reviewStatus: "APPROVED" as const,
+        },
+      ],
+    };
     const validationErrors = validateKnowledgeGraph(graph);
     expect(validationErrors).toHaveLength(0);
 
