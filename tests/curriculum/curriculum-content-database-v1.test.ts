@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
@@ -10,6 +10,11 @@ import {
   ContentNotPublishedError,
   StudentRuntimeAiViolationError,
 } from "@/src/domain/content/publication-guard";
+import { canonicalContentHash } from "@/src/domain/content/canonical-content-hash";
+import {
+  registerReviewer,
+  clearReviewerRegistry,
+} from "@/src/domain/content/reviewer-registry";
 
 import {
   validateThptSubjectSelection,
@@ -174,7 +179,25 @@ describe("Curriculum Content Database V1 — Authority, Provenance & Boundary Te
 
   // 3. Publication Guard & Student Runtime Restrictions
   describe("Publication Guard & Security Barriers", () => {
-    const validPublishedItem: QuestionItem = {
+    beforeEach(() => {
+      clearReviewerRegistry();
+      registerReviewer({
+        reviewerId: "REV-HUMAN-01",
+        type: "HUMAN",
+        role: "PEDAGOGICAL_CONTROLLER",
+        active: true,
+        verifiedByController: true,
+      });
+      registerReviewer({
+        reviewerId: "REV-HUMAN-02",
+        type: "HUMAN",
+        role: "SUBJECT_EXPERT",
+        active: true,
+        verifiedByController: true,
+      });
+    });
+
+    const baseValidItem: QuestionItem = {
       id: "ITEM-TEST-01",
       primaryNodeId: "NODE-01",
       supportingNodeIds: [],
@@ -190,12 +213,20 @@ describe("Curriculum Content Database V1 — Authority, Provenance & Boundary Te
       reviewState: "INTERNAL_REVIEWED",
       publicationState: "PUBLISHED_BETA",
       version: "1.0.0",
+    };
+
+    const validPublishedItem: QuestionItem = {
+      ...baseValidItem,
       reviewAttestation: {
         reviewerId: "REV-HUMAN-01",
         reviewerName: "Pham Thi C (Math Controller)",
         role: "PEDAGOGICAL_CONTROLLER",
         attestedAt: "2026-09-17T00:00:00Z",
-        contentHash: "a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90",
+        contentHash: canonicalContentHash(baseValidItem),
+        hashAlgorithm: "SHA-256",
+        hashSchemaVersion: "content-hash-v1",
+        decision: "APPROVE",
+        scope: "QUESTION_ITEM",
       },
     };
 
@@ -225,16 +256,31 @@ describe("Curriculum Content Database V1 — Authority, Provenance & Boundary Te
     });
 
     it("filters arrays cleanly, omitting unapproved items", () => {
+      const item4Base: QuestionItem = {
+        ...validPublishedItem,
+        id: "ITEM-4",
+        publicationState: "PUBLISHED_VERIFIED",
+        reviewState: "SUBJECT_EXPERT_REVIEWED",
+      };
+      const item4: QuestionItem = {
+        ...item4Base,
+        reviewAttestation: {
+          reviewerId: "REV-HUMAN-02",
+          role: "SUBJECT_EXPERT",
+          attestedAt: "2026-09-17T00:00:00Z",
+          contentHash: canonicalContentHash(item4Base),
+          hashAlgorithm: "SHA-256",
+          hashSchemaVersion: "content-hash-v1",
+          decision: "APPROVE",
+          scope: "QUESTION_ITEM",
+        },
+      };
+
       const items: QuestionItem[] = [
         validPublishedItem,
         { ...validPublishedItem, id: "ITEM-2", publicationState: "DRAFT" },
         { ...validPublishedItem, id: "ITEM-3", reviewState: "AI_DRAFT" },
-        {
-          ...validPublishedItem,
-          id: "ITEM-4",
-          publicationState: "PUBLISHED_VERIFIED",
-          reviewState: "SUBJECT_EXPERT_REVIEWED",
-        },
+        item4,
       ];
 
       const published = filterPublishedForStudent(items);

@@ -303,6 +303,7 @@ export const RAW_GRADE_6_SOURCES = [
     id: "SRC-NXBGD-KNTT-MATH6-VBT-T2",
     authority: "Nhà xuất bản Giáo dục Việt Nam",
     title: "VBT Toán 6, tập hai (Bài mẫu) — Bộ sách Kết nối tri thức với cuộc sống",
+    canonicalInternalName: "VBT Toán 6, tập hai (Bài mẫu)",
     sourceType: "APPROVED_TEXTBOOK_SOURCE",
     sourceTier: "TIER_B2_NXBGD_PUBLISHER_RESOURCE",
     resourceType: "WORKBOOK_SAMPLE",
@@ -544,11 +545,25 @@ export async function runSourceVerificationV2({
       }
     }
 
+    // Dynamic derivation of sourceDisplayedTitle and identityStatus
+    const canonicalInternalName = src.canonicalInternalName || undefined;
+    const sourceDisplayedTitle = canonicalTitle || src.title;
+    let identityStatus = undefined;
+
+    if (canonicalInternalName && sourceDisplayedTitle) {
+      const normInternal = canonicalInternalName.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const normDisplayed = sourceDisplayedTitle.toLowerCase().replace(/[^a-z0-9]/g, "");
+      identityStatus = normInternal === normDisplayed ? "SOURCE_LABEL_CONSISTENT" : "SOURCE_LABEL_INCONSISTENT";
+    }
+
     // Deterministic canonical metadata fingerprint
     const canonicalMetadata = {
       id: src.id,
       canonicalTitle: canonicalTitle || src.title,
       canonicalUrl: src.url,
+      canonicalInternalName: canonicalInternalName || null,
+      sourceDisplayedTitle: sourceDisplayedTitle || null,
+      identityStatus: identityStatus || null,
       resourceType: src.resourceType,
       sourceTier: src.sourceTier,
       totalPages: remoteViewerInventory?.totalPages || null,
@@ -563,6 +578,9 @@ export async function runSourceVerificationV2({
 
     const record = {
       ...src,
+      canonicalInternalName,
+      sourceDisplayedTitle,
+      identityStatus,
       retrievedAt,
       verificationStatus,
       httpStatus: httpStatus ?? undefined,

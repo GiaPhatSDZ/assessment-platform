@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
@@ -19,10 +19,26 @@ import {
   promoteContent,
   ContentNotPublishedError,
 } from "@/src/domain/content/publication-guard";
+import { canonicalContentHash } from "@/src/domain/content/canonical-content-hash";
+import {
+  registerReviewer,
+  clearReviewerRegistry,
+} from "@/src/domain/content/reviewer-registry";
 // @ts-ignore - ESM script import for unit testing
 import { runSourceVerificationV2 } from "../../scripts/curriculum/ingest-nxbgd-sources.mjs";
 
 describe("NXBGD Source Verification Engine V2.1 & Provenance R2.1 Audit", () => {
+  beforeEach(() => {
+    clearReviewerRegistry();
+    registerReviewer({
+      reviewerId: "REV-HUMAN-01",
+      type: "HUMAN",
+      role: "PEDAGOGICAL_CONTROLLER",
+      active: true,
+      verifiedByController: true,
+      displayName: "Tran Van B (Lead Reviewer)",
+    });
+  });
   const g6MathDir = path.resolve("curriculum/vietnam/lower-secondary/grade-6/math");
 
   it("verifies distinct Tier B categories and Tier A consolidated chain in source-registry.json", () => {
@@ -273,7 +289,7 @@ describe("NXBGD Source Verification Engine V2.1 & Provenance R2.1 Audit", () => 
       misconceptionTags: [],
       sourceRefs: [],
       authoringOrigin: "AI_ASSISTED",
-      itemMaturity: "DRAFT",
+      itemMaturity: "REVIEWED",
       reviewState: "AI_DRAFT",
       publicationState: "PUBLISHED_BETA",
       version: "1.0.0",
@@ -283,8 +299,7 @@ describe("NXBGD Source Verification Engine V2.1 & Provenance R2.1 Audit", () => 
     expect(() => assertPublishedForStudent(sampleItem)).toThrow(ContentNotPublishedError);
 
     // 2. Promotion with fake AI reviewer must be blocked
-    const contentPayload = JSON.stringify(sampleItem.prompt);
-    const contentHash = crypto.createHash("sha256").update(contentPayload).digest("hex");
+    const contentHash = canonicalContentHash(sampleItem);
 
     expect(() => {
       promoteContent(
@@ -296,8 +311,11 @@ describe("NXBGD Source Verification Engine V2.1 & Provenance R2.1 Audit", () => 
           role: "PEDAGOGICAL_CONTROLLER",
           attestedAt: "2026-09-17T00:00:00Z",
           contentHash,
-        },
-        contentPayload
+          hashAlgorithm: "SHA-256",
+          hashSchemaVersion: "content-hash-v1",
+          decision: "APPROVE",
+          scope: "QUESTION_ITEM",
+        }
       );
     }).toThrow(SelfPromotionForbiddenError);
 
@@ -312,8 +330,11 @@ describe("NXBGD Source Verification Engine V2.1 & Provenance R2.1 Audit", () => 
           role: "PEDAGOGICAL_CONTROLLER",
           attestedAt: "2026-09-17T00:00:00Z",
           contentHash: "mismatched-tampered-hash",
-        },
-        contentPayload
+          hashAlgorithm: "SHA-256",
+          hashSchemaVersion: "content-hash-v1",
+          decision: "APPROVE",
+          scope: "QUESTION_ITEM",
+        }
       );
     }).toThrow(SelfPromotionForbiddenError);
 
@@ -327,9 +348,12 @@ describe("NXBGD Source Verification Engine V2.1 & Provenance R2.1 Audit", () => 
         role: "PEDAGOGICAL_CONTROLLER",
         attestedAt: "2026-09-17T00:00:00Z",
         contentHash,
+        hashAlgorithm: "SHA-256",
+        hashSchemaVersion: "content-hash-v1",
+        decision: "APPROVE",
+        scope: "QUESTION_ITEM",
         auditNotes: "Fully audited against SGK Grade 6 Mathematics Lesson 25.",
-      },
-      contentPayload
+      }
     );
 
     expect(promoted.reviewState).toBe("INTERNAL_REVIEWED");
@@ -447,8 +471,7 @@ describe("NXBGD Source Verification Engine V2.1 & Provenance R2.1 Audit", () => 
     expect(() => assertPublishedForStudent(arbitraryReviewerItem)).toThrow(ContentNotPublishedError);
 
     // In promoteContent(), an arbitrary reviewer string or invalid reviewerId prefix is rejected
-    const contentPayload = JSON.stringify(arbitraryReviewerItem.prompt);
-    const contentHash = crypto.createHash("sha256").update(contentPayload).digest("hex");
+    const contentHash = canonicalContentHash(arbitraryReviewerItem);
 
     expect(() => {
       promoteContent(
@@ -460,8 +483,11 @@ describe("NXBGD Source Verification Engine V2.1 & Provenance R2.1 Audit", () => 
           role: "PEDAGOGICAL_CONTROLLER",
           attestedAt: "2026-09-17T00:00:00Z",
           contentHash,
-        },
-        contentPayload
+          hashAlgorithm: "SHA-256",
+          hashSchemaVersion: "content-hash-v1",
+          decision: "APPROVE",
+          scope: "QUESTION_ITEM",
+        }
       );
     }).toThrow(SelfPromotionForbiddenError);
 
@@ -475,8 +501,11 @@ describe("NXBGD Source Verification Engine V2.1 & Provenance R2.1 Audit", () => 
           role: "CONTRIBUTOR" as any, // invalid role
           attestedAt: "2026-09-17T00:00:00Z",
           contentHash,
-        },
-        contentPayload
+          hashAlgorithm: "SHA-256",
+          hashSchemaVersion: "content-hash-v1",
+          decision: "APPROVE",
+          scope: "QUESTION_ITEM",
+        }
       );
     }).toThrow(SelfPromotionForbiddenError);
   });

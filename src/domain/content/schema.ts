@@ -130,11 +130,27 @@ export interface ApprovalProvenance {
 
 export interface ReviewAttestation {
   reviewerId: string;
-  reviewerName: string;
+  reviewerName?: string;
   role: "PEDAGOGICAL_CONTROLLER" | "SUBJECT_EXPERT" | "CURRICULUM_AUDITOR";
   attestedAt: string;
   contentHash: string;
+  hashAlgorithm: "SHA-256";
+  hashSchemaVersion: "content-hash-v1";
+  decision: "APPROVE" | "REJECT" | "REQUEST_CHANGES";
+  scope: "QUESTION_ITEM" | "LESSON" | "PARENT_GUIDE" | "EXPLANATION";
   auditNotes?: string;
+}
+
+/**
+ * Shared metadata contract for content types supporting formal review and publication workflow.
+ */
+export interface ReviewableContentMeta {
+  authoringOrigin?: "HUMAN" | "AI_ASSISTED" | "ADAPTED_WITH_PERMISSION";
+  itemMaturity?: "DRAFT" | "REVIEWED" | "PILOT" | "CALIBRATED";
+  reviewState: ReviewState;
+  publicationState?: PublicationState;
+  version?: string;
+  reviewAttestation?: ReviewAttestation;
 }
 
 export interface SourceDocument {
@@ -172,6 +188,9 @@ export interface SourceDocument {
   approvalDecisionDate?: string;
   approvalSourceId?: string;
   requiredForSlice?: boolean;
+  canonicalInternalName?: string;
+  sourceDisplayedTitle?: string;
+  identityStatus?: "SOURCE_LABEL_CONSISTENT" | "SOURCE_LABEL_INCONSISTENT";
 }
 
 export class SelfPromotionForbiddenError extends Error {
@@ -284,6 +303,7 @@ export interface QuestionItem {
   prompt: RichContent[];
   options?: MultipleChoiceOption[];
   correctAnswer: string;
+  answerSpec?: unknown;
   rationale: string;
   distractorRationales?: Record<string, string>;
   misconceptionTags: string[];
