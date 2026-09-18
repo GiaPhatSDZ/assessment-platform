@@ -7,23 +7,42 @@ SUPERSEDES: Historical Generic Assessment Platform (v0.1 / Transitional V1/V2)
 FROZEN BASELINE: R2.1 Source Provenance / R2.2 Publication Gate / R2.2.1 Server Delivery Boundary
 ```
 
-**Scope Jurisdiction:** Vietnam K-12 General Education Program (GDPT 2018)  
+**Product Scope:** Preschool (ages 3–6) through Grade 12  
 **Effective Date:** 2026-09-18  
 **Repository:** `GiaPhatSDZ/assessment-platform`
 
 ---
 
-## 1. Product Truth & Mission
+## 1. Product Truth & Stage-Specific Scope
 
 **PRODUCT:**
-AI School curriculum-grounded learning and Knowledge Control.
+AI School curriculum-grounded learning and Knowledge Control across Preschool (ages 3–6) through Grade 12.
 
-AI School is designed to replace opaque, high-stress testing and generic question dumps with deterministic, evidence-based knowledge tracing aligned with the Vietnamese National Curriculum (**Chương trình Giáo dục phổ thông 2018 - Ban hành kèm Thông tư 32/2018/TT-BGDĐT**).
+AI School is designed to replace opaque, high-stress testing, drill-and-kill, and generic black-box question dumps with deterministic, evidence-based knowledge tracing. The platform spans two distinct educational stages governed by separate national curriculum authorities:
 
-### Core Invariants:
-1. **Knowledge Control over Black-Box AI:** We do not use generative AI to invent questions, guess grades, or score tests. Every diagnostic item and prerequisite relationship is rooted in accredited national textbook and curriculum sources.
-2. **Prerequisite Gap Tracing over Drill-and-Kill:** Instead of forcing students through dozens of repetitive exercises on their failing topic, the system traces the prerequisite graph (DAG) backwards to identify the true foundational blocker (e.g., missing Grade 5 common denominator technique blocking Grade 6 fraction addition).
-3. **Evidence-Based Mastery:** Competence is demonstrated through concrete item attempts and targeted re-tests, not inferred from generic test scores or subjective confidence rankings.
+### 1.1 Stage-Specific Curriculum Authority
+
+#### PRESCHOOL (Ages 3–4, 4–5, 5–6)
+- **Governing Authority:** Current National Preschool Curriculum Authority (Chương trình Giáo dục Mầm non ban hành kèm Thông tư 17/2009/TT-BGDĐT, sửa đổi bổ sung theo Thông tư 28/2016/TT-BGDĐT và Thông tư 51/2020/TT-BGDĐT).
+- **Separation of Pilot Regimes:** Pilot or experimental preschool programs (e.g. Đề án thí điểm GDMN mới 2026-2027) must remain strictly classified under Tier B and separated from current national standards.
+- **Pedagogical Model:** Developmental, play-based, observational, and parent-guided activity model.
+- **Preschool Invariant:** Preschool is **NOT "small Grade 1"**. Preschool learning must never be forced into formal academic drills, mechanical testing, or elementary school prerequisites.
+- **Authority Boundary:** Preschool is **NOT governed by TT 32/2018/TT-BGDĐT (GDPT 2018)**.
+
+#### GRADE 1–12 (Primary through Upper Secondary)
+- **Governing Authority:** Current Vietnamese General Education Program (Chương trình Giáo dục phổ thông 2018 - Ban hành kèm Thông tư 32/2018/TT-BGDĐT, sửa đổi bổ sung theo Thông tư 13/2022/TT-BGDĐT).
+- **Provenance Model:** Subject-specific provenance adhering to the frozen R2.1 source provenance model and official textbook/resource authorities.
+
+### 1.2 Core Product Invariants
+1. **Knowledge Control over Black-Box AI:** We do not use generative AI to invent questions, guess grades, or score tests. Every diagnostic item links to verified curriculum and textbook sources.
+2. **Prerequisite Gap Tracing over Drill-and-Kill:** Instead of forcing students through repetitive exercises on a failing topic, the system traces the prerequisite graph (DAG) backwards to identify the true foundational blocker (e.g. missing Grade 5 common denominator technique blocking Grade 6 fraction addition).
+3. **Prerequisite Evidence Model:** Prerequisite relationships are not assumed to be verbatim quotes from textbooks; they are governed by the formal 4-tier evidence model:
+   - `CURRICULUM_EXPLICIT`: Directly mandated by national curriculum learning outcomes (YCCĐ).
+   - `EXPERT_REVIEW`: Validated by subject pedagogical expert consensus.
+   - `EMPIRICAL`: Supported by statistical student response and mastery transition data.
+   - `DRAFT_INFERENCE`: Preliminary draft inference; fails closed for student delivery until human review signoff.
+   Only sufficiently evidenced and reviewed graph content may be published for student runtime.
+4. **Evidence-Based Mastery:** Competence is demonstrated through concrete item attempts and targeted re-tests, not inferred from generic test scores or subjective confidence rankings.
 
 ---
 
@@ -82,11 +101,13 @@ AI School is designed to replace opaque, high-stress testing and generic questio
    - Requires deterministic canonical content hash verification: `computedHash === reviewAttestation.contentHash`.
    - Requires `hashAlgorithm: "SHA-256"` and `hashSchemaVersion: "content-hash-v1"`.
    - Rejects stale attestations immediately when content fields (`prompt`, `options`, `correctAnswer`, `sourceRefs`, `authoringOrigin`) are modified post-review.
-4. **Human Review Attestation Required:**
+4. **Human Review Attestation Required & Authoring Origins:**
    - Publication gate strictly mandates human review attestation (`ReviewAttestation`).
-   - Self-promotion by AI (`authoringOrigin === "AI_GENERATED"`) without verified human pedagogical signoff is blocked with `SelfPromotionForbiddenError`.
+   - Valid schema authoring origins: `HUMAN`, `AI_ASSISTED`, `ADAPTED_WITH_PERMISSION`.
+   - AI-assisted drafting (`authoringOrigin: "AI_ASSISTED"`) is permitted in authoring pipelines, but self-promotion without verified human pedagogical review signoff is strictly blocked with `SelfPromotionForbiddenError`.
+   - Human review attestation before student publication is mandatory regardless of authoring origin.
 5. **Reviewer Authority Fail-Closed:**
-   - Production reviewer registry (`productionReviewerAuthority`) is read-only and empty by default (fail-closed).
+   - Production reviewer registry (`productionReviewerAuthority`) is read-only and empty by default (fail-closed; 0 production reviewers).
    - Test registries may only be injected when `process.env.NODE_ENV === "test"`.
    - Arbitrary production authority injection throws `SECURITY_VIOLATION`.
 
@@ -105,7 +126,7 @@ AI School is designed to replace opaque, high-stress testing and generic questio
 | Lessons | `curriculum/.../math/lessons/fractions-addition.json` | `itemMaturity: "DRAFT"`, `reviewState: "AI_DRAFT"` | **BLOCKED** (`CONTENT_NOT_AVAILABLE`) |
 | Knowledge Nodes | `curriculum/.../math/knowledge-nodes.json` | `reviewState: "SOURCE_LINKED"` | **BLOCKED** (`null`) |
 | Prerequisite Edges | `curriculum/.../math/prerequisite-edges.json` | `reviewState: "SOURCE_LINKED"` | **BLOCKED** (`null`) |
-| Reviewer Authority | `productionReviewerAuthority` | `0` verified human reviewers | **FAIL-CLOSED** |
+| Reviewer Authority | `productionReviewerAuthority` | zero production reviewer | **FAIL-CLOSED** |
 
 - **SOURCE_LINKED / AI_DRAFT / DRAFT** status across all Grade 6 artifacts.
 - **zero production reviewer** registered in production authority.

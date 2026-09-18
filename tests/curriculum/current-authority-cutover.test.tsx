@@ -1,13 +1,16 @@
 /**
  * AI School Current Authority & Legacy Cutover Test Suite
  * 
- * Verifies all Task 8 requirements:
- * 1. Current authority document exists and defines current truth
- * 2. Historical specs are marked as superseded baseline
- * 3. README and ARCHITECTURE no longer define generic assessment as primary product
- * 4. Stale global source registry cannot be mistaken for current authority
- * 5. KnowledgeGapRunner legacy path is not active in production routes
- * 6. LearnerHome contains no fake learner mastery/evidence claims
+ * Verifies all Task 8 requirements and Controller Audit Truth Patches:
+ * 1. Current authority document defines full product scope (Preschool 3–6 AND Grade 1–12)
+ * 2. Authority separates Preschool (not under GDPT 2018, not "small Grade 1") from Grade 1–12
+ * 3. Authority uses AI_ASSISTED (not AI_GENERATED) and defines the 4-tier prerequisite evidence model
+ * 4. Historical specs are marked as superseded baseline
+ * 5. README and ARCHITECTURE feature AI School scope and contain NO "chữ ký số"
+ * 6. Stale global source registry cannot be mistaken for current authority
+ * 7. KnowledgeGapRunner legacy path is not active in production routes
+ * 8. LearnerHome contains no fake learner mastery/evidence claims
+ * 9. ParentView does not advertise unavailable live Grade 6 diagnostic
  */
 
 import { describe, it, expect } from "vitest";
@@ -16,7 +19,7 @@ import * as path from "path";
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { LearnerHome } from "@/components/v3/profile/LearnerHome";
-import { CurriculumService } from "@/src/application/curriculum/curriculum-service";
+import { ParentView } from "@/components/v3/profile/ParentView";
 
 describe("AI School Current Authority & Legacy Cutover", () => {
   const rootDir = path.resolve(".");
@@ -28,11 +31,21 @@ describe("AI School Current Authority & Legacy Cutover", () => {
       expect(fs.existsSync(authorityDocPath)).toBe(true);
     });
 
-    it("defines PRODUCT truth (curriculum-grounded learning and Knowledge Control)", () => {
+    it("restores full product scope: Preschool ages 3–6 through Grade 12", () => {
       const content = fs.readFileSync(authorityDocPath, "utf-8");
-      expect(content).toContain("AI School");
-      expect(content).toContain("GDPT 2018");
-      expect(content).toContain("Knowledge Control");
+      expect(content).toContain("Preschool (ages 3–6) through Grade 12");
+      expect(content).toMatch(/PRESCHOOL/);
+      expect(content).toMatch(/GRADE 1–12/);
+      expect(content).toContain("3–4, 4–5, 5–6");
+    });
+
+    it("defines stage-specific authority and does not place preschool under GDPT 2018", () => {
+      const content = fs.readFileSync(authorityDocPath, "utf-8");
+      // Explicitly specifies preschool is NOT small Grade 1 and NOT under TT32/GDPT 2018
+      expect(content).toContain("NOT \"small Grade 1\"");
+      expect(content).toMatch(/NOT governed by TT 32\/2018\/TT-BGDĐT \(GDPT 2018\)/);
+      expect(content).toMatch(/Chương trình Giáo dục Mầm non/);
+      expect(content).toMatch(/developmental, play-based, observational, and parent-guided/i);
     });
 
     it("defines STUDENT truth (no runtime generative AI, only reviewed content, DAG gap, no fake scores)", () => {
@@ -40,22 +53,35 @@ describe("AI School Current Authority & Legacy Cutover", () => {
       expect(content).toMatch(/no runtime generative AI/i);
       expect(content).toMatch(/reviewed.*published/i);
       expect(content).toMatch(/diagnostic.*evidence.*prerequisite.*learning.*retest/i);
-      expect(content).toMatch(/no fake global score|no fake.*score/i);
+      expect(content).toMatch(/no fake global score/i);
     });
 
     it("defines PARENT truth (Parent Copilot isolated, read-only, cannot alter evidence)", () => {
       const content = fs.readFileSync(authorityDocPath, "utf-8");
       expect(content).toContain("Parent Copilot");
-      expect(content).toMatch(/parent-facing only|isolated/i);
-      expect(content).toMatch(/cannot change mastery\/evidence state|cannot alter/i);
+      expect(content).toMatch(/parent-facing only/i);
+      expect(content).toMatch(/cannot change mastery\/evidence state/i);
     });
 
-    it("defines CONTENT AUTHORITY truth (frozen R2 invariants, server-only DRAFT, fail-closed)", () => {
+    it("defines CONTENT AUTHORITY truth with valid authoringOrigin enum (AI_ASSISTED, not AI_GENERATED)", () => {
       const content = fs.readFileSync(authorityDocPath, "utf-8");
       expect(content).toContain("FROZEN");
       expect(content).toMatch(/server-only/i);
       expect(content).toMatch(/human review attestation/i);
       expect(content).toMatch(/fail-closed/i);
+      // Terminology check: Must use AI_ASSISTED, not AI_GENERATED
+      expect(content).toContain("AI_ASSISTED");
+      expect(content).not.toContain("AI_GENERATED");
+      expect(content).toContain("HUMAN");
+      expect(content).toContain("ADAPTED_WITH_PERMISSION");
+    });
+
+    it("defines formal 4-tier prerequisite evidence model rather than claiming verbatim textbook text", () => {
+      const content = fs.readFileSync(authorityDocPath, "utf-8");
+      expect(content).toContain("CURRICULUM_EXPLICIT");
+      expect(content).toContain("EXPERT_REVIEW");
+      expect(content).toContain("EMPIRICAL");
+      expect(content).toContain("DRAFT_INFERENCE");
     });
 
     it("defines CURRENT GRADE 6 STATUS (SOURCE_LINKED / AI_DRAFT / DRAFT, zero reviewer, zero published)", () => {
@@ -91,23 +117,24 @@ describe("AI School Current Authority & Legacy Cutover", () => {
     }
   });
 
-  describe("3. README and ARCHITECTURE Primary Product Direction", () => {
-    it("README.md features AI School as primary product and deprecates generic assessment as primary", () => {
+  describe("3. README and ARCHITECTURE Alignment & Digital Signature Removal", () => {
+    it("README.md features full scope (Preschool 3–6 and Grade 1–12) and contains NO 'chữ ký số'", () => {
       const readme = fs.readFileSync(path.join(rootDir, "README.md"), "utf-8");
       expect(readme).toContain("AI School");
-      expect(readme).toContain("GDPT 2018");
+      expect(readme).toContain("Mầm non (3–6 tuổi)");
+      expect(readme).toContain("Lớp 1–12");
       expect(readme).toContain("REUSABLE PLATFORM-CORE REFERENCE");
-      // Must not present generic 10-question career assessment as the primary header/title
-      expect(readme).not.toMatch(/^# AI Readiness & Generic Assessment Platform/m);
-      expect(readme).toMatch(/# AI School/);
+      // MUST NOT contain 'chữ ký số'
+      expect(readme).not.toContain("chữ ký số");
+      expect(readme).toContain("human review attestation");
     });
 
-    it("ARCHITECTURE.md features AI School architecture with frozen R2 content authority", () => {
+    it("ARCHITECTURE.md features AI School architecture and contains NO 'chữ ký số'", () => {
       const arch = fs.readFileSync(path.join(rootDir, "ARCHITECTURE.md"), "utf-8");
       expect(arch).toContain("AI School");
-      expect(arch).toContain("GDPT 2018");
       expect(arch).toContain("R2 Content Authority Layer");
       expect(arch).toContain("FROZEN");
+      expect(arch).not.toContain("chữ ký số");
     });
   });
 
@@ -205,6 +232,33 @@ describe("AI School Current Authority & Legacy Cutover", () => {
       // No fake mastery claims
       expect(screen.queryByText(/Đã có bằng chứng vững/i)).toBeNull();
       expect(screen.queryByText(/Điểm trung bình năng lực/i)).toBeNull();
+    });
+  });
+
+  describe("7. ParentView Truth & Grade 6 Diagnostic Non-Availability", () => {
+    it("does not advertise unavailable live Grade 6 diagnostic or unsupported live claims", () => {
+      const parentViewPath = path.join(rootDir, "components", "v3", "profile", "ParentView.tsx");
+      const content = fs.readFileSync(parentViewPath, "utf-8");
+
+      // Unsupported live-product claims must not exist as live instructions
+      expect(content).not.toContain("1. Khảo sát nhanh 5 phút:");
+      expect(content).not.toContain("Cùng con làm 4 câu hỏi nhận thức môn Toán 6");
+      expect(content).not.toContain("Bắt đầu khảo sát cùng con");
+
+      // Must explicitly badge illustrative guide and state DRAFT/CONTENT_NOT_AVAILABLE
+      expect(content).toContain("Ví dụ minh họa");
+      expect(content).toContain("CONTENT_NOT_AVAILABLE");
+      expect(content).toContain("DRAFT");
+    });
+
+    it("renders ParentView with explicit illustrative disclaimer and links to curriculum catalog", () => {
+      render(<ParentView />);
+
+      expect(screen.getAllByText(/Ví dụ minh họa/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/CONTENT_NOT_AVAILABLE/i).length).toBeGreaterThan(0);
+
+      const catalogLink = screen.getByRole("link", { name: /Xem danh mục chương trình/i });
+      expect(catalogLink).toHaveAttribute("href", "/curriculum");
     });
   });
 });

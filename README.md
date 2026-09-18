@@ -1,4 +1,4 @@
-# AI School — Nền Tảng Khảo Sát Năng Lực & Làm Chủ Tri Thức Chuẩn GDPT 2018
+# AI School — Nền Tảng Khảo Sát Năng Lực & Làm Chủ Tri Thức (Mầm Non 3–6 Tuổi & Lớp 1–12)
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?logo=typescript)](https://www.typescriptlang.org/)
@@ -6,11 +6,13 @@
 [![Vitest](https://img.shields.io/badge/Vitest-3.2-green?logo=vitest)](https://vitest.dev/)
 [![Playwright](https://img.shields.io/badge/Playwright-1.50-green?logo=playwright)](https://playwright.dev/)
 
-**AI School** là nền tảng chẩn đoán mắt xích kiến thức và làm chủ tri thức bám sát Chương trình Giáo dục phổ thông 2018 (**Thông tư 32/2018/TT-BGDĐT**). Hệ thống thay thế phương pháp luyện đề tràn lan bằng quy trình chẩn đoán truy vết ngược trên đồ thị tri thức có hướng (DAG), giúp học sinh và phụ huynh phát hiện chính xác lỗ hổng gốc rễ và củng cố có trọng tâm.
+**AI School** là nền tảng chẩn đoán mắt xích kiến thức và làm chủ tri thức có thẩm quyền, bao phủ từ lứa tuổi **Mầm non (3–6 tuổi)** đến **Lớp 1–12**:
+- **Giai đoạn Mầm non (3–4, 4–5, 5–6 tuổi):** Vận hành theo Chương trình Giáo dục mầm non quốc gia hiện hành (Thông tư 17/2009/TT-BGDĐT, sửa đổi bởi Thông tư 28/2016/TT-BGDĐT và 51/2020/TT-BGDĐT; chương trình thí điểm mới được phân loại riêng). Mô hình tiếp cận dựa trên phát triển tâm lý lứa tuổi, học qua chơi, quan sát hành vi và hướng dẫn phụ huynh đồng hành; mầm non tuyệt đối không phải là "Lớp 1 thu nhỏ" và không thuộc phạm vi điều chỉnh của GDPT 2018.
+- **Giai đoạn Phổ thông (Lớp 1 đến Lớp 12):** Vận hành theo Chương trình Giáo dục phổ thông (GDPT 2018 - Ban hành kèm Thông tư 32/2018/TT-BGDĐT cùng các thông tư sửa đổi), quản lý nguồn học liệu và đồ thị tri thức bám sát chuẩn Yêu cầu cần đạt (YCCĐ) theo mô hình thẩm quyền R2.
 
 > [!IMPORTANT]
 > **Tài Liệu Thẩm Quyền Kiến Trúc Hiện Hành:**  
-> Vui lòng tham khảo văn bản [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md) để nắm rõ toàn bộ quy chuẩn sản phẩm, ranh giới an toàn học sinh, và cơ chế phát hành nội dung.
+> Vui lòng tham khảo văn bản [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md) để nắm rõ toàn bộ quy chuẩn sản phẩm, thẩm quyền từng cấp học, ranh giới an toàn học sinh, và cơ chế phát hành nội dung.
 
 ---
 
@@ -18,9 +20,10 @@
 
 1. **Không Dùng Generative AI Trong Runtime Học Sinh (Zero Runtime Student AI)**:
    - Học sinh không tiếp xúc với chatbot hay Generative AI trong quá trình làm bài chẩn đoán và học tập.
-   - Toàn bộ câu hỏi, bài học và ví dụ mẫu phải được biên soạn, thẩm định bởi con người và có chữ ký số/review attestation gắn với phiên bản nội dung.
-2. **Truy Vết Mắt Xích Tiên Quyết (Prerequisite Gap Tracing)**:
+   - Soạn thảo nội dung có thể sử dụng hỗ trợ từ AI (`AI_ASSISTED`) hoặc con người (`HUMAN`), nhưng bắt buộc phải có chứng nhận thẩm định con người (human review attestation) gắn chặt với mã băm nội dung/phiên bản chính xác trước khi phát hành tới học sinh.
+2. **Truy Vết Mắt Xích Tiên Quyết (Prerequisite Gap Tracing & Evidence Model)**:
    - Thay vì bắt học sinh làm lại hàng chục bài tập của kỹ năng đang sai, hệ thống truy vết ngược trên đồ thị tri thức DAG để tìm mắt xích nền tảng bị hổng (ví dụ: hổng kỹ năng quy đồng mẫu số ở Lớp 5 dẫn tới không làm được phép cộng phân số ở Lớp 6).
+   - Quan hệ tiên quyết được chứng minh theo 4 mức bằng chứng (`CURRICULUM_EXPLICIT`, `EXPERT_REVIEW`, `EMPIRICAL`, `DRAFT_INFERENCE`); chỉ đồ thị đã qua thẩm định mới được phát hành cho học sinh.
 3. **Cổng Phát Hành Mật Mã Học & Ranh Giới Máy Chủ (Server-Only Publication Gate)**:
    - Dữ liệu học liệu DRAFT/chưa qua thẩm định con người chỉ được nạp ở tầng máy chủ (`server-only`) và **không bao giờ lọt vào client bundle** của học sinh.
    - Khi chưa có kiểm duyệt, phòng thi tự động đóng (`CONTENT_NOT_AVAILABLE`).
@@ -28,7 +31,7 @@
    - AI hỗ trợ phụ huynh (Parent Copilot) chỉ hoạt động tại góc phụ huynh (`/parent`), bám sát yêu cầu cần đạt (YCCĐ) chính thống và bằng chứng học tập thực tế của con.
    - AI phụ huynh hoàn toàn chỉ đọc, không có quyền thay đổi trạng thái làm chủ hay điểm số của học sinh.
 5. **Không Bịa Đặt Điểm Số Toàn Cầu (No Fake Intelligence Scores)**:
-   - Không tạo điểm số IQ giả lập, không xếp hạng trí tuệ mơ hồ. Mọi đánh giá đều gắn liền với từng mắt xích tri thức cụ thể theo chuẩn GDPT.
+   - Không tạo điểm số IQ giả lập, không xếp hạng trí tuệ mơ hồ. Mọi đánh giá đều gắn liền với từng mắt xích tri thức cụ thể theo chuẩn GDPT hoặc chuẩn phát triển mầm non.
 
 ---
 

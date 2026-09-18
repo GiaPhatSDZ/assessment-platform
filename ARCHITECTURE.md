@@ -7,7 +7,8 @@ SUPERSEDES: Historical Generic Assessment Platform (v0.1 / Transitional V1/V2)
 FROZEN BASELINE: R2.1 Source Provenance / R2.2 Publication Gate / R2.2.1 Server Delivery Boundary
 ```
 
-Vui lòng tham khảo chi tiết tại: [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md).
+Vui lòng tham khảo chi tiết tại: [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md).  
+Phạm vi sản phẩm: **Mầm non (3–6 tuổi)** theo Chương trình GDMN quốc gia và **Lớp 1–12** theo GDPT 2018 với thẩm quyền phân tầng riêng biệt.
 
 ---
 
@@ -68,7 +69,7 @@ graph TD
 - **Mã băm nội dung chuẩn (`canonical-content-hash.ts`)**: Tính toán SHA-256 trên nội dung sư phạm thực tế (loại bỏ siêu dữ liệu quy trình); bảo toàn thứ tự các mảng ngữ nghĩa.
 - **Ủy quyền người thẩm định (`reviewer-registry.ts`)**: Cơ chế ủy quyền thẩm định chỉ đọc trong môi trường sản xuất (`productionReviewerAuthority`), ném ngoại lệ bảo mật `SECURITY_VIOLATION` nếu cố tình tiêm thẩm quyền giả mạo ngoài môi trường test.
 - **Cổng phát hành duy nhất (`publication-guard.ts`)**:
-  - `assertPublishedForStudent(item)`: Bắt buộc `itemMaturity` hợp lệ (`REVIEWED`, `PILOT`, `CALIBRATED`), kiểm tra độ tươi của mã băm (`contentHash === computedHash`) và chữ ký thẩm định con người.
+  - `assertPublishedForStudent(item)`: Bắt buộc `itemMaturity` hợp lệ (`REVIEWED`, `PILOT`, `CALIBRATED`), kiểm tra độ tươi của mã băm (`contentHash === computedHash`) và chứng nhận thẩm định con người (`reviewAttestation`).
   - Từ chối ngay lập tức trạng thái `DRAFT` hoặc học liệu bị chỉnh sửa sau thẩm định (`REVIEW_ATTESTATION_STALE`).
 
 ### 2.3 Động Cơ Chẩn Đoán & Bồi Đắp Lỗ Hổng (`src/domain/diagnostic/`, `src/domain/remediation/`)
