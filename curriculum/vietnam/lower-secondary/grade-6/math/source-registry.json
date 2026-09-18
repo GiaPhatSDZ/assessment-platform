@@ -15,21 +15,24 @@
       "SRC-VN-MOET-GEP-2018",
       "SRC-VN-MOET-AMEND-20-2021",
       "SRC-VN-MOET-AMEND-13-2022",
+      "SRC-VN-MOET-AMEND-17-2025",
       "SRC-VN-MOET-VBHN-10-2022"
     ],
     "curriculumStatus": "CURRENT_NATIONAL",
     "requiredForSlice": false,
+    "legalAuthorityAsOf": "2026-09-18",
     "rights": {
       "redistribution": true,
       "commercialReuse": "CONDITIONAL",
       "notes": "Văn bản quy phạm pháp luật nhà nước Việt Nam, trích dẫn hợp lệ theo quy định."
     },
     "rightsNotes": "Repository copyright boundary enforced: no full textbook files stored; commercial reuse rights are not granted; legal review is required before commercial deployment using NXBGD-derived resources.",
-    "retrievedAt": "2026-09-17",
+    "sourceDisplayedTitle": "Chương trình Giáo dục Phổ thông 2018 — Chương trình Tổng thể (Ban hành kèm Thông tư 32/2018/TT-BGDĐT)",
+    "retrievedAt": "2026-09-18",
     "verificationStatus": "OFFLINE_REGISTERED_METADATA",
     "canonicalTitle": "Chương trình Giáo dục Phổ thông 2018 — Chương trình Tổng thể (Ban hành kèm Thông tư 32/2018/TT-BGDĐT)",
-    "canonicalMetadataFingerprint": "b839f08927b04589055626f17e99d85b7a8c21cab2223d1e4f531031ae6fac6f",
-    "fingerprint": "b839f08927b04589055626f17e99d85b7a8c21cab2223d1e4f531031ae6fac6f"
+    "canonicalMetadataFingerprint": "33877c20c2c4ddaed499ff98863520faca958176b443f6031421e7d93db515e5",
+    "fingerprint": "33877c20c2c4ddaed499ff98863520faca958176b443f6031421e7d93db515e5"
   },
   {
     "id": "SRC-VN-MOET-MATH-2018",
@@ -49,17 +52,19 @@
     ],
     "curriculumStatus": "CURRENT_NATIONAL",
     "requiredForSlice": true,
+    "legalAuthorityAsOf": "2026-09-18",
     "rights": {
       "redistribution": true,
       "commercialReuse": "CONDITIONAL",
       "notes": "Chuẩn đầu ra yêu cầu cần đạt chính thức môn Toán cấp THCS."
     },
     "rightsNotes": "Repository copyright boundary enforced: no full textbook files stored; commercial reuse rights are not granted; legal review is required before commercial deployment using NXBGD-derived resources.",
-    "retrievedAt": "2026-09-17",
+    "sourceDisplayedTitle": "Chương trình Giáo dục Phổ thông Môn Toán (Ban hành kèm Thông tư 32/2018/TT-BGDĐT)",
+    "retrievedAt": "2026-09-18",
     "verificationStatus": "OFFLINE_REGISTERED_METADATA",
     "canonicalTitle": "Chương trình Giáo dục Phổ thông Môn Toán (Ban hành kèm Thông tư 32/2018/TT-BGDĐT)",
-    "canonicalMetadataFingerprint": "b2094de9cd64022460822e859007fd12e94d4e4a098bf9b3429c3e589650b3c8",
-    "fingerprint": "b2094de9cd64022460822e859007fd12e94d4e4a098bf9b3429c3e589650b3c8"
+    "canonicalMetadataFingerprint": "40d9a36d6d740041f6bf5fafb1afc5a4a17dfb4911879221a76fb13f11dad902",
+    "fingerprint": "40d9a36d6d740041f6bf5fafb1afc5a4a17dfb4911879221a76fb13f11dad902"
   },
   {
     "id": "SRC-VN-MOET-AMEND-20-2021",
@@ -75,17 +80,19 @@
     "sourceVersion": "2021-07-01-TT20-AMEND",
     "curriculumStatus": "CURRENT_NATIONAL",
     "requiredForSlice": false,
+    "legalAuthorityAsOf": "2026-09-18",
     "rights": {
       "redistribution": true,
       "commercialReuse": "CONDITIONAL",
       "notes": "Thông tư sửa đổi, bổ sung lộ trình thực hiện Chương trình GDPT 2018."
     },
     "rightsNotes": "Repository copyright boundary enforced: no full textbook files stored; commercial reuse rights are not granted; legal review is required before commercial deployment using NXBGD-derived resources.",
-    "retrievedAt": "2026-09-17",
+    "sourceDisplayedTitle": "Sửa đổi, bổ sung Điều 3 Thông tư số 32/2018/TT-BGDĐT ngày 26/12/2018 của Bộ trưởng Bộ GD&ĐT ban hành Chương trình giáo dục phổ thông",
+    "retrievedAt": "2026-09-18",
     "verificationStatus": "OFFLINE_REGISTERED_METADATA",
     "canonicalTitle": "Sửa đổi, bổ sung Điều 3 Thông tư số 32/2018/TT-BGDĐT ngày 26/12/2018 của Bộ trưởng Bộ GD&ĐT ban hành Chương trình giáo dục phổ thông",
-    "canonicalMetadataFingerprint": "5c33b9866326e08eb8536c79354f01610c41a79c2d0317e8e746d75534efca71",
-    "fingerprint": "5c33b9866326e08eb8536c79354f01610c41a79c2d0317e8e746d75534efca71"
+    "canonicalMetadataFingerprint": "e2b14d99ec25887a07e968133d31ff8f9daeb1c92f7d331331d5151be834fd66",
+    "fingerprint": "e2b14d99ec25887a07e968133d31ff8f9daeb1c92f7d331331d5151be834fd66"
   },
   {
     "id": "SRC-VN-MOET-AMEND-13-2022",
@@ -97,21 +104,51 @@
     "resourceType": "LEGAL_DOCUMENT",
     "url": "https://moet.gov.vn/van-ban/van-ban-quan-ly/Pages/chi-tiet-van-ban.aspx?ItemID=1488",
     "issuedAt": "2022-08-03",
-    "effectiveFrom": "2022-09-18",
+    "effectiveFrom": "2022-08-03",
     "sourceVersion": "2022-08-03-TT13-AMEND",
     "curriculumStatus": "CURRENT_NATIONAL",
     "requiredForSlice": false,
+    "legalAuthorityAsOf": "2026-09-18",
     "rights": {
       "redistribution": true,
       "commercialReuse": "CONDITIONAL",
       "notes": "Văn bản sửa đổi nội dung Chương trình GDPT 2018 (môn Lịch sử và cơ cấu lựa chọn THPT)."
     },
     "rightsNotes": "Repository copyright boundary enforced: no full textbook files stored; commercial reuse rights are not granted; legal review is required before commercial deployment using NXBGD-derived resources.",
-    "retrievedAt": "2026-09-17",
+    "sourceDisplayedTitle": "Thông tư sửa đổi, bổ sung một số nội dung trong CT GDPT ban hành kèm theo Thông tư 32/2018/TT-BGDĐT",
+    "retrievedAt": "2026-09-18",
     "verificationStatus": "OFFLINE_REGISTERED_METADATA",
     "canonicalTitle": "Thông tư sửa đổi, bổ sung một số nội dung trong CT GDPT ban hành kèm theo Thông tư 32/2018/TT-BGDĐT",
-    "canonicalMetadataFingerprint": "b8d867984771d7348ccc61fc69f0acbacdeef3d41250cdf20ad4383d10ba829f",
-    "fingerprint": "b8d867984771d7348ccc61fc69f0acbacdeef3d41250cdf20ad4383d10ba829f"
+    "canonicalMetadataFingerprint": "5c85f94ea0a1c0ea2d04e4711c3727cd480feeed5bf1e2a6388b2b5675495296",
+    "fingerprint": "5c85f94ea0a1c0ea2d04e4711c3727cd480feeed5bf1e2a6388b2b5675495296"
+  },
+  {
+    "id": "SRC-VN-MOET-AMEND-17-2025",
+    "authority": "Bộ Giáo dục và Đào tạo Việt Nam",
+    "title": "Thông tư số 17/2025/TT-BGDĐT ngày 12/09/2025 của Bộ GD&ĐT sửa đổi, bổ sung một số nội dung trong Chương trình GDPT ban hành kèm Thông tư 32/2018/TT-BGDĐT",
+    "documentNumber": "17/2025/TT-BGDĐT",
+    "sourceType": "OFFICIAL_CURRICULUM",
+    "sourceTier": "TIER_A_CURRICULUM_AUTHORITY",
+    "resourceType": "LEGAL_DOCUMENT",
+    "url": "https://moet.gov.vn/van-ban/van-ban-quan-ly/Pages/chi-tiet-van-ban.aspx?ItemID=1725",
+    "issuedAt": "2025-09-12",
+    "effectiveFrom": "2025-09-12",
+    "sourceVersion": "2025-09-12-TT17-AMEND",
+    "curriculumStatus": "CURRENT_NATIONAL",
+    "requiredForSlice": false,
+    "legalAuthorityAsOf": "2026-09-18",
+    "rights": {
+      "redistribution": true,
+      "commercialReuse": "CONDITIONAL",
+      "notes": "Văn bản sửa đổi, bổ sung một số nội dung trong CT GDPT (môn Lịch sử và Địa lí, Giáo dục công dân); không áp dụng sửa đổi đối với môn Toán Lớp 6."
+    },
+    "rightsNotes": "Repository copyright boundary enforced: no full textbook files stored; commercial reuse rights are not granted; legal review is required before commercial deployment using NXBGD-derived resources.",
+    "sourceDisplayedTitle": "Thông tư số 17/2025/TT-BGDĐT ngày 12/09/2025 của Bộ GD&ĐT sửa đổi, bổ sung một số nội dung trong Chương trình GDPT ban hành kèm Thông tư 32/2018/TT-BGDĐT",
+    "retrievedAt": "2026-09-18",
+    "verificationStatus": "OFFLINE_REGISTERED_METADATA",
+    "canonicalTitle": "Thông tư số 17/2025/TT-BGDĐT ngày 12/09/2025 của Bộ GD&ĐT sửa đổi, bổ sung một số nội dung trong Chương trình GDPT ban hành kèm Thông tư 32/2018/TT-BGDĐT",
+    "canonicalMetadataFingerprint": "c8475d930c03f5ac7559bd1c22bc747d8ad23eca73530f6f46c0dede7fd93129",
+    "fingerprint": "c8475d930c03f5ac7559bd1c22bc747d8ad23eca73530f6f46c0dede7fd93129"
   },
   {
     "id": "SRC-VN-MOET-VBHN-10-2022",
@@ -127,17 +164,20 @@
     "sourceVersion": "2022-12-30-VBHN10-CONSOLIDATED",
     "curriculumStatus": "CURRENT_NATIONAL",
     "requiredForSlice": true,
+    "legalAuthorityAsOf": "2026-09-18",
+    "consolidationScope": "TT32/2018 + TT20/2021 + TT13/2022 (Predates TT17/2025)",
     "rights": {
       "redistribution": true,
       "commercialReuse": "CONDITIONAL",
-      "notes": "Văn bản hợp nhất chính thức toàn bộ Chương trình Giáo dục Phổ thông hiện hành."
+      "notes": "Văn bản hợp nhất chính thức ban hành ngày 30/12/2022, hợp nhất Thông tư 32/2018/TT-BGDĐT, 20/2021/TT-BGDĐT và 13/2022/TT-BGDĐT. Đây là mốc hợp nhất lịch sử (snapshot through 2022), đứng trước Thông tư 17/2025/TT-BGDĐT và không cấu thành bản hợp nhất toàn diện năm 2026."
     },
     "rightsNotes": "Repository copyright boundary enforced: no full textbook files stored; commercial reuse rights are not granted; legal review is required before commercial deployment using NXBGD-derived resources.",
-    "retrievedAt": "2026-09-17",
+    "sourceDisplayedTitle": "Văn bản hợp nhất số 10/VBHN-BGDĐT ngày 30/12/2022 hợp nhất các Thông tư 32/2018, 20/2021, 13/2022 ban hành CT GDPT",
+    "retrievedAt": "2026-09-18",
     "verificationStatus": "OFFLINE_REGISTERED_METADATA",
     "canonicalTitle": "Văn bản hợp nhất số 10/VBHN-BGDĐT ngày 30/12/2022 hợp nhất các Thông tư 32/2018, 20/2021, 13/2022 ban hành CT GDPT",
-    "canonicalMetadataFingerprint": "62c839393952b6c8c67b1a0b8c3e4320b00f940349d87883e9f888e6cc25f103",
-    "fingerprint": "62c839393952b6c8c67b1a0b8c3e4320b00f940349d87883e9f888e6cc25f103"
+    "canonicalMetadataFingerprint": "fb1929d070ec2d21ad6ed675aab747d299247d95f6af9881c17fcdffc6923e97",
+    "fingerprint": "fb1929d070ec2d21ad6ed675aab747d299247d95f6af9881c17fcdffc6923e97"
   },
   {
     "id": "SRC-VN-MOET-QD-718-2021",
@@ -153,17 +193,19 @@
     "sourceVersion": "2021-02-09-QD718",
     "curriculumStatus": "CURRENT_NATIONAL",
     "requiredForSlice": true,
+    "legalAuthorityAsOf": "2026-09-18",
     "rights": {
       "redistribution": true,
       "commercialReuse": "CONDITIONAL",
       "notes": "Quyết định hành chính phê duyệt danh mục SGK lớp 6 của Bộ trưởng Bộ GD&ĐT (Phụ lục phê duyệt SGK Toán 6 Kết nối tri thức)."
     },
     "rightsNotes": "Repository copyright boundary enforced: no full textbook files stored; commercial reuse rights are not granted; legal review is required before commercial deployment using NXBGD-derived resources.",
-    "retrievedAt": "2026-09-17",
+    "sourceDisplayedTitle": "Quyết định số 718/QĐ-BGDĐT ngày 09/02/2021 của Bộ trưởng Bộ GD&ĐT phê duyệt danh mục sách giáo khoa lớp 6 sử dụng trong cơ sở GDPT",
+    "retrievedAt": "2026-09-18",
     "verificationStatus": "OFFLINE_REGISTERED_METADATA",
     "canonicalTitle": "Quyết định số 718/QĐ-BGDĐT ngày 09/02/2021 của Bộ trưởng Bộ GD&ĐT phê duyệt danh mục sách giáo khoa lớp 6 sử dụng trong cơ sở GDPT",
-    "canonicalMetadataFingerprint": "1cffb8a4ad45d16005ff5369db922cb97ecdecdeac359e704f572a907b19e364",
-    "fingerprint": "1cffb8a4ad45d16005ff5369db922cb97ecdecdeac359e704f572a907b19e364"
+    "canonicalMetadataFingerprint": "91821e9a894ca7efe5a8ae3eb40ab845ab6c97d192cf1f36ef28750b420eaef4",
+    "fingerprint": "91821e9a894ca7efe5a8ae3eb40ab845ab6c97d192cf1f36ef28750b420eaef4"
   },
   {
     "id": "SRC-NXBGD-KNTT-MATH6-T1",
@@ -195,7 +237,8 @@
       "notes": "Sử dụng miễn phí cho mục đích giảng dạy và học tập; không sử dụng cho mục đích kinh doanh."
     },
     "rightsNotes": "Repository copyright boundary enforced: no full textbook files stored; commercial reuse rights are not granted; legal review is required before commercial deployment using NXBGD-derived resources.",
-    "retrievedAt": "2026-09-17",
+    "sourceDisplayedTitle": "SGK Toán 6, tập một",
+    "retrievedAt": "2026-09-18",
     "verificationStatus": "VIEWER_INVENTORY_VERIFIED",
     "httpStatus": 200,
     "canonicalTitle": "SGK Toán 6, tập một",
@@ -203,9 +246,9 @@
       "totalPages": 124,
       "haveCoverPage": true
     },
-    "remoteResponseFingerprint": "25557ae07558d58fa27a11dd57b9de2a2dc35937a73887d51985fcd4b1c9561e",
-    "canonicalMetadataFingerprint": "e747e096b85b6eea73ed95e2edf89bedfc0d1e7da08f551607d1edce25e5f1f3",
-    "fingerprint": "e747e096b85b6eea73ed95e2edf89bedfc0d1e7da08f551607d1edce25e5f1f3"
+    "remoteResponseFingerprint": "a82490aadb61a32c1f995844cae7ca49254f8f4b185df9939823eccab4044b76",
+    "canonicalMetadataFingerprint": "7453725f1122d4515f3890ec98a5363c8ffbc0a326d839675f021d619e020d0d",
+    "fingerprint": "7453725f1122d4515f3890ec98a5363c8ffbc0a326d839675f021d619e020d0d"
   },
   {
     "id": "SRC-NXBGD-KNTT-MATH6-T2",
@@ -237,7 +280,8 @@
       "notes": "Sử dụng miễn phí cho mục đích giảng dạy và học tập; không sử dụng cho mục đích kinh doanh."
     },
     "rightsNotes": "Repository copyright boundary enforced: no full textbook files stored; commercial reuse rights are not granted; legal review is required before commercial deployment using NXBGD-derived resources.",
-    "retrievedAt": "2026-09-17",
+    "sourceDisplayedTitle": "SGK Toán 6, tập hai",
+    "retrievedAt": "2026-09-18",
     "verificationStatus": "VIEWER_INVENTORY_VERIFIED",
     "httpStatus": 200,
     "canonicalTitle": "SGK Toán 6, tập hai",
@@ -245,9 +289,9 @@
       "totalPages": 112,
       "haveCoverPage": true
     },
-    "remoteResponseFingerprint": "8d1b1d94ae5f80c3efd36dc3b249f9cf4a09ead8af344e0b52464b997d20d604",
-    "canonicalMetadataFingerprint": "31a37ad05cf62ae75f331eeb3fb7a9e4e5f65e7159a504e579c6d2d4e8f21829",
-    "fingerprint": "31a37ad05cf62ae75f331eeb3fb7a9e4e5f65e7159a504e579c6d2d4e8f21829"
+    "remoteResponseFingerprint": "8a9128abca0ab39093c0c9e74deec7764d5c6fe51b9caef8dd3894c3b447dfa3",
+    "canonicalMetadataFingerprint": "6054fcd1cc3110d76910771aa6000a6a10d66de319d017bebbe15d469b976c32",
+    "fingerprint": "6054fcd1cc3110d76910771aa6000a6a10d66de319d017bebbe15d469b976c32"
   },
   {
     "id": "SRC-NXBGD-KNTT-MATH6-SGV-T2",
@@ -268,7 +312,8 @@
       "notes": "Sách giáo viên hướng dẫn chuyên môn và gợi ý sư phạm."
     },
     "rightsNotes": "Repository copyright boundary enforced: no full textbook files stored; commercial reuse rights are not granted; legal review is required before commercial deployment using NXBGD-derived resources.",
-    "retrievedAt": "2026-09-17",
+    "sourceDisplayedTitle": "SGV Toán 6",
+    "retrievedAt": "2026-09-18",
     "verificationStatus": "VIEWER_INVENTORY_VERIFIED",
     "httpStatus": 200,
     "canonicalTitle": "SGV Toán 6",
@@ -276,17 +321,15 @@
       "totalPages": 220,
       "haveCoverPage": true
     },
-    "remoteResponseFingerprint": "aa2d78e504cfb63b0ea0b1b1dd342ac7bf3c3d1426fa83f74857d5ea36ca55cf",
-    "canonicalMetadataFingerprint": "f4e74d15b00ea8f1536147266eef441a0410a87931dd3a336611c46687259009",
-    "fingerprint": "f4e74d15b00ea8f1536147266eef441a0410a87931dd3a336611c46687259009"
+    "remoteResponseFingerprint": "489f2af1e4936f9a4735e8263c933d1ec08771dc07c605a1fced0c68508f2d1a",
+    "canonicalMetadataFingerprint": "05ff52e270eb9e2a3ed1b5a1e73171c64fab5076e7afc95445c0a6ed4fcd9db5",
+    "fingerprint": "05ff52e270eb9e2a3ed1b5a1e73171c64fab5076e7afc95445c0a6ed4fcd9db5"
   },
   {
     "id": "SRC-NXBGD-KNTT-MATH6-VBT-T2",
     "authority": "Nhà xuất bản Giáo dục Việt Nam",
     "title": "VBT Toán 6, tập hai (Bài mẫu) — Bộ sách Kết nối tri thức với cuộc sống",
     "canonicalInternalName": "VBT Toán 6, tập hai (Bài mẫu)",
-    "sourceDisplayedTitle": "SBT Toán 6, tập hai (Bài mẫu)",
-    "identityStatus": "SOURCE_LABEL_INCONSISTENT",
     "sourceType": "APPROVED_TEXTBOOK_SOURCE",
     "sourceTier": "TIER_B2_NXBGD_PUBLISHER_RESOURCE",
     "resourceType": "WORKBOOK_SAMPLE",
@@ -302,7 +345,9 @@
       "notes": "Vở bài tập mẫu 7 trang từ taphuan.nxbgd.vn. Không sao chép nguyên văn vào ngân hàng câu hỏi."
     },
     "rightsNotes": "Repository copyright boundary enforced: no full textbook files stored; commercial reuse rights are not granted; legal review is required before commercial deployment using NXBGD-derived resources.",
-    "retrievedAt": "2026-09-17",
+    "sourceDisplayedTitle": "SBT Toán 6, tập hai (Bài mẫu)",
+    "identityStatus": "SOURCE_LABEL_INCONSISTENT",
+    "retrievedAt": "2026-09-18",
     "verificationStatus": "VIEWER_INVENTORY_VERIFIED",
     "httpStatus": 200,
     "canonicalTitle": "SBT Toán 6, tập hai (Bài mẫu)",
@@ -310,9 +355,9 @@
       "totalPages": 7,
       "haveCoverPage": true
     },
-    "remoteResponseFingerprint": "93ec4bbbebf5f63a767de68794e4550123033960a7ec6b8e5571912b7fcce886",
-    "canonicalMetadataFingerprint": "eabce441dc78abec5061dbcea0efbe9d1f505ad3a2ecba2d36bcda7c0f71b1c4",
-    "fingerprint": "eabce441dc78abec5061dbcea0efbe9d1f505ad3a2ecba2d36bcda7c0f71b1c4"
+    "remoteResponseFingerprint": "46f1991e4f10abdaabeb66027008977f906d9c4698916ef44640b742c0396c42",
+    "canonicalMetadataFingerprint": "30fe4bab34f89d163739d7a582d242ad8d63a6a7c1d0486a860d7661483f6d9d",
+    "fingerprint": "30fe4bab34f89d163739d7a582d242ad8d63a6a7c1d0486a860d7661483f6d9d"
   },
   {
     "id": "SRC-NXBGD-KNTT-MATH6-TRAIN-DOC",
@@ -333,7 +378,8 @@
       "notes": "Tài liệu tập huấn nghiệp vụ giáo viên của NXB Giáo Dục Việt Nam."
     },
     "rightsNotes": "Repository copyright boundary enforced: no full textbook files stored; commercial reuse rights are not granted; legal review is required before commercial deployment using NXBGD-derived resources.",
-    "retrievedAt": "2026-09-17",
+    "sourceDisplayedTitle": "Tài liệu tập huấn giáo viên môn Toán 6",
+    "retrievedAt": "2026-09-18",
     "verificationStatus": "VIEWER_INVENTORY_VERIFIED",
     "httpStatus": 200,
     "canonicalTitle": "Tài liệu tập huấn giáo viên môn Toán 6",
@@ -341,9 +387,9 @@
       "totalPages": 56,
       "haveCoverPage": true
     },
-    "remoteResponseFingerprint": "e9a4a1f65e9666cf71f94d638b2aa1d34c41e17e4af38da0eea75a07bfa29e48",
-    "canonicalMetadataFingerprint": "5a44979a05af3034d5cc19b05c01e382b38c4b9501d4b305e2a93575f5c69f4e",
-    "fingerprint": "5a44979a05af3034d5cc19b05c01e382b38c4b9501d4b305e2a93575f5c69f4e"
+    "remoteResponseFingerprint": "9c71b16dbf3daa4f0f7dd43e4b5ecb68ce93e9da684fcc90563711f1b96b392a",
+    "canonicalMetadataFingerprint": "09b9625b6bf178717702623115b2c09da1186077d32da648d8d3b3e9ffe82d01",
+    "fingerprint": "09b9625b6bf178717702623115b2c09da1186077d32da648d8d3b3e9ffe82d01"
   },
   {
     "id": "SRC-NXBGD-KNTT-MATH6-TRAIN-SLIDES-ARITHMETIC",
@@ -364,12 +410,13 @@
       "notes": "Slide bồi dưỡng chuyên đề Số học phục vụ nghiên cứu sư phạm."
     },
     "rightsNotes": "Repository copyright boundary enforced: no full textbook files stored; commercial reuse rights are not granted; legal review is required before commercial deployment using NXBGD-derived resources.",
-    "retrievedAt": "2026-09-17",
+    "sourceDisplayedTitle": "Slide phục vụ bồi dưỡng GV SGK Toán 6.2.Số học (update 2.6.2026).pptx",
+    "retrievedAt": "2026-09-18",
     "verificationStatus": "METADATA_VERIFIED",
     "httpStatus": 302,
     "canonicalTitle": "Slide phục vụ bồi dưỡng GV SGK Toán 6.2.Số học (update 2.6.2026).pptx",
-    "remoteResponseFingerprint": "5a99e8d0e14c6609ffec536fdb51b05d9f6d650ffc61774e473c228f143bb107",
-    "canonicalMetadataFingerprint": "9cf91e998a960100f75fe78116bccd584904294fc04dc6ba8c24fe8b028080ba",
-    "fingerprint": "9cf91e998a960100f75fe78116bccd584904294fc04dc6ba8c24fe8b028080ba"
+    "remoteResponseFingerprint": "56279d0a03c92aad2bef01e3536336b567873ec6ce93d8800282fa39a74d0094",
+    "canonicalMetadataFingerprint": "23c0f6e0f4d833b77709d9d05b6ad8e7af88f304e7eb8fe839ba0be94248d679",
+    "fingerprint": "23c0f6e0f4d833b77709d9d05b6ad8e7af88f304e7eb8fe839ba0be94248d679"
   }
 ]

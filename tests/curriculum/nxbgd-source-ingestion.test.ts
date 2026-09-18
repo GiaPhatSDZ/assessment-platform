@@ -46,9 +46,9 @@ describe("NXBGD Source Verification Engine V2.1 & Provenance R2.1 Audit", () => 
       fs.readFileSync(path.join(g6MathDir, "source-registry.json"), "utf-8")
     );
 
-    // Tier A: MOET Curriculum Authority (6 sources including QĐ 718)
+    // Tier A: MOET Curriculum Authority (7 sources including QĐ 718 and TT 17/2025)
     const tierA = sourceRegistry.filter((s) => s.sourceTier === "TIER_A_CURRICULUM_AUTHORITY");
-    expect(tierA.length).toBe(6);
+    expect(tierA.length).toBe(7);
     for (const s of tierA) {
       expect(s.authority).toBe("Bộ Giáo dục và Đào tạo Việt Nam");
       expect(s.rights?.redistribution).toBe(true);
@@ -64,6 +64,7 @@ describe("NXBGD Source Verification Engine V2.1 & Provenance R2.1 Audit", () => 
       "SRC-VN-MOET-GEP-2018",
       "SRC-VN-MOET-AMEND-20-2021",
       "SRC-VN-MOET-AMEND-13-2022",
+      "SRC-VN-MOET-AMEND-17-2025",
       "SRC-VN-MOET-VBHN-10-2022",
     ]);
 

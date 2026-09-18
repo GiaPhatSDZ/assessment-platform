@@ -261,4 +261,94 @@ describe("AI School Current Authority & Legacy Cutover", () => {
       expect(catalogLink).toHaveAttribute("href", "/curriculum");
     });
   });
+
+  describe("8. Legal Authority Freshness Refresh (2026-09-18)", () => {
+    const canonicalRegistryPath = path.join(
+      rootDir,
+      "curriculum",
+      "vietnam",
+      "lower-secondary",
+      "grade-6",
+      "math",
+      "source-registry.json"
+    );
+    const authorityDocPath = path.join(rootDir, "docs", "authority", "AI_SCHOOL_CURRENT_AUTHORITY.md");
+
+    it("general authority chain contains TT20, TT13, TT17", () => {
+      const sources = JSON.parse(fs.readFileSync(canonicalRegistryPath, "utf-8"));
+      const gepSource = sources.find((s: any) => s.id === "SRC-VN-MOET-GEP-2018");
+      expect(gepSource).toBeDefined();
+      expect(gepSource.authorityChain).toContain("SRC-VN-MOET-AMEND-20-2021");
+      expect(gepSource.authorityChain).toContain("SRC-VN-MOET-AMEND-13-2022");
+      expect(gepSource.authorityChain).toContain("SRC-VN-MOET-AMEND-17-2025");
+      expect(gepSource.authorityChain).toContain("SRC-VN-MOET-VBHN-10-2022");
+    });
+
+    it("TT13 effectiveFrom is 2022-08-03", () => {
+      const sources = JSON.parse(fs.readFileSync(canonicalRegistryPath, "utf-8"));
+      const tt13 = sources.find((s: any) => s.id === "SRC-VN-MOET-AMEND-13-2022");
+      expect(tt13).toBeDefined();
+      expect(tt13.documentNumber).toBe("13/2022/TT-BGDĐT");
+      expect(tt13.issuedAt).toBe("2022-08-03");
+      expect(tt13.effectiveFrom).toBe("2022-08-03");
+    });
+
+    it("TT17/2025 source exists and is Tier A with official metadata and honest verification", () => {
+      const sources = JSON.parse(fs.readFileSync(canonicalRegistryPath, "utf-8"));
+      const tt17 = sources.find((s: any) => s.id === "SRC-VN-MOET-AMEND-17-2025");
+      expect(tt17).toBeDefined();
+      expect(tt17.documentNumber).toBe("17/2025/TT-BGDĐT");
+      expect(tt17.issuedAt).toBe("2025-09-12");
+      expect(tt17.effectiveFrom).toBe("2025-09-12");
+      expect(tt17.sourceType).toBe("OFFICIAL_CURRICULUM");
+      expect(tt17.sourceTier).toBe("TIER_A_CURRICULUM_AUTHORITY");
+      expect(tt17.requiredForSlice).toBe(false);
+      // Honest offline status, no fabricated remote fetch
+      expect(tt17.verificationStatus).toBe("OFFLINE_REGISTERED_METADATA");
+      expect(tt17.httpStatus).toBeUndefined();
+    });
+
+    it("TT17 is NOT falsely claimed to amend Math 6", () => {
+      const sources = JSON.parse(fs.readFileSync(canonicalRegistryPath, "utf-8"));
+      const mathSource = sources.find((s: any) => s.id === "SRC-VN-MOET-MATH-2018");
+      expect(mathSource).toBeDefined();
+      expect(mathSource.authorityChain).not.toContain("SRC-VN-MOET-AMEND-17-2025");
+    });
+
+    it("VBHN10/2022 is not called complete current-2026 consolidation and predates TT17/2025", () => {
+      const sources = JSON.parse(fs.readFileSync(canonicalRegistryPath, "utf-8"));
+      const vbhn10 = sources.find((s: any) => s.id === "SRC-VN-MOET-VBHN-10-2022");
+      expect(vbhn10).toBeDefined();
+      expect(vbhn10.consolidationScope).toContain("Predates TT17/2025");
+      expect(vbhn10.rights?.notes).toContain("không cấu thành bản hợp nhất toàn diện năm 2026");
+
+      const authorityDoc = fs.readFileSync(authorityDocPath, "utf-8");
+      expect(authorityDoc).toContain("Official consolidated snapshot through `TT32/2018 + TT20/2021 + TT13/2022`");
+      expect(authorityDoc).toContain("Predates `TT17/2025/TT-BGDĐT`");
+      expect(authorityDoc).toMatch(/Must NOT be described as a complete 2026 consolidation/i);
+    });
+
+    it("legalAuthorityAsOf = 2026-09-18 and preferred wording is present", () => {
+      const sources = JSON.parse(fs.readFileSync(canonicalRegistryPath, "utf-8"));
+      const gepSource = sources.find((s: any) => s.id === "SRC-VN-MOET-GEP-2018");
+      expect(gepSource.legalAuthorityAsOf).toBe("2026-09-18");
+
+      const tt17 = sources.find((s: any) => s.id === "SRC-VN-MOET-AMEND-17-2025");
+      expect(tt17.legalAuthorityAsOf).toBe("2026-09-18");
+
+      const authorityDoc = fs.readFileSync(authorityDocPath, "utf-8");
+      expect(authorityDoc).toContain("legalAuthorityAsOf: 2026-09-18");
+      expect(authorityDoc).toContain(
+        "TT32/2018 and effective amendments tracked by the source authority registry, with subject-specific applicability."
+      );
+    });
+
+    it("preserves preschool truth: separate national authority, 2026-2027 pilot separate, not under GDPT 2018", () => {
+      const authorityDoc = fs.readFileSync(authorityDocPath, "utf-8");
+      expect(authorityDoc).toContain("NOT governed by TT 32/2018/TT-BGDĐT (GDPT 2018)");
+      expect(authorityDoc).toContain("Đề án thí điểm GDMN mới 2026-2027");
+      expect(authorityDoc).toContain("classified under Tier B and separated from current national standards");
+    });
+  });
 });
+

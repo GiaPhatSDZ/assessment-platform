@@ -191,6 +191,8 @@ export interface SourceDocument {
   canonicalInternalName?: string;
   sourceDisplayedTitle?: string;
   identityStatus?: "SOURCE_LABEL_CONSISTENT" | "SOURCE_LABEL_INCONSISTENT";
+  legalAuthorityAsOf?: string;
+  consolidationScope?: string;
 }
 
 export class SelfPromotionForbiddenError extends Error {
