@@ -20,11 +20,68 @@ describe("V3 Evidence-First Vertical Slice (End-to-End Integration)", () => {
     const validationErrors = validateKnowledgeGraph(graph);
     expect(validationErrors).toHaveLength(0);
 
-    // 2. Diagnostic Items Retrieval
-    const diagnosticItems = CurriculumService.getInitialDiagnosticItems();
-    expect(diagnosticItems.length).toBe(4);
-    const reTestItems = CurriculumService.getReTestItems();
-    expect(reTestItems.length).toBe(4);
+    // 2. Diagnostic Items Retrieval (R2.2 Publication Gate Verification)
+    // Under R2.2 publication enforcement, unreviewed DRAFT canonical items fail closed
+    const canonicalInitial = CurriculumService.getInitialDiagnosticItems();
+    expect(canonicalInitial).toEqual([]);
+    const canonicalReTest = CurriculumService.getReTestItems();
+    expect(canonicalReTest).toEqual([]);
+
+    // Sample verified diagnostic items to evaluate the full engine lifecycle
+    const diagnosticItems = [
+      {
+        id: "ITEM-SAMPLE-FRAC-01",
+        primaryNodeId: "NODE-MATH-6-FRAC-03",
+        nodeIds: ["NODE-MATH-6-FRAC-03"],
+        type: "MULTIPLE_CHOICE" as const,
+        cognitiveDemand: "APPLY" as const,
+        prompt: "Tính 3/8 + 5/12",
+        correctAnswer: "A",
+        rationale: "MSC = 24",
+        misconceptionTags: ["ADD_NUM_AND_DENOM_DIRECTLY"],
+        itemStatus: "REVIEWED" as const,
+        isReTest: false,
+      },
+      {
+        id: "ITEM-SAMPLE-FRAC-02",
+        primaryNodeId: "NODE-MATH-6-FRAC-02",
+        nodeIds: ["NODE-MATH-6-FRAC-02"],
+        type: "MULTIPLE_CHOICE" as const,
+        cognitiveDemand: "APPLY" as const,
+        prompt: "Quy đồng 1/6 và 3/8",
+        correctAnswer: "A",
+        rationale: "BCNN = 24",
+        misconceptionTags: ["CONFUSE_LCM_WITH_PRODUCT"],
+        itemStatus: "REVIEWED" as const,
+        isReTest: false,
+      },
+      {
+        id: "ITEM-SAMPLE-INT-01",
+        primaryNodeId: "NODE-MATH-6-INT-01",
+        nodeIds: ["NODE-MATH-6-INT-01"],
+        type: "MULTIPLE_CHOICE" as const,
+        cognitiveDemand: "PROCEDURE" as const,
+        prompt: "BCNN của 6 và 8",
+        correctAnswer: "24",
+        rationale: "BCNN(6, 8) = 24",
+        misconceptionTags: [],
+        itemStatus: "REVIEWED" as const,
+        isReTest: false,
+      },
+      {
+        id: "ITEM-SAMPLE-FRAC-SAME-01",
+        primaryNodeId: "NODE-MATH-4-FRAC-01",
+        nodeIds: ["NODE-MATH-4-FRAC-01"],
+        type: "MULTIPLE_CHOICE" as const,
+        cognitiveDemand: "PROCEDURE" as const,
+        prompt: "1/5 + 2/5",
+        correctAnswer: "3/5",
+        rationale: "Cùng mẫu",
+        misconceptionTags: [],
+        itemStatus: "REVIEWED" as const,
+        isReTest: false,
+      },
+    ];
 
     // 3. Student Takes Diagnostic Test:
     // Student fails Target item (Grade 6 Unlike Denom) with distractor B ("ADD_NUM_AND_DENOM_DIRECTLY")
@@ -73,11 +130,14 @@ describe("V3 Evidence-First Vertical Slice (End-to-End Integration)", () => {
       "NODE-MATH-6-FRAC-03",
     ]);
 
-    // 6. Learning Pack Generation
+    // 6. Learning Pack Generation (Publication Gate Enforcement)
     const learningPack = generateLearningPack(gapReport);
     expect(learningPack.focusNodeId).toBe("NODE-MATH-6-FRAC-02");
     expect(learningPack.curriculumSourceRefs[0].sourceId).toBe("SRC-VN-MOET-MATH-2018");
-    expect(learningPack.workedExamplePlan.length).toBeGreaterThan(0);
+    // Under R2.2, unreviewed learning content fails closed to CONTENT_NOT_AVAILABLE
+    expect(learningPack.contentStatus).toBe("CONTENT_NOT_AVAILABLE");
+    expect(learningPack.workedExamplePlan).toEqual([]);
+    expect(learningPack.learningResourceRefs).toEqual([]);
     expect(learningPack.geminiNotebookInstructions.copyablePrompt).toContain("Bộ GD&ĐT");
 
     const manualGuide = ManualGeminiNotebookProvider.getRemediationGuide(learningPack);
@@ -85,7 +145,23 @@ describe("V3 Evidence-First Vertical Slice (End-to-End Integration)", () => {
     expect(manualGuide.stepByStepGuide).toHaveLength(5);
 
     // 7. Student Completes Remediation & Takes Parallel Re-Test
-    const targetReTestItems = reTestItems.filter(
+    const sampleReTestItems = [
+      {
+        id: "ITEM-SAMPLE-RETEST-01",
+        primaryNodeId: "NODE-MATH-6-FRAC-03",
+        nodeIds: ["NODE-MATH-6-FRAC-03"],
+        type: "MULTIPLE_CHOICE" as const,
+        cognitiveDemand: "APPLY" as const,
+        prompt: "Tính 1/4 + 1/6",
+        correctAnswer: "5/12",
+        rationale: "MSC = 12",
+        misconceptionTags: [],
+        itemStatus: "REVIEWED" as const,
+        isReTest: true,
+      },
+    ];
+
+    const targetReTestItems = sampleReTestItems.filter(
       (i) => i.primaryNodeId === "NODE-MATH-6-FRAC-03"
     );
     expect(targetReTestItems.length).toBeGreaterThanOrEqual(1);

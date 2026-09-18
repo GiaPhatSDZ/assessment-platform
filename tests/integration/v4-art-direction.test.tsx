@@ -66,10 +66,29 @@ describe("AI School V4 Art Direction & Visual Architecture Suite", () => {
   });
 
   it("renders FocusDiagnosticWorkspace distraction-free with KaTeX math and zero cheat controls", () => {
-    const items = CurriculumService.getInitialDiagnosticItems();
+    const sampleItems = [
+      {
+        id: "ITEM-SAMPLE-01",
+        primaryNodeId: "NODE-MATH-6-FRAC-03",
+        nodeIds: ["NODE-MATH-6-FRAC-03"],
+        type: "MULTIPLE_CHOICE" as const,
+        cognitiveDemand: "APPLY" as const,
+        prompt: "Tính giá trị của biểu thức: \\frac{3}{8} + \\frac{5}{12}",
+        options: [
+          { id: "opt-1", text: "\\frac{19}{24}" },
+          { id: "opt-2", text: "\\frac{8}{20}" },
+        ],
+        correctAnswer: "\\frac{19}{24}",
+        rationale: "Mẫu số chung là 24.",
+        misconceptionTags: ["MISCON-ADD-DENOM"],
+        itemStatus: "REVIEWED" as const,
+        isReTest: false,
+      },
+    ];
+
     const { container } = render(
       <FocusDiagnosticWorkspace
-        items={items}
+        items={sampleItems}
         subjectTitle="Toán Lớp 6"
         topicTitle="Phép cộng phân số khác mẫu số"
         onComplete={() => {}}

@@ -20,9 +20,9 @@ const COVERAGE_DATA: CoverageItem[] = [
     subject: "Toán học",
     topic: "Cộng, trừ hai phân số không cùng mẫu số",
     sourceDoc: "TT 32/2018/TT-BGDĐT (Trang 55)",
-    status: "AVAILABLE",
+    status: "IN_PROGRESS",
     link: "/diagnostic/math-grade6",
-    notes: "Lát cắt dọc chuẩn 4 nút tri thức tiên quyết, chẩn đoán ngộ nhận và học bù bằng chứng thực.",
+    notes: "Đồ thị 4 nút tri thức tiên quyết; câu hỏi chẩn đoán và học liệu đang trong tiến trình thẩm định sư phạm (DRAFT).",
   },
   {
     grade: "Lớp 6 (THCS)",
@@ -37,9 +37,8 @@ const COVERAGE_DATA: CoverageItem[] = [
     subject: "Toán học",
     topic: "Cộng hai phân số cùng mẫu số",
     sourceDoc: "TT 32/2018/TT-BGDĐT",
-    status: "AVAILABLE",
-    link: "/diagnostic/math-grade6",
-    notes: "Đã tích hợp làm nút tiên quyết trong đồ thị Toán 6.",
+    status: "IN_PROGRESS",
+    notes: "Nút tiên quyết trong đồ thị Toán 6; đang đối soát chuẩn đầu ra.",
   },
   {
     grade: "Lớp 7 - 12",

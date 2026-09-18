@@ -9,6 +9,7 @@ import { canonicalContentHash } from "./canonical-content-hash";
 import {
   ReviewerRole,
   ReviewerAuthority,
+  ReviewerAuthorizationError,
   getEffectiveReviewerAuthority,
 } from "./reviewer-registry";
 
@@ -172,11 +173,24 @@ export function promoteContent<
   };
 }
 
+function resolveStudentAuthority(authority?: ReviewerAuthority): ReviewerAuthority {
+  if (process.env.NODE_ENV === "test") {
+    return authority ?? getEffectiveReviewerAuthority();
+  }
+  // In production (NODE_ENV !== "test"), student publication paths must ONLY use the trusted productionReviewerAuthority.
+  if (authority && authority !== getEffectiveReviewerAuthority()) {
+    throw new ReviewerAuthorizationError(
+      "SECURITY_VIOLATION: Arbitrary runtime authority injection is strictly forbidden in student publication paths."
+    );
+  }
+  return getEffectiveReviewerAuthority();
+}
+
 /**
- * Validates that an item is authorized to be delivered to a student.
+ * Gatekeeper for student runtime content delivery.
  * Throws ContentNotPublishedError if:
- * - publicationState is unapproved
- * - reviewState is unapproved
+ * - publicationState is not PUBLISHED_BETA or PUBLISHED_VERIFIED
+ * - reviewState is not an approved human review state
  * - itemMaturity is 'DRAFT'
  * - any authoringOrigin (HUMAN, AI_ASSISTED, ADAPTED_WITH_PERMISSION) lacks a valid,
  *   approved review attestation from a trusted, controller-verified human reviewer
@@ -192,8 +206,10 @@ export function assertPublishedForStudent(
     reviewAttestation?: ReviewAttestation;
     [key: string]: any;
   },
-  authority: ReviewerAuthority = getEffectiveReviewerAuthority()
+  authority?: ReviewerAuthority
 ): void {
+  const effectiveAuthority = resolveStudentAuthority(authority);
+
   // 1. Publication State Check
   if (!ALLOWED_STUDENT_PUBLICATION_STATES.has(item.publicationState)) {
     throw new ContentNotPublishedError(item.id, item.publicationState);
@@ -261,7 +277,7 @@ export function assertPublishedForStudent(
   }
 
   // Reviewer Authority validation
-  if (!authority.isTrustedReviewer(attestation.reviewerId, attestation.role as ReviewerRole)) {
+  if (!effectiveAuthority.isTrustedReviewer(attestation.reviewerId, attestation.role as ReviewerRole)) {
     throw new ContentNotPublishedError(
       item.id,
       item.publicationState,

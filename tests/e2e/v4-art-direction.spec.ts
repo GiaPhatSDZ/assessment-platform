@@ -68,12 +68,10 @@ test.describe("AI School V4 Art Direction & Responsive Layout Suites", () => {
     await expect(page.getByText("Điền đáp án đúng toàn bộ")).toHaveCount(0);
     await expect(page.getByText("MATH-VN-G6-NUM-001")).toHaveCount(0);
 
-    // Select option 1 and click Next
-    const firstOption = page.locator("button[type='button']").filter({ hasText: "1" }).first();
-    await firstOption.click();
-    await page.getByRole("button", { name: /Tiếp tục/i }).click();
-
-    // Advanced to question 2
-    await expect(page.getByText(/Câu 2 \//i)).toBeVisible();
+    // Under R2.2 publication gate: Canonical Grade 6 items are DRAFT, so student diagnostic fails closed
+    await expect(page.getByText(/CONTENT_NOT_AVAILABLE/i)).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 1, name: /Học liệu chẩn đoán đang trong quá trình thẩm định sư phạm/i })
+    ).toBeVisible();
   });
 });

@@ -1,13 +1,13 @@
-# AI School R2.2 Publication Enforcement Report
+# AI School R2.2 Publication Enforcement & Student Runtime Cutover Report
 
 **Report Status:**
 ```text
-EXECUTOR R2.2 REMEDIATION COMPLETE
+EXECUTOR R2.2 RUNTIME CUTOVER COMPLETE
 CONTROLLER REVIEW: PENDING
 ```
 
 **Repository:** `GiaPhatSDZ/assessment-platform`  
-**Baseline Commit:** `868cdb2630ad61c9a453f2646c3b762e45ca1e00`  
+**Baseline Commit:** `a83915a690ae577d32397202c36bbb50324113fa`  
 **Execution Timestamp:** 2026-09-18  
 
 ---
@@ -123,41 +123,63 @@ This remediation fulfills the requirements of `GEMINI_R2_2_PUBLICATION_ENFORCEME
 
 ## 9. Local Executor Evidence
 
-### Automated Test Runs
+---
 
-#### 1. Focused Publication Enforcement Suite (R2.2)
-- **Command:** `npx vitest run tests/curriculum/publication-enforcement-r2-2.test.ts`
-- **Result:** 20 / 20 tests PASSED (Duration: 2.17s)
+## 9. Student Runtime Cutover & Fail-Closed Implementation (Controller Audit Commit a83915a)
 
-#### 2. Curriculum Authority & Ingestion Suites
-- **Command:** `npx vitest run tests/curriculum/curriculum-content-database-v1.test.ts tests/curriculum/nxbgd-source-ingestion.test.ts tests/curriculum/publication-enforcement-r2-2.test.ts`
-- **Result:** 67 / 67 tests PASSED (3 test files, Duration: 3.30s)
+Following Controller Audit of commit `a83915a`, the student runtime has been cut over from legacy content sources to the canonical publication authority:
 
-#### 3. Complete Test Suite
-- **Command:** `npm test`
-- **Result:** 35 / 35 test files passed, 184 / 184 tests PASSED (Duration: 41.21s)
+### P0. Parallel Legacy Content Authority Removed:
+- **Legacy Path Eliminated:** `assessment-items/reviewed/math-grade6-fractions.json` has been decoupled from the student diagnostic runner.
+- **Sole Publication Authority:** `CurriculumService.getInitialDiagnosticItems()` and `getReTestItems()` exclusively source canonical question bank items (`@/curriculum/vietnam/lower-secondary/grade-6/math/question-bank/items.json`) through `filterPublishedForStudent()`.
+- **Fail-Closed Presentation:** Because canonical Grade 6 items are `DRAFT`, the student diagnostic runner on `/diagnostic/math-grade6` strictly fails closed and displays `CONTENT_NOT_AVAILABLE · ĐANG THẨM ĐỊNH (DRAFT)`, adhering to TT 32/2018/TT-BGDĐT pedagogical standards. Zero draft questions reach the student.
 
-#### 4. TypeScript Compilation Gate
-- **Command:** `npx tsc --noEmit`
-- **Result:** Code 0, 0 type errors.
+### P0. Learning Pack Review Gate Enforced:
+- **`LearningPack.contentStatus`:** Added explicit status `"PUBLISHED" | "CONTENT_NOT_AVAILABLE"`.
+- **Pre-Delivery Gate:** `generateLearningPack()` evaluates lesson candidates with `isPublishedForStudent()`. When unreviewed, returns `contentStatus: "CONTENT_NOT_AVAILABLE"`, empty worked examples, empty practice plans, and empty Tier-D resource references.
+- **Student View Protection:** `LearningPackView` renders a fail-closed pedagogical review holding screen when `contentStatus === "CONTENT_NOT_AVAILABLE"`, blocking unreviewed or hardcoded Tier-D learning material.
 
-#### 5. Code Quality / ESLint Gate
-- **Command:** `npm run lint`
-- **Result:** Code 0, 0 warnings, 0 errors.
+### P1. False UI Claims Removed:
+- **`NewDiagnosticWizard`:** Removed `"Sẵn sàng"`, `"Đã duyệt (APPROVED)"`, and `"Lát cắt đã hoàn thiện"`. Replaced with truthful `"Đang thẩm định (DRAFT)"` and `"Đang thẩm định (CONTENT_IN_REVIEW)"`.
+- **`CoverageExplorer`:** Replaced false `"AVAILABLE"` claims on unreviewed slices with `"IN_PROGRESS"` ("Đang biên soạn / thẩm định").
 
-#### 6. Production Bundle Build Gate
-- **Command:** `npm run build`
-- **Result:** Code 0, all 24 static and dynamic routes compiled successfully in 13.1s.
+### Parent Copilot Boundary Enforcement:
+- **Student Flow Purged:** Removed `GeminiHandoff` and `NotebookLM` imports and components completely from student remediation view (`LearningPackView`).
+- **Parent Isolation:** AI assistance is strictly confined to parent-facing routes (`/parent`, `ParentView.tsx`, `GeminiHandoffSection.tsx`).
 
-#### 7. Playwright End-to-End Suite
-- **Command:** `npm run test:e2e`
-- **Result:** 34 / 34 tests PASSED across Chromium and Mobile Chrome (Duration: 38.1s).
+### Reviewer Authority Hardening:
+- **Production Immutability:** Mutable reviewer registration (`setTestReviewerAuthority`, `registerReviewer`, `registerReviewerForTesting`) is strictly guarded by `process.env.NODE_ENV === "test"`. Outside test environments, all mutators throw security errors and `productionReviewerAuthority` is enforced.
+- **No Runtime Authority Injection:** `assertPublishedForStudent`, `isPublishedForStudent`, and `filterPublishedForStudent` throw `ReviewerAuthorizationError` if an external caller attempts to inject a custom authority in non-test environments.
 
 ---
 
-## 10. Open Limitations
+## 10. Required Regression Matrix & Test Evidence
 
-1. **Grade 6 Content Remains Unreviewed:**
-   All 6 diagnostic items in `curriculum/vietnam/lower-secondary/grade-6/math/question-bank/items.json` remain in `itemMaturity: "DRAFT"` and `reviewState: "AI_DRAFT"`. No real human review attestations have been created yet, pending real human pedagogical controller review.
-2. **Reviewer Authority Population:**
-   Production reviewer registry is intentionally empty. Before production deployment, real human pedagogical reviewers must be provisioned through a secure controller-managed configuration.
+All 7 required regression items are verified by automated tests in `tests/curriculum/runtime-cutover-r2-2.test.tsx` and the full suite:
+
+| # | Regression Requirement | Test Location | Result |
+|---|---|---|---|
+| 1 | Active Grade 6 route cannot render legacy reviewed JSON | `tests/curriculum/runtime-cutover-r2-2.test.tsx` | **PASS** |
+| 2 | DRAFT canonical question items cannot reach student diagnostic | `tests/curriculum/runtime-cutover-r2-2.test.tsx` | **PASS** |
+| 3 | Student learning pack cannot render Tier-D/unreviewed learning content | `tests/curriculum/runtime-cutover-r2-2.test.tsx` | **PASS** |
+| 4 | Student flow contains no NotebookLM/Gemini handoff | `tests/curriculum/runtime-cutover-r2-2.test.tsx` | **PASS** |
+| 5 | False APPROVED UI copy is absent from wizard and coverage explorer | `tests/curriculum/runtime-cutover-r2-2.test.tsx` | **PASS** |
+| 6 | Publication guard remains the sole content authorization path | `tests/curriculum/runtime-cutover-r2-2.test.tsx` | **PASS** |
+| 7 | Existing R2.2 stale-attestation and hash integrity tests remain green | `tests/curriculum/publication-enforcement-r2-2.test.ts` | **PASS** |
+
+### Verification Gate Results:
+- **Vitest Unit/Integration:** `npm test` → **36 test files passed, 201 tests passed** (0 failures).
+- **TypeScript Typecheck:** `npx tsc --noEmit` → **0 errors (Exit code 0)**.
+- **ESLint Quality Check:** `npm run lint` → **0 errors, 0 warnings (Exit code 0)**.
+- **Production Build:** `npm run build` → **Compiled successfully, 24/24 static/dynamic routes generated**.
+- **Playwright E2E:** `npm run test:e2e` → **34 / 34 tests passed** across Chromium and Mobile Chrome.
+
+---
+
+## 11. Open Limitations & Content Status
+
+1. **All Grade 6 Content Kept DRAFT:**
+   In strict compliance with Controller instructions, all Grade 6 items in `curriculum/vietnam/lower-secondary/grade-6/math/question-bank/items.json` remain `itemMaturity: "DRAFT"` and `reviewState: "AI_DRAFT"`. No fabricated review attestations were added.
+2. **Reviewer Authority Remains Empty in Production:**
+   Production reviewer registry is read-only and empty until formal pedagogical committee onboarding.
+

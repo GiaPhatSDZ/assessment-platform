@@ -4,6 +4,8 @@ import { ManualGeminiNotebookProvider } from "@/src/infrastructure/remediation/g
 import { processReTestOutcome } from "@/src/domain/mastery/history";
 import { GapReport } from "@/src/domain/diagnostic/gap-engine";
 import { ItemAttempt } from "@/src/domain/diagnostic/types";
+import { canonicalContentHash } from "@/src/domain/content/canonical-content-hash";
+import { createTestReviewerAuthority, setTestReviewerAuthority } from "@/src/domain/content/reviewer-registry";
 
 describe("Learning Pack & Re-test Mastery Cycle", () => {
   const mockGapReport: GapReport = {
@@ -23,14 +25,64 @@ describe("Learning Pack & Re-test Mastery Cycle", () => {
     ruleVersion: "1.0.0",
   };
 
-  it("generates a source-grounded learning pack targeting the root prerequisite gap", () => {
+  it("generates a source-grounded learning pack failing closed when content is unreviewed", () => {
     const pack = generateLearningPack(mockGapReport);
 
     expect(pack.focusNodeId).toBe("NODE-MATH-6-FRAC-02");
     expect(pack.focusNodeLabel).toBe("Quy đồng mẫu số các phân số");
     expect(pack.curriculumSourceRefs[0].sourceId).toBe("SRC-VN-MOET-MATH-2018");
     expect(pack.geminiNotebookInstructions.copyablePrompt).toContain("Bộ GD&ĐT");
-    expect(pack.workedExamplePlan.length).toBeGreaterThan(0);
+    // Under R2.2 publication gate, unreviewed learning content cannot be exposed to students
+    expect(pack.contentStatus).toBe("CONTENT_NOT_AVAILABLE");
+    expect(pack.workedExamplePlan.length).toBe(0);
+    expect(pack.learningResourceRefs.length).toBe(0);
+  });
+
+  it("populates worked examples and published status when a reviewed lesson is provided", () => {
+    const mockReviewedLesson = {
+      id: "LESSON-MOCK-01",
+      nodeIds: ["NODE-MATH-6-FRAC-02"],
+      title: "Quy đồng mẫu số các phân số",
+      publicationState: "PUBLISHED_VERIFIED",
+      reviewState: "INTERNAL_REVIEWED",
+      itemMaturity: "REVIEWED",
+      authoringOrigin: "HUMAN",
+      learnerText: [{ type: "text", value: "Quy tắc 3 bước quy đồng mẫu số." }],
+      workedExamples: [
+        {
+          prompt: [{ type: "text", value: "Quy đồng 1/6 và 3/8" }],
+          steps: [{ type: "text", value: "BCNN là 24" }],
+          finalAnswer: "4/24 và 9/24",
+        },
+      ],
+      reviewAttestation: {
+        reviewerId: "REV-HUMAN-01",
+        role: "PEDAGOGICAL_CONTROLLER",
+        decision: "APPROVE",
+        scope: "LESSON",
+        hashAlgorithm: "SHA-256",
+        hashSchemaVersion: "content-hash-v1",
+        contentHash: "PLACEHOLDER",
+        attestedAt: "2026-09-18T00:00:00.000Z",
+      },
+    };
+    setTestReviewerAuthority(createTestReviewerAuthority([{
+      reviewerId: "REV-HUMAN-01",
+      type: "HUMAN",
+      role: "PEDAGOGICAL_CONTROLLER",
+      active: true,
+      verifiedByController: true,
+    }]));
+
+    mockReviewedLesson.reviewAttestation.contentHash = canonicalContentHash(mockReviewedLesson);
+
+    const pack = generateLearningPack(mockGapReport, mockReviewedLesson);
+    expect(pack.contentStatus).toBe("PUBLISHED");
+    expect(pack.workedExamplePlan.length).toBe(1);
+    expect(pack.workedExamplePlan[0]).toContain("Quy đồng 1/6 và 3/8");
+    expect(pack.learningResourceRefs.length).toBe(1);
+
+    setTestReviewerAuthority(null);
   });
 
   it("produces valid Gemini Notebook manual instructions", () => {

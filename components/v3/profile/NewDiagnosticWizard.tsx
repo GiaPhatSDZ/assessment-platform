@@ -90,7 +90,7 @@ export function NewDiagnosticWizard() {
             Chọn khối lớp theo chương trình Bộ GD&ĐT
           </h2>
           <p className="text-xs text-slate-500">
-            Hiện tại hệ thống đã hoàn thiện thẩm định đối soát cho Lớp 6 (THCS).
+            Nội dung Lớp 6 (THCS) đang trong quá trình thẩm định đối soát sư phạm (DRAFT).
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
@@ -105,8 +105,8 @@ export function NewDiagnosticWizard() {
             >
               <div className="flex items-center justify-between text-xs font-bold text-edu-700 mb-1">
                 <span>Lớp 6 (THCS)</span>
-                <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] text-emerald-800 font-bold">
-                  Sẵn sàng
+                <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] text-amber-800 font-bold">
+                  Đang thẩm định (DRAFT)
                 </span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400">
@@ -153,7 +153,7 @@ export function NewDiagnosticWizard() {
             Chọn môn học cần chẩn đoán
           </h2>
           <p className="text-xs text-slate-500">
-            Chỉ mở các phân môn đã được chuyên gia thẩm định câu hỏi và ngộ nhận sư phạm.
+            Chỉ mở chẩn đoán khi nội dung và ngộ nhận sư phạm đã được chuyên gia hoàn tất thẩm định.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
@@ -164,8 +164,8 @@ export function NewDiagnosticWizard() {
             >
               <div className="flex items-center justify-between text-xs font-bold text-edu-700 mb-1">
                 <span>Toán học</span>
-                <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] text-emerald-800 font-bold">
-                  Đã duyệt (APPROVED)
+                <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] text-amber-800 font-bold">
+                  Đang thẩm định (CONTENT_IN_REVIEW)
                 </span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400">
@@ -223,8 +223,8 @@ export function NewDiagnosticWizard() {
             >
               <div className="flex items-center justify-between text-xs font-bold text-slate-900 dark:text-white mb-1">
                 <span>Cộng, trừ hai phân số không cùng mẫu số</span>
-                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
-                  Lát cắt đã hoàn thiện
+                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                  Đang thẩm định (DRAFT)
                 </span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">

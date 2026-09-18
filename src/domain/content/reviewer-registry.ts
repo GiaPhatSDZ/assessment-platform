@@ -130,18 +130,31 @@ export const productionReviewerAuthority: ReviewerAuthority = new ReadOnlyReview
 // Internal test authority holder used ONLY when explicitly injected in test harness
 let testAuthorityOverride: ReviewerAuthority | null = null;
 
+function assertTestEnvironment(helperName: string): void {
+  if (process.env.NODE_ENV !== "test") {
+    throw new ReviewerAuthorizationError(
+      `SECURITY_VIOLATION: '${helperName}' is restricted strictly to test environments (NODE_ENV === 'test'). In production, reviewer authority is immutable and read-only.`
+    );
+  }
+}
+
 /**
  * Returns the effective reviewer authority.
- * Defaults to productionReviewerAuthority unless test authority is injected.
+ * Defaults to productionReviewerAuthority.
+ * Test override is ONLY permitted when process.env.NODE_ENV === 'test'.
  */
 export function getEffectiveReviewerAuthority(): ReviewerAuthority {
-  return testAuthorityOverride ?? productionReviewerAuthority;
+  if (process.env.NODE_ENV === "test") {
+    return testAuthorityOverride ?? productionReviewerAuthority;
+  }
+  return productionReviewerAuthority;
 }
 
 /**
  * Test-only utility: Creates an isolated, immutable ReviewerAuthority from supplied test records.
  */
 export function createTestReviewerAuthority(records: ReviewerRecord[]): ReviewerAuthority {
+  assertTestEnvironment("createTestReviewerAuthority");
   return new ReadOnlyReviewerAuthority(records);
 }
 
@@ -149,6 +162,7 @@ export function createTestReviewerAuthority(records: ReviewerRecord[]): Reviewer
  * Test-only utility: Injects or clears the test reviewer authority override.
  */
 export function setTestReviewerAuthority(authority: ReviewerAuthority | null): void {
+  assertTestEnvironment("setTestReviewerAuthority");
   testAuthorityOverride = authority;
 }
 
@@ -156,6 +170,7 @@ export function setTestReviewerAuthority(authority: ReviewerAuthority | null): v
  * Backward-compatibility test helper: registers reviewer into an injected test authority.
  */
 export function registerReviewerForTesting(record: ReviewerRecord): void {
+  assertTestEnvironment("registerReviewerForTesting");
   const current = testAuthorityOverride instanceof ReadOnlyReviewerAuthority
     ? Array.from((testAuthorityOverride as any).store.values()) as ReviewerRecord[]
     : [];
@@ -169,6 +184,7 @@ export function registerReviewerForTesting(record: ReviewerRecord): void {
  * Backward-compatibility test helper: resets test authority back to null (production).
  */
 export function resetReviewerAuthorityForTesting(): void {
+  assertTestEnvironment("resetReviewerAuthorityForTesting");
   testAuthorityOverride = null;
 }
 
