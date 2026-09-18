@@ -376,12 +376,13 @@ describe("Curriculum Content Database V1 — Authority, Provenance & Boundary Te
       };
 
       const pack = generateLearningPack(sampleGap);
-      expect(pack.geminiNotebookInstructions.copyablePrompt).toContain("dành riêng cho phụ huynh");
+      expect((pack as any).geminiNotebookInstructions).toBeUndefined();
       expect(pack.parentGuide).toContain("Trợ lý Phụ huynh");
       // Must not instruct child to chat with AI directly
       expect(pack.parentGuide).not.toContain("để con tự đối thoại học tập");
 
       const guide = ManualGeminiNotebookProvider.getRemediationGuide(pack);
+      expect(guide.suggestedPrompt).toContain("dành riêng cho phụ huynh");
       expect(guide.safetyAndAgeNote).toContain("Học sinh không trực tiếp sử dụng hay trò chuyện với AI");
       expect(guide.stepByStepGuide[0]).toContain("Phụ huynh");
     });

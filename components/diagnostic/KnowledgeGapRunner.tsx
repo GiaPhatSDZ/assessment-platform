@@ -5,6 +5,7 @@ import { CurriculumService } from "@/src/application/curriculum/curriculum-servi
 import { gradeAttempt, evaluateSession } from "@/src/domain/diagnostic/engine";
 import { detectKnowledgeGap, GapReport } from "@/src/domain/diagnostic/gap-engine";
 import { generateLearningPack, LearningPack } from "@/src/domain/remediation/learning-pack";
+import { ManualGeminiNotebookProvider } from "@/src/infrastructure/remediation/gemini-notebook/manual-provider";
 import { processReTestOutcome, MasteryTransitionRecord } from "@/src/domain/mastery/history";
 import { ItemAttempt } from "@/src/domain/diagnostic/types";
 
@@ -72,7 +73,8 @@ export function KnowledgeGapRunner() {
 
   const handleCopyPrompt = () => {
     if (learningPack) {
-      navigator.clipboard.writeText(learningPack.geminiNotebookInstructions.copyablePrompt);
+      const guide = ManualGeminiNotebookProvider.getRemediationGuide(learningPack);
+      navigator.clipboard.writeText(guide.suggestedPrompt);
       setCopiedPrompt(true);
       setTimeout(() => setCopiedPrompt(false), 2500);
     }
@@ -408,7 +410,7 @@ export function KnowledgeGapRunner() {
                   </button>
                 </div>
                 <pre className="mt-2 max-h-36 overflow-y-auto whitespace-pre-wrap rounded-lg bg-slate-50 p-3 font-mono text-[11px] text-slate-800 dark:bg-slate-900 dark:text-slate-300">
-                  {learningPack.geminiNotebookInstructions.copyablePrompt}
+                  {ManualGeminiNotebookProvider.getRemediationGuide(learningPack).suggestedPrompt}
                 </pre>
               </div>
             </div>

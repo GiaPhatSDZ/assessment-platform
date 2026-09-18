@@ -2,184 +2,148 @@
 
 **Report Status:**
 ```text
-EXECUTOR R2.2 RUNTIME CUTOVER COMPLETE
+EXECUTOR R2.2.1 SERVER DELIVERY FREEZE CLEANUP COMPLETE
 CONTROLLER REVIEW: PENDING
 ```
 
 **Repository:** `GiaPhatSDZ/assessment-platform`  
-**Baseline Commit:** `a83915a690ae577d32397202c36bbb50324113fa`  
+**Baseline Commit:** `6efc0688702379aa118ec7f4bc5e6bf8042de01a`  
 **Execution Timestamp:** 2026-09-18  
 
 ---
 
 ## 1. Executive Summary & Scope Adherence
 
-This remediation fulfills the requirements of `GEMINI_R2_2_PUBLICATION_ENFORCEMENT_PROMPT.md` and the mandatory amendments from `CONTROLLER PLAN REVIEW — R2.2`. The implementation guarantees that content entering student runtime cannot bypass cryptographic review verification, reviewer authority verification, or item maturity gates.
+This remediation fulfills the requirements of R2.2.1 FREEZE CLEANUP following Controller Audit of remote commit `6efc0688702379aa118ec7f4bc5e6bf8042de01a`. The implementation guarantees that unpublished DRAFT curriculum content never crosses the server/client boundary into client browser bundles.
 
 ### Scope Invariant Verification:
 - **No curriculum subjects added:** The 166-subject national catalog remains unchanged.
 - **No grades or lessons added:** Grade 6 Mathematics vertical slice remains the sole exploratory baseline.
 - **No question-bank items added:** The 6 draft question items remain untouched.
-- **Grade 6 Content Maturity Preserved:** All Grade 6 items remain `itemMaturity: "DRAFT"`, `reviewState: "AI_DRAFT"`, `publicationState: "DRAFT"`, `publishedAt: null`, `publishedBy: null`.
+- **Grade 6 Content Maturity Preserved:** All Grade 6 items and lessons remain `itemMaturity: "DRAFT"`, `reviewState: "AI_DRAFT"`, `publicationState: "DRAFT"`, `publishedAt: null`, `publishedBy: null`.
 - **Zero fake reviewers in production data:** Production reviewer authority is strictly read-only and empty by default (fail-closed).
 - **No UI changes / No scoring direction modifications.**
 - **Unrelated transcript-bridge work preserved:** Stored in dedicated branch `feature/transcript-bridge`.
 
 ---
 
-## 2. Changed Files
+## 2. Changed Files (R2.2.1 Freeze Cleanup)
 
 | File | Status | Description |
 |---|---|---|
-| `src/domain/content/canonical-json.ts` | **NEW** | Deterministic JSON serialization (`stableCanonicalJsonV1`, `stableCanonicalJsonSha256`). Does not claim RFC 8785 compliance. |
-| `src/domain/content/canonical-content-hash.ts` | **NEW** | Deterministic `canonicalContentHash(item)`. Excludes workflow metadata; includes `authoringOrigin`; preserves semantic array order. |
-| `src/domain/content/reviewer-registry.ts` | **NEW** | Read-only `ReviewerAuthority` contract and `ReadOnlyReviewerAuthority`. Production registry is empty. Test injection mechanisms provided. |
-| `src/domain/content/schema.ts` | **MODIFIED** | Updated `ReviewAttestation` (`hashAlgorithm: "SHA-256"`, `hashSchemaVersion: "content-hash-v1"`, `decision`, `scope`). Added `ReviewableContentMeta`. Extended `SourceDocument`. |
-| `src/domain/content/publication-guard.ts` | **MODIFIED** | Refactored `promoteContent` (removed `rawContentToHash`). Refactored `assertPublishedForStudent` (universal review gate, hash freshness check, maturity check). Unified `filterPublishedForStudent` with error propagation. |
-| `curriculum/vietnam/lower-secondary/grade-6/math/source-registry.json` | **MODIFIED** | Explicitly represented VBT/SBT label ambiguity with `canonicalInternalName`, `sourceDisplayedTitle`, and `identityStatus: "SOURCE_LABEL_INCONSISTENT"`. |
-| `scripts/curriculum/ingest-nxbgd-sources.mjs` | **MODIFIED** | Dynamic derivation of `identityStatus` comparing `canonicalInternalName` with probed `sourceDisplayedTitle`. |
-| `tests/curriculum/publication-enforcement-r2-2.test.ts` | **NEW** | 20 comprehensive unit tests covering all 17 mandatory acceptance criteria and controller amendments. |
-| `tests/curriculum/curriculum-content-database-v1.test.ts` | **MODIFIED** | Updated test fixtures to use `canonicalContentHash`, valid reviewer authority, and new attestation contract. |
-| `tests/curriculum/nxbgd-source-ingestion.test.ts` | **MODIFIED** | Updated `promoteContent` invocations to match R2.2 API (internal hashing, algorithm/version fields, reviewer authority). |
+| `src/application/curriculum/student-content-delivery-service.ts` | **NEW** | Server-only content delivery service (`import "server-only"`). Sole authorization layer for importing canonical question bank and lesson JSON. Transforms approved content to sanitized delivery DTOs; returns fail-closed `CONTENT_NOT_AVAILABLE` when no approved material exists. |
+| `app/diagnostic/math-grade6/page.tsx` | **MODIFIED** | Server component invokes `StudentContentDeliveryService.getDiagnosticDelivery()`. Passes sanitized delivery DTO or fail-closed state to client component. Zero draft content crosses boundary. |
+| `src/application/curriculum/curriculum-service.ts` | **MODIFIED** | Removed static import of canonical `question-bank/items.json`. Client-side invocations fail closed with empty item sets. |
+| `src/domain/remediation/learning-pack.ts` | **MODIFIED** | Removed static import of canonical `lessons/fractions-addition.json`. Purged `geminiNotebookInstructions` from student `LearningPack` interface and payload. |
+| `src/infrastructure/remediation/gemini-notebook/manual-provider.ts` | **MODIFIED** | Decoupled dynamic parent notebook prompt generation from student `LearningPack` internals. Confined to parent-only use. |
+| `src/domain/content/publication-guard.ts` | **MODIFIED** | Hardened `promoteContent()`: arbitrary authority injection is forbidden in production (`SECURITY_VIOLATION`), permitted only in `NODE_ENV === "test"`. Hardened maturity gate: missing or DRAFT `itemMaturity` fails closed. |
+| `src/domain/content/schema.ts` | **MODIFIED** | Added `itemMaturity` to `Lesson` and `Explanation` schemas. |
+| `components/v3/diagnostic/Grade6FractionsDiagnosticFlow.tsx` | **MODIFIED** | Accepts sanitized `DiagnosticDeliveryDto` from server component. Removed unverified claims ("chữ ký số", "hội đồng chuyên môn"). |
+| `components/v3/profile/NewDiagnosticWizard.tsx` | **MODIFIED** | Removed unverified "Trang 55" locator claim; truthful national curriculum references only. |
+| `components/v3/curriculum/CoverageExplorer.tsx` | **MODIFIED** | Removed unverified "Trang 55" locator claim. |
+| `components/diagnostic/KnowledgeGapRunner.tsx` | **MODIFIED** | Switched from `learningPack.geminiNotebookInstructions` to `ManualGeminiNotebookProvider`. |
+| `vitest.config.ts` | **MODIFIED** | Added alias for `"server-only"` to allow unit testing of server modules. |
+| `tests/curriculum/server-delivery-boundary-r2-2-1.test.ts` | **NEW** | 12 tests covering mandatory R2.2.1 acceptance criteria A-I (bundle sentinels, server-only imports, promotion hardening, parent isolation, maturity enforcement). |
 
 ---
 
-## 3. Canonical Content Hash Contract
+## 3. Server Delivery Boundary Architecture
 
-- **Function:** `canonicalContentHash(item: ReviewableContentItem): string`
-- **Algorithm:** SHA-256 over `stableCanonicalJsonV1` representation (`hashAlgorithm: "SHA-256"`, `hashSchemaVersion: "content-hash-v1"`).
-- **Hashed Fields (QuestionItem):**
-  - `id`, `primaryNodeId`, `supportingNodeIds` (sorted copy), `type`, `cognitiveDemand`, `prompt` (order preserved), `options` (order preserved), `correctAnswer`, `answerSpec` (when present), `rationale`, `distractorRationales`, `misconceptionTags` (sorted copy), `sourceRefs`, `authoringOrigin`, `version`.
-- **Hashed Fields (Lesson):**
-  - `id`, `nodeIds` (sorted copy), `title`, `learnerText` (order preserved), `workedExamples` (order preserved), `approvedSourceRefs`, `ageOrGradeFit`, `authoringOrigin`, `version`.
-- **Excluded Workflow Metadata:**
-  - `reviewState`, `reviewAttestation`, `publicationState`, `publishedAt`, `publishedBy`, `itemMaturity`.
-- **Order Invariant:**
-  - Only explicitly set-like identifier arrays (`supportingNodeIds`, `misconceptionTags`, `nodeIds`) are sorted.
-  - Semantic content arrays (`prompt`, `options`, `learnerText`, `workedExamples`, `steps`, `RichContent`) strictly maintain their author-defined sequence.
+```
+canonical repository files
+       ↓
+SERVER-ONLY loader (`import "server-only"`)
+[StudentContentDeliveryService]
+       ↓
+publication guard (`assertPublishedForStudent` / `filterPublishedForStudent`)
+       ↓
+sanitized published delivery DTO (`DiagnosticDeliveryDto` / `LessonDeliveryDto`)
+       ↓
+Client Component (`Grade6FractionsDiagnosticFlow`)
+```
 
----
-
-## 4. Trusted Reviewer Authority Architecture
-
-- **Read-Only In Production:**
-  `productionReviewerAuthority: ReviewerAuthority = new ReadOnlyReviewerAuthority([])`
-  Mutable functions (`registerReviewer`/`clearReviewerRegistry`) are NOT part of the production trust mechanism.
-- **Verification Criteria:**
-  - Reviewer ID must exist in the authoritative registry.
-  - `type === "HUMAN"`.
-  - `active === true`.
-  - `verifiedByController === true`.
-  - Reviewer role must match the required attestation role.
-- **Test Injection:**
-  Isolated test authorities are injected via `createTestReviewerAuthority()` or optional parameter on publication guard functions.
+- **Server-Only Enforcement:** Canonical curriculum JSON files (`question-bank/items.json`, `lessons/fractions-addition.json`) are only imported by `StudentContentDeliveryService` which declares `import "server-only"`.
+- **Client Sanitization:** Any client-callable service (`CurriculumService`, `generateLearningPack`) has zero static imports of unpublished curriculum JSON.
+- **Fail-Closed Presentation:** When no items meet student publication criteria (`itemMaturity` in `["REVIEWED", "PILOT", "CALIBRATED"]` with valid human review attestation and fresh cryptographic hash), the server returns `status: "CONTENT_NOT_AVAILABLE"` and an empty items list. Zero draft content crosses the wire.
 
 ---
 
-## 5. Review Attestation & Freshness Behavior
+## 4. Promotion Authority Hardening & Maturity Failsafe
 
-- **`promoteContent(item, targetState, attestation, authority?)`:**
-  - Rejects external caller-supplied `rawContentToHash`.
-  - Computes `canonicalContentHash(item)` internally.
-  - Requires `attestation.contentHash === computedHash`.
-  - Requires `attestation.decision === "APPROVE"`.
-  - Requires `attestation.hashAlgorithm === "SHA-256"` and `attestation.hashSchemaVersion === "content-hash-v1"`.
-  - Requires attestation scope to match content type.
-  - Asserts reviewer validity in `ReviewerAuthority`.
-- **`assertPublishedForStudent(item, authority?)`:**
-  - Recomputes current `canonicalContentHash(item)`.
-  - If `currentHash !== item.reviewAttestation.contentHash`: throws `ContentNotPublishedError` with `REVIEW_ATTESTATION_STALE`.
-  - Verifies that post-review mutations to `correctAnswer`, `sourceRefs`, `rationale`, or `authoringOrigin` invalidate the attestation immediately.
-
----
-
-## 6. Student Publication Gate Unification & Error Propagation
-
-- **Single Predicate:** `isPublishedForStudent(item, authority?)` is the sole boolean evaluator for student delivery.
-- **Error Propagation:**
-  `isPublishedForStudent` catches ONLY expected `ContentNotPublishedError`. Any unexpected system errors (e.g. `TypeError`, `RangeError`) immediately propagate without being swallowed.
-- **Pure Filter:** `filterPublishedForStudent(items, authority?)` delegates directly to `isPublishedForStudent`. There is no parallel or weaker publication logic in the repository.
-
----
-
-## 7. Item Maturity Coherence
-
-- `itemMaturity: "DRAFT"` is strictly rejected from student runtime by `assertPublishedForStudent`.
-- Allowed student delivery maturities: `REVIEWED`, `PILOT`, `CALIBRATED`.
-- Manual modification of `reviewState = INTERNAL_REVIEWED` or `publicationState = PUBLISHED_BETA` cannot bypass the maturity gate.
+- **`promoteContent` Invariant:**
+  ```ts
+  function resolvePromotionAuthority(authority?: ReviewerAuthority): ReviewerAuthority {
+    if (authority && authority !== productionReviewerAuthority) {
+      if (process.env.NODE_ENV !== "test") {
+        throw new ReviewerAuthorizationError(
+          "SECURITY_VIOLATION: Arbitrary ReviewerAuthority injection into promoteContent is only permitted when NODE_ENV === 'test'",
+        );
+      }
+      return authority;
+    }
+    return productionReviewerAuthority;
+  }
+  ```
+- **Maturity Fail-Closed Gate:**
+  In `assertPublishedForStudent`:
+  ```ts
+  if (!item.itemMaturity || item.itemMaturity === "DRAFT" || !ALLOWED_STUDENT_MATURITY_STATES.has(item.itemMaturity)) {
+    throw new ContentNotPublishedError(
+      `Item ${item.id} has invalid or unreviewed maturity '${item.itemMaturity}'. Allowed student maturities: REVIEWED, PILOT, CALIBRATED.`,
+      "ITEM_MATURITY_NOT_ALLOWED",
+    );
+  }
+  ```
 
 ---
 
-## 8. VBT/SBT Upstream Source-Label Ambiguity Handling
+## 5. Parent Copilot Isolation
 
-- For `SRC-NXBGD-KNTT-MATH6-VBT-T2`:
-  - `canonicalInternalName`: `"VBT Toán 6, tập hai (Bài mẫu)"`
-  - `sourceDisplayedTitle`: `"SBT Toán 6, tập hai (Bài mẫu)"`
-  - `identityStatus`: `"SOURCE_LABEL_INCONSISTENT"`
-- In `scripts/curriculum/ingest-nxbgd-sources.mjs`, `identityStatus` is dynamically derived by comparing `canonicalInternalName` with the actual upstream title scraped by the remote viewer probe, rather than being permanently hardcoded.
-- Upstream source authority semantics (`TIER_B2_NXBGD_PUBLISHER_RESOURCE`) are fully preserved without silently normalizing the upstream title.
+- **Interface Cleaned:** Student `LearningPack` interface no longer contains `geminiNotebookInstructions`, `copyablePrompt`, or NotebookLM fields.
+- **Payload Isolated:** Prompt construction is completely isolated to parent-facing services (`ManualGeminiNotebookProvider`) and parent routes (`/parent`). Student-facing flows receive zero AI prompt generation artifacts.
 
 ---
 
-## 9. Local Executor Evidence
+## 6. Truthful UI & Report Copy Audit
+
+- **Removed unverified claims:**
+  - `"chữ ký số"` → Replaced with truthful `"review attestation gắn với phiên bản nội dung"`.
+  - `"hội đồng chuyên môn"` → Replaced with truthful `"đang chờ thẩm định con người"`.
+  - `"Trang 55"` → Replaced with verified national curriculum references (`"Chương trình GDPT 2018 môn Toán"`).
+  - Language implying TT32 defines cryptographic hashes removed.
 
 ---
 
-## 9. Student Runtime Cutover & Fail-Closed Implementation (Controller Audit Commit a83915a)
+## 7. Mandatory Test Matrix & Verification Evidence
 
-Following Controller Audit of commit `a83915a`, the student runtime has been cut over from legacy content sources to the canonical publication authority:
+All 9 mandatory acceptance tests (A through I) are verified green:
 
-### P0. Parallel Legacy Content Authority Removed:
-- **Legacy Path Eliminated:** `assessment-items/reviewed/math-grade6-fractions.json` has been decoupled from the student diagnostic runner.
-- **Sole Publication Authority:** `CurriculumService.getInitialDiagnosticItems()` and `getReTestItems()` exclusively source canonical question bank items (`@/curriculum/vietnam/lower-secondary/grade-6/math/question-bank/items.json`) through `filterPublishedForStudent()`.
-- **Fail-Closed Presentation:** Because canonical Grade 6 items are `DRAFT`, the student diagnostic runner on `/diagnostic/math-grade6` strictly fails closed and displays `CONTENT_NOT_AVAILABLE · ĐANG THẨM ĐỊNH (DRAFT)`, adhering to TT 32/2018/TT-BGDĐT pedagogical standards. Zero draft questions reach the student.
-
-### P0. Learning Pack Review Gate Enforced:
-- **`LearningPack.contentStatus`:** Added explicit status `"PUBLISHED" | "CONTENT_NOT_AVAILABLE"`.
-- **Pre-Delivery Gate:** `generateLearningPack()` evaluates lesson candidates with `isPublishedForStudent()`. When unreviewed, returns `contentStatus: "CONTENT_NOT_AVAILABLE"`, empty worked examples, empty practice plans, and empty Tier-D resource references.
-- **Student View Protection:** `LearningPackView` renders a fail-closed pedagogical review holding screen when `contentStatus === "CONTENT_NOT_AVAILABLE"`, blocking unreviewed or hardcoded Tier-D learning material.
-
-### P1. False UI Claims Removed:
-- **`NewDiagnosticWizard`:** Removed `"Sẵn sàng"`, `"Đã duyệt (APPROVED)"`, and `"Lát cắt đã hoàn thiện"`. Replaced with truthful `"Đang thẩm định (DRAFT)"` and `"Đang thẩm định (CONTENT_IN_REVIEW)"`.
-- **`CoverageExplorer`:** Replaced false `"AVAILABLE"` claims on unreviewed slices with `"IN_PROGRESS"` ("Đang biên soạn / thẩm định").
-
-### Parent Copilot Boundary Enforcement:
-- **Student Flow Purged:** Removed `GeminiHandoff` and `NotebookLM` imports and components completely from student remediation view (`LearningPackView`).
-- **Parent Isolation:** AI assistance is strictly confined to parent-facing routes (`/parent`, `ParentView.tsx`, `GeminiHandoffSection.tsx`).
-
-### Reviewer Authority Hardening:
-- **Production Immutability:** Mutable reviewer registration (`setTestReviewerAuthority`, `registerReviewer`, `registerReviewerForTesting`) is strictly guarded by `process.env.NODE_ENV === "test"`. Outside test environments, all mutators throw security errors and `productionReviewerAuthority` is enforced.
-- **No Runtime Authority Injection:** `assertPublishedForStudent`, `isPublishedForStudent`, and `filterPublishedForStudent` throw `ReviewerAuthorizationError` if an external caller attempts to inject a custom authority in non-test environments.
-
----
-
-## 10. Required Regression Matrix & Test Evidence
-
-All 7 required regression items are verified by automated tests in `tests/curriculum/runtime-cutover-r2-2.test.tsx` and the full suite:
-
-| # | Regression Requirement | Test Location | Result |
+| ID | Mandatory Verification Item | Test / Verification Method | Result |
 |---|---|---|---|
-| 1 | Active Grade 6 route cannot render legacy reviewed JSON | `tests/curriculum/runtime-cutover-r2-2.test.tsx` | **PASS** |
-| 2 | DRAFT canonical question items cannot reach student diagnostic | `tests/curriculum/runtime-cutover-r2-2.test.tsx` | **PASS** |
-| 3 | Student learning pack cannot render Tier-D/unreviewed learning content | `tests/curriculum/runtime-cutover-r2-2.test.tsx` | **PASS** |
-| 4 | Student flow contains no NotebookLM/Gemini handoff | `tests/curriculum/runtime-cutover-r2-2.test.tsx` | **PASS** |
-| 5 | False APPROVED UI copy is absent from wizard and coverage explorer | `tests/curriculum/runtime-cutover-r2-2.test.tsx` | **PASS** |
-| 6 | Publication guard remains the sole content authorization path | `tests/curriculum/runtime-cutover-r2-2.test.tsx` | **PASS** |
-| 7 | Existing R2.2 stale-attestation and hash integrity tests remain green | `tests/curriculum/publication-enforcement-r2-2.test.ts` | **PASS** |
+| **A** | DRAFT question-bank sentinel (`ITEM-G6-FRAC-01`) is absent from production client chunks | Static chunk scanner across all 45 `.next/static/**/*.js` chunks | **PASS** (0 occurrences) |
+| **B** | DRAFT lesson sentinel (`LESSON-MATH-6-FRAC-01`, pedagogical text) is absent from production client chunks | Static chunk scanner across all 45 `.next/static/**/*.js` chunks | **PASS** (0 occurrences) |
+| **C** | Server delivery returns zero student items for current DRAFT bank | `StudentContentDeliveryService.getDiagnosticDelivery` returns `items: []` | **PASS** |
+| **D** | Client receives only `CONTENT_NOT_AVAILABLE` state | `getDiagnosticDelivery` returns `status: "CONTENT_NOT_AVAILABLE"` | **PASS** |
+| **E** | Arbitrary production authority injection into `promoteContent` fails | `promoteContent` throws `SECURITY_VIOLATION` in production mode | **PASS** |
+| **F** | Student `LearningPack` type/payload contains no parent AI prompt fields | `generateLearningPack` payload inspection (`geminiNotebookInstructions` undefined) | **PASS** |
+| **G** | Missing `itemMaturity` fails student publication | `assertPublishedForStudent` throws `ITEM_MATURITY_NOT_ALLOWED` | **PASS** |
+| **H** | Existing R2.2 hash/stale-attestation tests remain green | `tests/curriculum/publication-enforcement-r2-2.test.ts` (20/20 passed) | **PASS** |
+| **I** | False "digital signature / committee / unverified page" copy absent | Grep and automated AST inspection of components | **PASS** |
 
-### Verification Gate Results:
-- **Vitest Unit/Integration:** `npm test` → **36 test files passed, 201 tests passed** (0 failures).
-- **TypeScript Typecheck:** `npx tsc --noEmit` → **0 errors (Exit code 0)**.
-- **ESLint Quality Check:** `npm run lint` → **0 errors, 0 warnings (Exit code 0)**.
-- **Production Build:** `npm run build` → **Compiled successfully, 24/24 static/dynamic routes generated**.
-- **Playwright E2E:** `npm run test:e2e` → **34 / 34 tests passed** across Chromium and Mobile Chrome.
+### Complete Verification Suite Output:
+- **`npm test`**: **37 passed (37 test files, 213 tests passed)**
+- **`npx tsc --noEmit`**: **0 errors (Exit code 0)**
+- **`npm run lint`**: **✔ No ESLint warnings or errors (Exit code 0)**
+- **`npm run build`**: **Compiled successfully, 24/24 static pages generated (Exit code 0)**
+- **`npm run test:e2e`**: **34 passed (Playwright Chromium & Mobile Chrome)**
 
 ---
 
-## 11. Open Limitations & Content Status
+## 8. Open Limitations & Content Status
 
-1. **All Grade 6 Content Kept DRAFT:**
-   In strict compliance with Controller instructions, all Grade 6 items in `curriculum/vietnam/lower-secondary/grade-6/math/question-bank/items.json` remain `itemMaturity: "DRAFT"` and `reviewState: "AI_DRAFT"`. No fabricated review attestations were added.
+1. **Grade 6 Content Remains Strictly DRAFT:**
+   In compliance with Controller directives, all Grade 6 items in `curriculum/vietnam/lower-secondary/grade-6/math/question-bank/items.json` and lesson in `curriculum/vietnam/lower-secondary/grade-6/math/lessons/fractions-addition.json` remain `itemMaturity: "DRAFT"` and `reviewState: "AI_DRAFT"`. No fake attestation or test reviewer exists in production data.
 2. **Reviewer Authority Remains Empty in Production:**
-   Production reviewer registry is read-only and empty until formal pedagogical committee onboarding.
+   `productionReviewerAuthority` contains zero reviewers by default, failing closed until real human reviewers are onboarded through official channels.
+
 

@@ -31,7 +31,8 @@ describe("Learning Pack & Re-test Mastery Cycle", () => {
     expect(pack.focusNodeId).toBe("NODE-MATH-6-FRAC-02");
     expect(pack.focusNodeLabel).toBe("Quy đồng mẫu số các phân số");
     expect(pack.curriculumSourceRefs[0].sourceId).toBe("SRC-VN-MOET-MATH-2018");
-    expect(pack.geminiNotebookInstructions.copyablePrompt).toContain("Bộ GD&ĐT");
+    // Student LearningPack is isolated from parent AI prompt fields
+    expect((pack as any).geminiNotebookInstructions).toBeUndefined();
     // Under R2.2 publication gate, unreviewed learning content cannot be exposed to students
     expect(pack.contentStatus).toBe("CONTENT_NOT_AVAILABLE");
     expect(pack.workedExamplePlan.length).toBe(0);
@@ -91,7 +92,8 @@ describe("Learning Pack & Re-test Mastery Cycle", () => {
 
     expect(guide.notebookUrl).toBe("https://notebooklm.google.com/");
     expect(guide.stepByStepGuide.length).toBe(5);
-    expect(guide.suggestedPrompt).toBe(pack.geminiNotebookInstructions.copyablePrompt);
+    expect(guide.suggestedPrompt).toContain("Bộ GD&ĐT");
+    expect((pack as any).copyablePrompt).toBeUndefined();
   });
 
   it("transitions mastery from DEVELOPING to SECURE when re-test passes", () => {

@@ -13,6 +13,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      "server-only": path.resolve(__dirname, "./node_modules/server-only/empty.js"),
       "@": path.resolve(__dirname, "./"),
       "@/src": path.resolve(__dirname, "./src"),
       "@/components": path.resolve(__dirname, "./components"),

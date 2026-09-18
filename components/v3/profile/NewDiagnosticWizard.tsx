@@ -212,7 +212,7 @@ export function NewDiagnosticWizard() {
             Chọn chủ đề kiến thức mục tiêu
           </h2>
           <p className="text-xs text-slate-500">
-            Chủ đề được neo trực tiếp vào văn bản quy chuẩn môn Toán Lớp 6 (Trang 55, TT 32/2018).
+            Chủ đề đối chiếu Chương trình GDPT hiện hành môn Toán Lớp 6 (Thông tư 32/2018/TT-BGDĐT).
           </p>
 
           <div className="space-y-3 pt-2">

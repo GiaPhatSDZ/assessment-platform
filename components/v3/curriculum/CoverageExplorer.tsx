@@ -19,7 +19,7 @@ const COVERAGE_DATA: CoverageItem[] = [
     grade: "Lớp 6 (THCS)",
     subject: "Toán học",
     topic: "Cộng, trừ hai phân số không cùng mẫu số",
-    sourceDoc: "TT 32/2018/TT-BGDĐT (Trang 55)",
+    sourceDoc: "TT 32/2018/TT-BGDĐT (Mục IV, Môn Toán Lớp 6)",
     status: "IN_PROGRESS",
     link: "/diagnostic/math-grade6",
     notes: "Đồ thị 4 nút tri thức tiên quyết; câu hỏi chẩn đoán và học liệu đang trong tiến trình thẩm định sư phạm (DRAFT).",

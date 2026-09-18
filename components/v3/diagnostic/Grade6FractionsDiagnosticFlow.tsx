@@ -17,10 +17,22 @@ import { MathText } from "@/components/math/MathText";
 
 type FlowPhase = "DIAGNOSTIC" | "GAP_REPORT" | "LEARNING_PACK" | "RETEST";
 
-export function Grade6FractionsDiagnosticFlow() {
+export interface Grade6FractionsDiagnosticFlowProps {
+  delivery?: {
+    status: "PUBLISHED" | "CONTENT_NOT_AVAILABLE";
+    topicId?: string;
+    topicTitle?: string;
+    items: any[];
+    reTestItems?: any[];
+    reason?: string;
+  };
+}
+
+export function Grade6FractionsDiagnosticFlow({ delivery }: Grade6FractionsDiagnosticFlowProps = {}) {
   const graph = CurriculumService.getFractionsKnowledgeGraph();
-  const initialItems = CurriculumService.getInitialDiagnosticItems();
-  const reTestItems = CurriculumService.getReTestItems();
+  const initialItems = delivery ? delivery.items : CurriculumService.getInitialDiagnosticItems();
+  const reTestItems = delivery?.reTestItems || CurriculumService.getReTestItems();
+  const isAvailable = delivery ? delivery.status === "PUBLISHED" && initialItems.length > 0 : initialItems.length > 0;
 
   const [phase, setPhase] = useState<FlowPhase>("DIAGNOSTIC");
   const [sessionNodeStates, setSessionNodeStates] = useState<Record<string, NodeMasteryState>>({});
@@ -28,7 +40,7 @@ export function Grade6FractionsDiagnosticFlow() {
   const [learningPack, setLearningPack] = useState<LearningPack | null>(null);
 
   // Fail-closed gate: When items are unreviewed/DRAFT, fail closed to CONTENT_NOT_AVAILABLE
-  if (initialItems.length === 0) {
+  if (!isAvailable) {
     return (
       <AppShell mode="FOCUS" focusTitle="Toán Lớp 6 · Trạng thái thẩm định học liệu" focusExitHref="/learn">
         <div data-testid="content-not-available" className="mx-auto w-full max-w-diagnostic space-y-8 animate-fadeIn py-8">
@@ -48,7 +60,7 @@ export function Grade6FractionsDiagnosticFlow() {
                 <MathText text="Chủ đề chẩn đoán: Phép cộng phân số $\frac{a}{m} + \frac{b}{n}$ (Toán Lớp 6)" />
               </div>
               <p className="text-sm text-ink-muted leading-relaxed font-normal">
-                Toàn bộ câu hỏi chẩn đoán môn Toán Lớp 6 (Chủ đề: Phép cộng phân số khác mẫu số) hiện ở trạng thái <strong className="font-semibold text-ink">DRAFT</strong> và đang chờ biên bản thẩm định độc lập từ hội đồng chuyên môn theo Chương trình GDPT 2018 (Thông tư 32/2018/TT-BGDĐT).
+                Toàn bộ câu hỏi chẩn đoán môn Toán Lớp 6 (Chủ đề: Phép cộng phân số khác mẫu số) hiện ở trạng thái <strong className="font-semibold text-ink">DRAFT</strong> và đang chờ thẩm định con người theo quy chuẩn review attestation gắn với phiên bản nội dung, đối chiếu Chương trình GDPT hiện hành.
               </p>
             </div>
 
@@ -59,7 +71,7 @@ export function Grade6FractionsDiagnosticFlow() {
               </div>
               <ul className="space-y-2 text-ink-muted list-disc list-inside">
                 <li>
-                  <strong className="text-ink">Không phục vụ câu hỏi chưa kiểm duyệt:</strong> Hệ thống tự động đóng phòng thi khi chưa có chữ ký số xác thực từ chuyên gia sư phạm.
+                  <strong className="text-ink">Không phục vụ câu hỏi chưa kiểm duyệt:</strong> Hệ thống tự động đóng phòng thi khi chưa có review attestation hợp lệ từ người thẩm định được ủy quyền.
                 </li>
                 <li>
                   <strong className="text-ink">Nghiêm cấm AI tạo sinh tùy tiện:</strong> Không dùng Generative AI để tự bịa câu hỏi hay giả lập đánh giá năng lực học sinh.

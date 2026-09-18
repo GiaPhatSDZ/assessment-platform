@@ -138,11 +138,12 @@ describe("V3 Evidence-First Vertical Slice (End-to-End Integration)", () => {
     expect(learningPack.contentStatus).toBe("CONTENT_NOT_AVAILABLE");
     expect(learningPack.workedExamplePlan).toEqual([]);
     expect(learningPack.learningResourceRefs).toEqual([]);
-    expect(learningPack.geminiNotebookInstructions.copyablePrompt).toContain("Bộ GD&ĐT");
+    expect((learningPack as any).geminiNotebookInstructions).toBeUndefined();
 
     const manualGuide = ManualGeminiNotebookProvider.getRemediationGuide(learningPack);
     expect(manualGuide.notebookUrl).toBe("https://notebooklm.google.com/");
     expect(manualGuide.stepByStepGuide).toHaveLength(5);
+    expect(manualGuide.suggestedPrompt).toContain("Bộ GD&ĐT");
 
     // 7. Student Completes Remediation & Takes Parallel Re-Test
     const sampleReTestItems = [

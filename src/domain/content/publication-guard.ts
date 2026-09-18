@@ -81,6 +81,19 @@ function deriveExpectedScope(item: Record<string, unknown>): string {
   return "QUESTION_ITEM";
 }
 
+function resolvePromotionAuthority(authority?: ReviewerAuthority): ReviewerAuthority {
+  if (process.env.NODE_ENV === "test") {
+    return authority ?? getEffectiveReviewerAuthority();
+  }
+  // In production (NODE_ENV !== "test"), promotion paths must ONLY use the trusted productionReviewerAuthority.
+  if (authority && authority !== getEffectiveReviewerAuthority()) {
+    throw new ReviewerAuthorizationError(
+      "SECURITY_VIOLATION: Arbitrary runtime authority injection is strictly forbidden in content promotion paths."
+    );
+  }
+  return getEffectiveReviewerAuthority();
+}
+
 /**
  * Promotion gate: The sole authorized path to promote content from draft states to reviewed states.
  * Computes canonicalContentHash internally; verifies trusted human reviewer authority,
@@ -98,8 +111,10 @@ export function promoteContent<
   item: T,
   targetState: ReviewState,
   attestation: ReviewAttestation,
-  authority: ReviewerAuthority = getEffectiveReviewerAuthority()
+  authority?: ReviewerAuthority
 ): T {
+  const effectiveAuthority = resolvePromotionAuthority(authority);
+
   if (!attestation.reviewerId || attestation.reviewerId.trim() === "") {
     throw new SelfPromotionForbiddenError("Review attestation must include non-empty reviewerId.");
   }
@@ -146,7 +161,7 @@ export function promoteContent<
 
   // 4. Trusted reviewer authority verification
   try {
-    authority.assertTrustedReviewer(attestation.reviewerId, attestation.role as ReviewerRole);
+    effectiveAuthority.assertTrustedReviewer(attestation.reviewerId, attestation.role as ReviewerRole);
   } catch (err: any) {
     throw new SelfPromotionForbiddenError(err.message);
   }
@@ -191,7 +206,7 @@ function resolveStudentAuthority(authority?: ReviewerAuthority): ReviewerAuthori
  * Throws ContentNotPublishedError if:
  * - publicationState is not PUBLISHED_BETA or PUBLISHED_VERIFIED
  * - reviewState is not an approved human review state
- * - itemMaturity is 'DRAFT'
+ * - itemMaturity is missing, DRAFT, or not in ALLOWED_STUDENT_MATURITY_STATES
  * - any authoringOrigin (HUMAN, AI_ASSISTED, ADAPTED_WITH_PERMISSION) lacks a valid,
  *   approved review attestation from a trusted, controller-verified human reviewer
  * - canonical hash has diverged since attestation (REVIEW_ATTESTATION_STALE)
@@ -224,19 +239,12 @@ export function assertPublishedForStudent(
     );
   }
 
-  // 3. Item Maturity Check (DRAFT is strictly rejected)
-  if (item.itemMaturity === "DRAFT") {
+  // 3. Item Maturity Check (Missing, undefined, or DRAFT is strictly rejected)
+  if (!item.itemMaturity || item.itemMaturity === "DRAFT" || !ALLOWED_STUDENT_MATURITY_STATES.has(item.itemMaturity)) {
     throw new ContentNotPublishedError(
       item.id,
       item.publicationState,
-      `CONTENT_NOT_AVAILABLE: Item '${item.id}' has unreviewed maturity 'DRAFT' and cannot enter student runtime.`
-    );
-  }
-  if (item.itemMaturity && !ALLOWED_STUDENT_MATURITY_STATES.has(item.itemMaturity)) {
-    throw new ContentNotPublishedError(
-      item.id,
-      item.publicationState,
-      `CONTENT_NOT_AVAILABLE: Item '${item.id}' has unapproved maturity '${item.itemMaturity}' for student delivery.`
+      `CONTENT_NOT_AVAILABLE: Content item '${item.id}' has missing or unreviewed maturity '${item.itemMaturity || "MISSING"}'. Student delivery strictly requires explicit maturity: ${Array.from(ALLOWED_STUDENT_MATURITY_STATES).join(", ")}.`
     );
   }
 

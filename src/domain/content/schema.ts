@@ -270,6 +270,7 @@ export interface Lesson {
   approvedSourceRefs: SourceRef[];
   ageOrGradeFit?: string[];
   authoringOrigin?: "HUMAN" | "AI_ASSISTED" | "ADAPTED_WITH_PERMISSION";
+  itemMaturity?: "DRAFT" | "REVIEWED" | "PILOT" | "CALIBRATED";
   reviewState: ReviewState;
   publicationState: PublicationState;
   version: string;
@@ -322,6 +323,7 @@ export interface Explanation {
   stepByStep: RichContent[];
   commonMistakeExplanation?: RichContent[];
   sourceRefs: SourceRef[];
+  itemMaturity?: "DRAFT" | "REVIEWED" | "PILOT" | "CALIBRATED";
   reviewState: ReviewState;
   publicationState: PublicationState;
 }

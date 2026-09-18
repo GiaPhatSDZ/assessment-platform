@@ -1,6 +1,5 @@
 import { SourceReference } from "../curriculum/types";
 import { GapReport } from "../diagnostic/gap-engine";
-import canonicalLessonData from "@/curriculum/vietnam/lower-secondary/grade-6/math/lessons/fractions-addition.json";
 import { isPublishedForStudent } from "../content/publication-guard";
 
 export interface LearningResourceRef {
@@ -28,11 +27,6 @@ export interface LearningPack {
   learnerGuide: string;
   workedExamplePlan: string[];
   practicePlan: string[];
-  geminiNotebookInstructions: {
-    suggestedTitle: string;
-    suggestedSources: string[];
-    copyablePrompt: string;
-  };
   reTestCriteria: string[];
   version: string;
   generatedAt: string;
@@ -73,10 +67,8 @@ export function generateLearningPack(gap: GapReport, lessonOverride?: any): Lear
   const focusNodeId = (isPrereqGap && gap.rootPrerequisiteNodeId) ? gap.rootPrerequisiteNodeId : gap.targetNodeId;
   const focusNodeLabel = (isPrereqGap && gap.rootPrerequisiteNodeLabel) ? gap.rootPrerequisiteNodeLabel : gap.targetNodeLabel;
 
-  // Resolve candidate lesson for the focus node
-  const candidateLesson = lessonOverride ?? (
-    canonicalLessonData.nodeIds.includes(focusNodeId) ? canonicalLessonData : null
-  );
+  // Resolve candidate lesson (supplied ONLY after server-side publication authorization or explicit test injection)
+  const candidateLesson = lessonOverride ?? null;
 
   // Publication gate check
   const isLessonPublished = candidateLesson ? isPublishedForStudent(candidateLesson) : false;
@@ -112,7 +104,7 @@ export function generateLearningPack(gap: GapReport, lessonOverride?: any): Lear
     : `Luyện tập thành thạo quy tắc và kỹ năng thực hiện '${gap.targetNodeLabel}'.`;
 
   const parentGuide = isPrereqGap
-    ? `Ba mẹ không cần phải tự dạy lại bài toán từ đầu. Điểm mấu chốt: Con đang vướng ở bước '${focusNodeLabel}' (chưa tìm đúng mẫu số chung nhỏ nhất). Phụ huynh có thể tham khảo Trợ lý Phụ huynh (Parent Copilot) để nhận bộ câu hỏi gợi ý phương pháp đồng hành cùng con mà không làm thay con.`
+    ? `Ba mẹ không cần phải tự dạy lại bài toán từ đầu. Điểm mấu chốt: Con đang vướng ở bước '${focusNodeLabel}' (chưa tìm đúng mẫu số chung nhỏ nhất). Phụ huynh có thể tham khảo Trợ lý Phụ huynh (Parent Copilot) để nhận bộ câu hỏi gợi mở phương pháp đồng hành cùng con mà không làm thay con.`
     : `Con đã nắm vững các bước quy đồng mẫu số. Ba mẹ chỉ cần nhắc con kiểm tra lại khâu tính toán nhẩm và rút gọn phân số sau khi cộng.`;
 
   // Student-facing text & plans: Empty when unreviewed
@@ -130,14 +122,6 @@ export function generateLearningPack(gap: GapReport, lessonOverride?: any): Lear
         "Bài tự luyện 2: Rút gọn phân số kết quả về dạng tối giản.",
       ]
     : [];
-
-  const geminiNotebookPrompt = `Bạn là trợ lý sư phạm dành riêng cho phụ huynh/người giám hộ học sinh bám sát Chương trình GDPT 2018 Bộ GD&ĐT Việt Nam.
-Mục tiêu: Hỗ trợ phụ huynh phương pháp đồng hành cùng con củng cố mắt xích kiến thức: "${focusNodeLabel}".
-Quy tắc sư phạm:
-1. Chỉ dựa trên tài liệu học tập chuẩn được cung cấp trong notebook này.
-2. Không giải bài hộ học sinh. Hướng dẫn phụ huynh đặt câu hỏi gợi mở cho con: "Để cộng được hai phân số này, bước đầu tiên con cần làm gì với hai mẫu số?".
-3. Gợi ý ví dụ trực quan đời thường (như chia bánh, chia cốc nước) để phụ huynh giúp con cảm nhận bản chất quy đồng trước khi áp dụng công thức.
-4. Ngôn từ ấm áp, rõ ràng, hỗ trợ phụ huynh kiên nhẫn đồng hành cùng con.`;
 
   const reTestCriteria = [
     "Thực hiện bài toán tìm BCNN của hai mẫu số đúng quy trình.",
@@ -161,14 +145,6 @@ Quy tắc sư phạm:
     learnerGuide,
     workedExamplePlan,
     practicePlan,
-    geminiNotebookInstructions: {
-      suggestedTitle: `Sổ Đồng Hành Phụ Huynh Toán 6 — Hỗ Trợ: ${focusNodeLabel}`,
-      suggestedSources: [
-        "Trích lục Chương trình GDPT 2018 Môn Toán (Bộ GD&ĐT)",
-        "Tài liệu hướng dẫn quy đồng mẫu số và tìm BCNN",
-      ],
-      copyablePrompt: geminiNotebookPrompt,
-    },
     reTestCriteria,
     version: LEARNING_PACK_VERSION,
     generatedAt: new Date().toISOString(),
