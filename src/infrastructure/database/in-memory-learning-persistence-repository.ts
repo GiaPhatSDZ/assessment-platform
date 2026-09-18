@@ -29,6 +29,11 @@ import {
   validateLearnerStageConstraints,
   validateStudentResponse,
   validateNodeStateCounts,
+  validateNodeStateConsistency,
+  sessionKindToEvidenceType,
+  sessionKindToMasteryReason,
+  EvidenceSemanticMismatchError,
+  MasterySemanticMismatchError,
 } from "../../domain/learning-persistence/types";
 import { hashVisitorToken, verifyVisitorTokenOwnership } from "../auth/anonymous-visitor";
 
@@ -115,20 +120,26 @@ export class InMemoryLearningPersistenceRepository implements LearningPersistenc
       throw new UnauthorizedLearnerAccessError(`Learner '${learnerId}' not found.`);
     }
 
-    // A4: Guardian claim must bind guardianUserId to authenticated ownership.userId OR require verified current visitor ownership
-    const hasVisitorOwnership = !!ownership.visitorToken && verifyVisitorTokenOwnership(ownership.visitorToken, learner.visitorOwnerHash);
-    const hasMatchingUserId = ownership.userId === guardianUserId;
-
-    if (!hasVisitorOwnership && !hasMatchingUserId) {
-      throw new UnauthorizedLearnerAccessError("Guardian claim requires verified current visitor ownership or matching authenticated userId.");
-    }
-
-    // If userId provided, it must match guardianUserId
-    if (ownership.userId && ownership.userId !== guardianUserId) {
-      throw new UnauthorizedLearnerAccessError("Authenticated userId must match guardianUserId.");
-    }
-
     const relKey = `${guardianUserId}:${learnerId}`;
+
+    // P0-1: If identical relationship already exists, authenticated guardian may treat as idempotent success
+    if (this.guardianRelationships.has(relKey) && ownership.userId === guardianUserId) {
+      return true;
+    }
+
+    // P0-1: Initial binding MUST satisfy all 4 conditions:
+    // 1. ownership.userId exists
+    // 2. ownership.userId === guardianUserId
+    // 3. ownership.visitorToken exists
+    // 4. visitor token verifies against learner.visitor_owner_hash
+    if (!ownership.userId || ownership.userId !== guardianUserId) {
+      throw new UnauthorizedLearnerAccessError("Guardian claim requires authenticated userId matching guardianUserId.");
+    }
+
+    if (!ownership.visitorToken || !verifyVisitorTokenOwnership(ownership.visitorToken, learner.visitorOwnerHash)) {
+      throw new UnauthorizedLearnerAccessError("Guardian claim requires verified current visitor ownership of the learner profile.");
+    }
+
     this.guardianRelationships.set(relKey, {
       learnerId,
       guardianUserId,
@@ -211,6 +222,14 @@ export class InMemoryLearningPersistenceRepository implements LearningPersistenc
   async appendKnowledgeEvidence(evidence: AppendEvidenceParams, ownership: OwnershipContext): Promise<KnowledgeEvidenceRecord> {
     this.assertLearnerOwnership(evidence.learnerId, ownership);
 
+    // A1 & A9: Verify session belongs to learner
+    const session = this.sessions.get(evidence.sessionId);
+    if (!session || session.learnerId !== evidence.learnerId) {
+      throw new OwnershipChainMismatchError(
+        `Session '${evidence.sessionId}' does not belong to learner '${evidence.learnerId}'.`
+      );
+    }
+
     // A1 & A9: Verify attempt belongs to this learner and session
     const attempt = this.attempts.get(evidence.attemptId);
     if (!attempt || attempt.learnerId !== evidence.learnerId || attempt.sessionId !== evidence.sessionId) {
@@ -220,6 +239,25 @@ export class InMemoryLearningPersistenceRepository implements LearningPersistenc
     }
 
     validateEvidenceType(evidence.evidenceType);
+
+    // P1-1: Semantic integrity checks
+    if (evidence.nodeId !== attempt.primaryNodeId) {
+      throw new EvidenceSemanticMismatchError(
+        `evidence.nodeId '${evidence.nodeId}' does not match attempt.primaryNodeId '${attempt.primaryNodeId}'.`
+      );
+    }
+    const expectedOutcome = attempt.isCorrect ? "CORRECT" : "INCORRECT";
+    if (evidence.outcome !== expectedOutcome) {
+      throw new EvidenceSemanticMismatchError(
+        `evidence.outcome '${evidence.outcome}' does not match attempt.isCorrect (${attempt.isCorrect} -> '${expectedOutcome}').`
+      );
+    }
+    const expectedEvidenceType = sessionKindToEvidenceType(session.sessionKind);
+    if (evidence.evidenceType !== expectedEvidenceType) {
+      throw new EvidenceSemanticMismatchError(
+        `evidence.evidenceType '${evidence.evidenceType}' does not match session.sessionKind '${session.sessionKind}' -> '${expectedEvidenceType}'.`
+      );
+    }
 
     const now = evidence.observedAt || new Date().toISOString();
     const id = crypto.randomUUID();
@@ -243,11 +281,8 @@ export class InMemoryLearningPersistenceRepository implements LearningPersistenc
   async upsertNodeState(state: UpsertNodeStateParams, ownership: OwnershipContext): Promise<KnowledgeNodeStateRecord> {
     this.assertLearnerOwnership(state.learnerId, ownership);
 
-    // A3: Count checks and nullable lastAssessedAt for NOT_ASSESSED
-    validateNodeStateCounts(state.attemptsCount, state.correctCount);
-    if (state.state !== "NOT_ASSESSED" && !state.lastAssessedAt) {
-      throw new Error(`State '${state.state}' requires lastAssessedAt.`);
-    }
+    // P1-3: Strengthen NOT_ASSESSED consistency
+    validateNodeStateConsistency(state.state, state.attemptsCount, state.correctCount, state.lastAssessedAt);
 
     const key = `${state.learnerId}:${state.nodeId}`;
     const now = new Date().toISOString();
@@ -260,7 +295,7 @@ export class InMemoryLearningPersistenceRepository implements LearningPersistenc
       attemptsCount: state.attemptsCount,
       correctCount: state.correctCount,
       misconceptionTags: state.misconceptionTags ?? [],
-      lastAssessedAt: state.state === "NOT_ASSESSED" ? (state.lastAssessedAt ?? null) : (state.lastAssessedAt || now),
+      lastAssessedAt: state.state === "NOT_ASSESSED" ? null : (state.lastAssessedAt || now),
       ruleVersion: state.ruleVersion,
       updatedAt: now,
     };
@@ -280,6 +315,14 @@ export class InMemoryLearningPersistenceRepository implements LearningPersistenc
     if (!session || session.learnerId !== transition.learnerId) {
       throw new OwnershipChainMismatchError(
         `Trigger session '${transition.triggerSessionId}' does not belong to learner '${transition.learnerId}'.`
+      );
+    }
+
+    // P1-4: Semantic integrity check between trigger session kind and reasonCode
+    const expectedReasonCode = sessionKindToMasteryReason(session.sessionKind);
+    if (transition.reasonCode !== expectedReasonCode) {
+      throw new MasterySemanticMismatchError(
+        `transition.reasonCode '${transition.reasonCode}' does not match trigger session.sessionKind '${session.sessionKind}' -> '${expectedReasonCode}'.`
       );
     }
 

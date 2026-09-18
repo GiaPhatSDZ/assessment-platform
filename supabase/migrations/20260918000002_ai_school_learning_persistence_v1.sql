@@ -136,7 +136,8 @@ CREATE TABLE IF NOT EXISTS public.knowledge_node_states (
   PRIMARY KEY (learner_id, node_id),
   CONSTRAINT chk_node_states_counts CHECK (correct_count <= attempts_count),
   CONSTRAINT chk_node_states_last_assessed CHECK (
-    (state = 'NOT_ASSESSED') OR (last_assessed_at IS NOT NULL)
+    (state = 'NOT_ASSESSED' AND attempts_count = 0 AND correct_count = 0 AND last_assessed_at IS NULL) OR
+    (state != 'NOT_ASSESSED' AND last_assessed_at IS NOT NULL)
   )
 );
 

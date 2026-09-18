@@ -243,6 +243,27 @@ export class OwnershipChainMismatchError extends Error {
   }
 }
 
+export class EvidenceSemanticMismatchError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "EvidenceSemanticMismatchError";
+  }
+}
+
+export class MasterySemanticMismatchError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "MasterySemanticMismatchError";
+  }
+}
+
+export class NodeStateConsistencyError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "NodeStateConsistencyError";
+  }
+}
+
 export class DatabasePersistenceError extends Error {
   constructor(message: string, public readonly originalError?: unknown) {
     super(message);
@@ -251,7 +272,8 @@ export class DatabasePersistenceError extends Error {
 }
 
 // Invariant Validation Helpers
-const SHA256_REGEX = /^[a-f0-9]{64}$/i;
+// P1-2: DB accepts lowercase SHA-256 only (^[a-f0-9]{64}$)
+const SHA256_REGEX = /^[a-f0-9]{64}$/;
 
 export function validateItemContentHash(hash: string): void {
   if (!hash || typeof hash !== "string" || !SHA256_REGEX.test(hash)) {
@@ -327,9 +349,59 @@ export function validateStudentResponse(response: any): asserts response is Stud
 
 export function validateNodeStateCounts(attemptsCount: number, correctCount: number): void {
   if (attemptsCount < 0 || correctCount < 0) {
-    throw new Error("attempts_count and correct_count must be non-negative.");
+    throw new NodeStateConsistencyError("attempts_count and correct_count must be non-negative.");
   }
   if (correctCount > attemptsCount) {
-    throw new Error(`correct_count (${correctCount}) cannot exceed attempts_count (${attemptsCount}).`);
+    throw new NodeStateConsistencyError(`correct_count (${correctCount}) cannot exceed attempts_count (${attemptsCount}).`);
+  }
+}
+
+// P1-3: Strengthen NOT_ASSESSED consistency
+export function validateNodeStateConsistency(
+  state: KnowledgeState,
+  attemptsCount: number,
+  correctCount: number,
+  lastAssessedAt?: string | null
+): void {
+  validateNodeStateCounts(attemptsCount, correctCount);
+
+  if (state === "NOT_ASSESSED") {
+    if (attemptsCount !== 0 || correctCount !== 0 || (lastAssessedAt != null && lastAssessedAt !== "")) {
+      throw new NodeStateConsistencyError(
+        "NOT_ASSESSED state requires attempts_count = 0, correct_count = 0, and last_assessed_at IS NULL."
+      );
+    }
+  } else {
+    if (!lastAssessedAt) {
+      throw new NodeStateConsistencyError(`State '${state}' requires last_assessed_at to be non-null.`);
+    }
+  }
+}
+
+// P1-1: Map session kind to expected evidence type
+export function sessionKindToEvidenceType(sessionKind: SessionKind): EvidenceType {
+  switch (sessionKind) {
+    case "DIAGNOSTIC":
+      return "DIAGNOSTIC_ATTEMPT";
+    case "PRACTICE":
+      return "PRACTICE_ATTEMPT";
+    case "RETEST":
+      return "RETEST_ATTEMPT";
+    default:
+      throw new EvidenceSemanticMismatchError(`Unknown session kind '${sessionKind}'.`);
+  }
+}
+
+// P1-4: Map session kind to expected mastery reason code
+export function sessionKindToMasteryReason(sessionKind: SessionKind): MasteryReasonCode {
+  switch (sessionKind) {
+    case "DIAGNOSTIC":
+      return "DIAGNOSTIC_EVALUATION";
+    case "PRACTICE":
+      return "PRACTICE_EVALUATION";
+    case "RETEST":
+      return "RETEST_EVALUATION";
+    default:
+      throw new MasterySemanticMismatchError(`Unknown session kind '${sessionKind}'.`);
   }
 }

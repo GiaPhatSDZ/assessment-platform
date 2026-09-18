@@ -36,7 +36,11 @@ import {
   validateEvidenceType,
   validateLearnerStageConstraints,
   validateStudentResponse,
-  validateNodeStateCounts,
+  validateNodeStateConsistency,
+  sessionKindToEvidenceType,
+  sessionKindToMasteryReason,
+  EvidenceSemanticMismatchError,
+  MasterySemanticMismatchError,
 } from "../../domain/learning-persistence/types";
 import { hashVisitorToken, verifyVisitorTokenOwnership } from "../auth/anonymous-visitor";
 import { getSupabaseAdminClient, isSupabaseAdminConfigured } from "./supabase-server";
@@ -202,17 +206,34 @@ export class SupabaseLearningPersistenceRepository implements LearningPersistenc
       throw new UnauthorizedLearnerAccessError(`Learner '${learnerId}' not found.`);
     }
 
-    // A4: Guardian claim must bind guardianUserId to authenticated ownership.userId OR require verified current visitor ownership
-    const hasVisitorOwnership =
-      !!ownership.visitorToken && verifyVisitorTokenOwnership(ownership.visitorToken, learnerData.visitor_owner_hash);
-    const hasMatchingUserId = ownership.userId === guardianUserId;
+    // P0-1: If identical relationship already exists, authenticated guardian may treat as idempotent success
+    if (ownership.userId && ownership.userId === guardianUserId) {
+      const { data: existingRel, error: relError } = await this.client
+        .from("guardian_learner_relationships")
+        .select("learner_id")
+        .eq("guardian_user_id", guardianUserId)
+        .eq("learner_id", learnerId)
+        .maybeSingle();
 
-    if (!hasVisitorOwnership && !hasMatchingUserId) {
-      throw new UnauthorizedLearnerAccessError("Guardian claim requires verified current visitor ownership or matching authenticated userId.");
+      if (relError) {
+        throw new DatabasePersistenceError(`Database error checking existing guardian relationship: ${relError.message}`, relError);
+      }
+      if (existingRel) {
+        return true;
+      }
     }
 
-    if (ownership.userId && ownership.userId !== guardianUserId) {
-      throw new UnauthorizedLearnerAccessError("Authenticated userId must match guardianUserId.");
+    // P0-1: Initial anonymous learner -> guardian binding MUST satisfy all 4 conditions:
+    // 1. ownership.userId exists
+    // 2. ownership.userId === guardianUserId
+    // 3. ownership.visitorToken exists
+    // 4. visitor token verifies against learner.visitor_owner_hash
+    if (!ownership.userId || ownership.userId !== guardianUserId) {
+      throw new UnauthorizedLearnerAccessError("Guardian claim requires authenticated userId matching guardianUserId.");
+    }
+
+    if (!ownership.visitorToken || !verifyVisitorTokenOwnership(ownership.visitorToken, learnerData.visitor_owner_hash)) {
+      throw new UnauthorizedLearnerAccessError("Guardian claim requires verified current visitor ownership of the learner profile.");
     }
 
     const { error: insertError } = await this.client
@@ -363,10 +384,26 @@ export class SupabaseLearningPersistenceRepository implements LearningPersistenc
   async appendKnowledgeEvidence(evidence: AppendEvidenceParams, ownership: OwnershipContext): Promise<KnowledgeEvidenceRecord> {
     await this.assertLearnerOwnership(evidence.learnerId, ownership);
 
+    // A1 & A9: Verify session belongs to this learner
+    const { data: sessionData, error: sessionError } = await this.client
+      .from("learning_sessions")
+      .select("learner_id, session_kind")
+      .eq("id", evidence.sessionId)
+      .maybeSingle();
+
+    if (sessionError) {
+      throw new DatabasePersistenceError(`Database error verifying session: ${sessionError.message}`, sessionError);
+    }
+    if (!sessionData || sessionData.learner_id !== evidence.learnerId) {
+      throw new OwnershipChainMismatchError(
+        `Session '${evidence.sessionId}' does not belong to learner '${evidence.learnerId}'.`
+      );
+    }
+
     // A1 & A9: Verify attempt belongs to this session and learner
     const { data: attemptData, error: attemptError } = await this.client
       .from("learning_attempts")
-      .select("session_id, learner_id")
+      .select("session_id, learner_id, primary_node_id, is_correct")
       .eq("id", evidence.attemptId)
       .maybeSingle();
 
@@ -384,6 +421,25 @@ export class SupabaseLearningPersistenceRepository implements LearningPersistenc
     }
 
     validateEvidenceType(evidence.evidenceType);
+
+    // P1-1: Semantic integrity checks
+    if (evidence.nodeId !== attemptData.primary_node_id) {
+      throw new EvidenceSemanticMismatchError(
+        `evidence.nodeId '${evidence.nodeId}' does not match attempt.primaryNodeId '${attemptData.primary_node_id}'.`
+      );
+    }
+    const expectedOutcome = attemptData.is_correct ? "CORRECT" : "INCORRECT";
+    if (evidence.outcome !== expectedOutcome) {
+      throw new EvidenceSemanticMismatchError(
+        `evidence.outcome '${evidence.outcome}' does not match attempt.isCorrect (${attemptData.is_correct} -> '${expectedOutcome}').`
+      );
+    }
+    const expectedEvidenceType = sessionKindToEvidenceType(sessionData.session_kind);
+    if (evidence.evidenceType !== expectedEvidenceType) {
+      throw new EvidenceSemanticMismatchError(
+        `evidence.evidenceType '${evidence.evidenceType}' does not match session.sessionKind '${sessionData.session_kind}' -> '${expectedEvidenceType}'.`
+      );
+    }
 
     const { data, error } = await this.client
       .from("knowledge_evidence")
@@ -420,10 +476,8 @@ export class SupabaseLearningPersistenceRepository implements LearningPersistenc
   async upsertNodeState(state: UpsertNodeStateParams, ownership: OwnershipContext): Promise<KnowledgeNodeStateRecord> {
     await this.assertLearnerOwnership(state.learnerId, ownership);
 
-    validateNodeStateCounts(state.attemptsCount, state.correctCount);
-    if (state.state !== "NOT_ASSESSED" && !state.lastAssessedAt) {
-      throw new Error(`State '${state.state}' requires lastAssessedAt.`);
-    }
+    // P1-3: Strengthen NOT_ASSESSED consistency
+    validateNodeStateConsistency(state.state, state.attemptsCount, state.correctCount, state.lastAssessedAt);
 
     const { data, error } = await this.client
       .from("knowledge_node_states")
@@ -435,7 +489,7 @@ export class SupabaseLearningPersistenceRepository implements LearningPersistenc
         attempts_count: state.attemptsCount,
         correct_count: state.correctCount,
         misconception_tags: state.misconceptionTags ?? [],
-        lastAssessedAt: state.state === "NOT_ASSESSED" ? (state.lastAssessedAt ?? null) : (state.lastAssessedAt || new Date().toISOString()),
+        last_assessed_at: state.state === "NOT_ASSESSED" ? null : (state.lastAssessedAt || new Date().toISOString()),
         rule_version: state.ruleVersion,
         updated_at: new Date().toISOString(),
       })
@@ -469,7 +523,7 @@ export class SupabaseLearningPersistenceRepository implements LearningPersistenc
     // A1 & A9: Verify trigger session belongs to this learner
     const { data: sessionData, error: sessionError } = await this.client
       .from("learning_sessions")
-      .select("learner_id")
+      .select("learner_id, session_kind")
       .eq("id", transition.triggerSessionId)
       .maybeSingle();
 
@@ -479,6 +533,14 @@ export class SupabaseLearningPersistenceRepository implements LearningPersistenc
     if (!sessionData || sessionData.learner_id !== transition.learnerId) {
       throw new OwnershipChainMismatchError(
         `Trigger session '${transition.triggerSessionId}' does not belong to learner '${transition.learnerId}'.`
+      );
+    }
+
+    // P1-4: Semantic integrity check between trigger session kind and reasonCode
+    const expectedReasonCode = sessionKindToMasteryReason(sessionData.session_kind);
+    if (transition.reasonCode !== expectedReasonCode) {
+      throw new MasterySemanticMismatchError(
+        `transition.reasonCode '${transition.reasonCode}' does not match trigger session.sessionKind '${sessionData.session_kind}' -> '${expectedReasonCode}'.`
       );
     }
 

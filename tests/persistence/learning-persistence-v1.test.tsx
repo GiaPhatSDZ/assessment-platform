@@ -14,6 +14,7 @@ import {
   validateLearnerStageConstraints,
   validateStudentResponse,
   validateNodeStateCounts,
+  validateNodeStateConsistency,
   UnauthorizedLearnerAccessError,
   InvalidItemHashError,
   InvalidEvidenceTypeError,
@@ -21,6 +22,9 @@ import {
   InvalidStudentResponseError,
   OwnershipChainMismatchError,
   DatabasePersistenceError,
+  EvidenceSemanticMismatchError,
+  MasterySemanticMismatchError,
+  NodeStateConsistencyError,
 } from "../../src/domain/learning-persistence/types";
 import { InMemoryLearningPersistenceRepository } from "../../src/infrastructure/database/in-memory-learning-persistence-repository";
 import { SupabaseLearningPersistenceRepository } from "../../src/infrastructure/database/supabase-learning-persistence-repository";
@@ -800,5 +804,783 @@ describe("AI School Persistence V1 Test Matrix", () => {
         { visitorToken: intruderToken }
       )
     ).rejects.toThrow(UnauthorizedLearnerAccessError);
+  });
+
+  // =========================================================================
+  // CONTROLLER AUDIT FIXES: P0-1, P0-2, P1-1, P1-2, P1-3, P1-4
+  // =========================================================================
+
+  describe("P0-1 Guardian Claim Ownership (Tests A - F)", () => {
+    // Helper to create mock Supabase client for guardian tests
+    function createSupabaseMockForGuardian(learnerProfile: any, initialGuardians: any[] = []) {
+      const guardians = [...initialGuardians];
+      return {
+        from: (table: string) => {
+          if (table === "learner_profiles") {
+            return {
+              select: () => ({
+                eq: (_f: string, id: string) => ({
+                  maybeSingle: async () => ({
+                    data: learnerProfile.id === id ? learnerProfile : null,
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
+          if (table === "guardian_learner_relationships") {
+            return {
+              select: () => ({
+                eq: (_f1: string, gId: string) => ({
+                  eq: (_f2: string, lId: string) => ({
+                    maybeSingle: async () => {
+                      const match = guardians.find(
+                        (g) => g.guardian_user_id === gId && g.learner_id === lId
+                      );
+                      return { data: match || null, error: null };
+                    },
+                  }),
+                }),
+              }),
+              upsert: async (payload: any) => {
+                guardians.push(payload);
+                return { error: null };
+              },
+            };
+          }
+          throw new Error(`Unexpected table ${table}`);
+        },
+      };
+    }
+
+    it("In-Memory Repository: Tests A - F", async () => {
+      const visitorToken = "visitor-token-p0-1-in-memory-1234567890123456";
+      const guardianUserId = crypto.randomUUID();
+      const otherUserId = crypto.randomUUID();
+      const unrelatedGuardianId = crypto.randomUUID();
+
+      const learner = await repository.createLearner(
+        { educationStage: "LOWER_SECONDARY", gradeLevel: 6 },
+        { visitorToken }
+      );
+
+      // Test A: matching guardian userId WITHOUT visitor token -> DENIED
+      await expect(
+        repository.claimLearnerForGuardian(learner.id, guardianUserId, "PARENT", {
+          userId: guardianUserId,
+        })
+      ).rejects.toThrow(UnauthorizedLearnerAccessError);
+
+      // Test B: valid visitor token WITHOUT authenticated userId -> DENIED
+      await expect(
+        repository.claimLearnerForGuardian(learner.id, guardianUserId, "PARENT", {
+          visitorToken,
+        })
+      ).rejects.toThrow(UnauthorizedLearnerAccessError);
+
+      // Test C: valid visitor token + different authenticated userId -> DENIED
+      await expect(
+        repository.claimLearnerForGuardian(learner.id, guardianUserId, "PARENT", {
+          visitorToken,
+          userId: otherUserId,
+        })
+      ).rejects.toThrow(UnauthorizedLearnerAccessError);
+
+      // Test D: valid visitor token + matching authenticated guardian -> PASS
+      await expect(
+        repository.claimLearnerForGuardian(learner.id, guardianUserId, "PARENT", {
+          visitorToken,
+          userId: guardianUserId,
+        })
+      ).resolves.toBe(true);
+
+      // Test E: existing guardian relationship permits later authenticated access (idempotent & load)
+      await expect(
+        repository.claimLearnerForGuardian(learner.id, guardianUserId, "PARENT", {
+          userId: guardianUserId,
+        })
+      ).resolves.toBe(true);
+
+      const ownedLearner = await repository.loadOwnedLearner(learner.id, {
+        userId: guardianUserId,
+      });
+      expect(ownedLearner).not.toBeNull();
+      expect(ownedLearner?.id).toBe(learner.id);
+
+      // Test F: unrelated guardian remains denied
+      await expect(
+        repository.claimLearnerForGuardian(learner.id, unrelatedGuardianId, "PARENT", {
+          userId: unrelatedGuardianId,
+        })
+      ).rejects.toThrow(UnauthorizedLearnerAccessError);
+
+      const unrelatedAccess = await repository.loadOwnedLearner(learner.id, {
+        userId: unrelatedGuardianId,
+      });
+      expect(unrelatedAccess).toBeNull();
+    });
+
+    it("Supabase Repository: Tests A - F (Contract & Mock Client)", async () => {
+      const visitorToken = "visitor-token-p0-1-supabase-12345678901234567";
+      const visitorHash = hashVisitorToken(visitorToken);
+      const learnerId = crypto.randomUUID();
+      const guardianUserId = crypto.randomUUID();
+      const otherUserId = crypto.randomUUID();
+      const unrelatedGuardianId = crypto.randomUUID();
+
+      const learnerDbRecord = {
+        id: learnerId,
+        visitor_owner_hash: visitorHash,
+        nickname: "Minh",
+        education_stage: "PRIMARY",
+        grade_level: 4,
+        age_band: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      const mockClient = createSupabaseMockForGuardian(learnerDbRecord);
+      const supabaseRepo = new SupabaseLearningPersistenceRepository(mockClient as any);
+
+      // Test A: matching guardian userId WITHOUT visitor token -> DENIED
+      await expect(
+        supabaseRepo.claimLearnerForGuardian(learnerId, guardianUserId, "PARENT", {
+          userId: guardianUserId,
+        })
+      ).rejects.toThrow(UnauthorizedLearnerAccessError);
+
+      // Test B: valid visitor token WITHOUT authenticated userId -> DENIED
+      await expect(
+        supabaseRepo.claimLearnerForGuardian(learnerId, guardianUserId, "PARENT", {
+          visitorToken,
+        })
+      ).rejects.toThrow(UnauthorizedLearnerAccessError);
+
+      // Test C: valid visitor token + different authenticated userId -> DENIED
+      await expect(
+        supabaseRepo.claimLearnerForGuardian(learnerId, guardianUserId, "PARENT", {
+          visitorToken,
+          userId: otherUserId,
+        })
+      ).rejects.toThrow(UnauthorizedLearnerAccessError);
+
+      // Test D: valid visitor token + matching authenticated guardian -> PASS
+      await expect(
+        supabaseRepo.claimLearnerForGuardian(learnerId, guardianUserId, "PARENT", {
+          visitorToken,
+          userId: guardianUserId,
+        })
+      ).resolves.toBe(true);
+
+      // Test E: existing guardian relationship permits later authenticated access (idempotent & load)
+      await expect(
+        supabaseRepo.claimLearnerForGuardian(learnerId, guardianUserId, "PARENT", {
+          userId: guardianUserId,
+        })
+      ).resolves.toBe(true);
+
+      // Test F: unrelated guardian remains denied
+      await expect(
+        supabaseRepo.claimLearnerForGuardian(learnerId, unrelatedGuardianId, "PARENT", {
+          userId: unrelatedGuardianId,
+        })
+      ).rejects.toThrow(UnauthorizedLearnerAccessError);
+    });
+  });
+
+  describe("P0-2 Supabase Node State Column Mapping", () => {
+    it("Supabase repository writes last_assessed_at and exact DB column keys (not lastAssessedAt)", async () => {
+      const visitorToken = "visitor-token-p0-2-key-test-1234567890123456";
+      const visitorHash = hashVisitorToken(visitorToken);
+      const learnerId = crypto.randomUUID();
+
+      let capturedPayload: any = null;
+
+      const mockClient = {
+        from: (table: string) => {
+          if (table === "learner_profiles") {
+            return {
+              select: () => ({
+                eq: () => ({
+                  maybeSingle: async () => ({
+                    data: {
+                      id: learnerId,
+                      visitor_owner_hash: visitorHash,
+                      education_stage: "LOWER_SECONDARY",
+                      grade_level: 6,
+                    },
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
+          if (table === "knowledge_node_states") {
+            return {
+              upsert: (payload: any) => {
+                capturedPayload = payload;
+                return {
+                  select: () => ({
+                    single: async () => ({
+                      data: {
+                        learner_id: payload.learner_id,
+                        node_id: payload.node_id,
+                        state: payload.state,
+                        confidence: payload.confidence,
+                        attempts_count: payload.attempts_count,
+                        correct_count: payload.correct_count,
+                        misconception_tags: payload.misconception_tags,
+                        last_assessed_at: payload.last_assessed_at,
+                        rule_version: payload.rule_version,
+                        updated_at: payload.updated_at,
+                      },
+                      error: null,
+                    }),
+                  }),
+                };
+              },
+            };
+          }
+          throw new Error(`Unexpected table ${table}`);
+        },
+      };
+
+      const supabaseRepo = new SupabaseLearningPersistenceRepository(mockClient as any);
+
+      const assessedAt = "2026-09-18T12:00:00.000Z";
+      await supabaseRepo.upsertNodeState(
+        {
+          learnerId,
+          nodeId: "NODE-MATH-6-FRAC-01",
+          state: "DEVELOPING",
+          confidence: "MEDIUM",
+          attemptsCount: 2,
+          correctCount: 1,
+          misconceptionTags: ["TAG-1"],
+          lastAssessedAt: assessedAt,
+          ruleVersion: "v1.0",
+        },
+        { visitorToken }
+      );
+
+      expect(capturedPayload).not.toBeNull();
+      // DB column key must be snake_case last_assessed_at
+      expect(capturedPayload).toHaveProperty("last_assessed_at");
+      expect(capturedPayload.last_assessed_at).toBe(assessedAt);
+
+      // CamelCase lastAssessedAt must NOT be in DB payload
+      expect(capturedPayload).not.toHaveProperty("lastAssessedAt");
+
+      // Assert exact insert/upsert database keys
+      const expectedKeys = [
+        "learner_id",
+        "node_id",
+        "state",
+        "confidence",
+        "attempts_count",
+        "correct_count",
+        "misconception_tags",
+        "last_assessed_at",
+        "rule_version",
+        "updated_at",
+      ].sort();
+
+      expect(Object.keys(capturedPayload).sort()).toEqual(expectedKeys);
+    });
+  });
+
+  describe("P1-1 Evidence Semantic Integrity", () => {
+    it("Rejects outcome mismatch, evidenceType mismatch, and nodeId mismatch in InMemory repo", async () => {
+      const visitorToken = "visitor-token-p1-1-integrity-1234567890123456";
+      const learner = await repository.createLearner(
+        { educationStage: "LOWER_SECONDARY", gradeLevel: 6 },
+        { visitorToken }
+      );
+
+      const session = await repository.createLearningSession(
+        { learnerId: learner.id, sessionKind: "DIAGNOSTIC", subjectId: "math", ruleVersion: "v1" },
+        { visitorToken }
+      );
+
+      const validHash = crypto.createHash("sha256").update("item-01").digest("hex");
+      const attempt = await repository.saveEvaluatedAttempt(
+        {
+          sessionId: session.id,
+          learnerId: learner.id,
+          itemId: "ITEM-01",
+          itemVersion: "1.0",
+          itemContentHash: validHash,
+          primaryNodeId: "NODE-PRIMARY-01",
+          studentResponse: { type: "MCQ", selectedOptionId: "opt-a" },
+          isCorrect: true,
+          gradingRuleVersion: "v1",
+        },
+        { visitorToken }
+      );
+
+      // Negative Test 1: outcome mismatch (attempt isCorrect=true, caller supplies INCORRECT)
+      await expect(
+        repository.appendKnowledgeEvidence(
+          {
+            learnerId: learner.id,
+            sessionId: session.id,
+            attemptId: attempt.id,
+            nodeId: "NODE-PRIMARY-01",
+            evidenceType: "DIAGNOSTIC_ATTEMPT",
+            outcome: "INCORRECT",
+            ruleVersion: "v1",
+          },
+          { visitorToken }
+        )
+      ).rejects.toThrow(EvidenceSemanticMismatchError);
+
+      // Negative Test 2: evidenceType mismatch (session is DIAGNOSTIC, caller supplies PRACTICE_ATTEMPT)
+      await expect(
+        repository.appendKnowledgeEvidence(
+          {
+            learnerId: learner.id,
+            sessionId: session.id,
+            attemptId: attempt.id,
+            nodeId: "NODE-PRIMARY-01",
+            evidenceType: "PRACTICE_ATTEMPT",
+            outcome: "CORRECT",
+            ruleVersion: "v1",
+          },
+          { visitorToken }
+        )
+      ).rejects.toThrow(EvidenceSemanticMismatchError);
+
+      // Negative Test 3: nodeId mismatch (attempt is NODE-PRIMARY-01, caller supplies NODE-OTHER-99)
+      await expect(
+        repository.appendKnowledgeEvidence(
+          {
+            learnerId: learner.id,
+            sessionId: session.id,
+            attemptId: attempt.id,
+            nodeId: "NODE-OTHER-99",
+            evidenceType: "DIAGNOSTIC_ATTEMPT",
+            outcome: "CORRECT",
+            ruleVersion: "v1",
+          },
+          { visitorToken }
+        )
+      ).rejects.toThrow(EvidenceSemanticMismatchError);
+
+      // Positive Test: Authoritative match succeeds
+      const validEvidence = await repository.appendKnowledgeEvidence(
+        {
+          learnerId: learner.id,
+          sessionId: session.id,
+          attemptId: attempt.id,
+          nodeId: "NODE-PRIMARY-01",
+          evidenceType: "DIAGNOSTIC_ATTEMPT",
+          outcome: "CORRECT",
+          ruleVersion: "v1",
+        },
+        { visitorToken }
+      );
+      expect(validEvidence.id).toBeDefined();
+      expect(validEvidence.outcome).toBe("CORRECT");
+      expect(validEvidence.evidenceType).toBe("DIAGNOSTIC_ATTEMPT");
+      expect(validEvidence.nodeId).toBe("NODE-PRIMARY-01");
+    });
+
+    it("Rejects mismatches in Supabase repository (Contract & Mock Client)", async () => {
+      const visitorToken = "visitor-token-p1-1-supa-123456789012345678";
+      const visitorHash = hashVisitorToken(visitorToken);
+      const learnerId = crypto.randomUUID();
+      const sessionId = crypto.randomUUID();
+      const attemptId = crypto.randomUUID();
+
+      const mockClient = {
+        from: (table: string) => {
+          if (table === "learner_profiles") {
+            return {
+              select: () => ({
+                eq: () => ({
+                  maybeSingle: async () => ({
+                    data: { id: learnerId, visitor_owner_hash: visitorHash },
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
+          if (table === "learning_sessions") {
+            return {
+              select: () => ({
+                eq: () => ({
+                  maybeSingle: async () => ({
+                    data: { learner_id: learnerId, session_kind: "PRACTICE" },
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
+          if (table === "learning_attempts") {
+            return {
+              select: () => ({
+                eq: () => ({
+                  maybeSingle: async () => ({
+                    data: {
+                      session_id: sessionId,
+                      learner_id: learnerId,
+                      primary_node_id: "NODE-PRAC-01",
+                      is_correct: false,
+                    },
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
+          if (table === "knowledge_evidence") {
+            return {
+              insert: (payload: any) => ({
+                select: () => ({
+                  single: async () => ({ data: { id: crypto.randomUUID(), ...payload }, error: null }),
+                }),
+              }),
+            };
+          }
+          throw new Error(`Unexpected table ${table}`);
+        },
+      };
+
+      const supabaseRepo = new SupabaseLearningPersistenceRepository(mockClient as any);
+
+      // Outcome mismatch (attempt isCorrect=false, evidence says CORRECT)
+      await expect(
+        supabaseRepo.appendKnowledgeEvidence(
+          {
+            learnerId,
+            sessionId,
+            attemptId,
+            nodeId: "NODE-PRAC-01",
+            evidenceType: "PRACTICE_ATTEMPT",
+            outcome: "CORRECT",
+            ruleVersion: "v1",
+          },
+          { visitorToken }
+        )
+      ).rejects.toThrow(EvidenceSemanticMismatchError);
+
+      // EvidenceType mismatch (session is PRACTICE, evidence says RETEST_ATTEMPT)
+      await expect(
+        supabaseRepo.appendKnowledgeEvidence(
+          {
+            learnerId,
+            sessionId,
+            attemptId,
+            nodeId: "NODE-PRAC-01",
+            evidenceType: "RETEST_ATTEMPT",
+            outcome: "INCORRECT",
+            ruleVersion: "v1",
+          },
+          { visitorToken }
+        )
+      ).rejects.toThrow(EvidenceSemanticMismatchError);
+
+      // NodeId mismatch
+      await expect(
+        supabaseRepo.appendKnowledgeEvidence(
+          {
+            learnerId,
+            sessionId,
+            attemptId,
+            nodeId: "NODE-WRONG-99",
+            evidenceType: "PRACTICE_ATTEMPT",
+            outcome: "INCORRECT",
+            ruleVersion: "v1",
+          },
+          { visitorToken }
+        )
+      ).rejects.toThrow(EvidenceSemanticMismatchError);
+
+      // Authoritative match passes
+      await expect(
+        supabaseRepo.appendKnowledgeEvidence(
+          {
+            learnerId,
+            sessionId,
+            attemptId,
+            nodeId: "NODE-PRAC-01",
+            evidenceType: "PRACTICE_ATTEMPT",
+            outcome: "INCORRECT",
+            ruleVersion: "v1",
+          },
+          { visitorToken }
+        )
+      ).resolves.toBeDefined();
+    });
+  });
+
+  describe("P1-2 Hash Contract Consistency", () => {
+    it("Accepts lowercase SHA-256 and rejects uppercase or non-hex hashes", () => {
+      const validLower = "a".repeat(64);
+      const validMixedHex = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+      expect(() => validateItemContentHash(validLower)).not.toThrow();
+      expect(() => validateItemContentHash(validMixedHex)).not.toThrow();
+
+      // Uppercase must be rejected
+      const upperHash = "A".repeat(64);
+      expect(() => validateItemContentHash(upperHash)).toThrow(InvalidItemHashError);
+
+      // Mixed-case must be rejected
+      const mixedCaseHash = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdeF";
+      expect(() => validateItemContentHash(mixedCaseHash)).toThrow(InvalidItemHashError);
+
+      // Invalid lengths and chars
+      expect(() => validateItemContentHash("a".repeat(63))).toThrow(InvalidItemHashError);
+      expect(() => validateItemContentHash("a".repeat(65))).toThrow(InvalidItemHashError);
+      expect(() => validateItemContentHash("z".repeat(64))).toThrow(InvalidItemHashError);
+    });
+  });
+
+  describe("P1-3 NOT_ASSESSED Consistency", () => {
+    it("Enforces domain validation rules for NOT_ASSESSED and other states", () => {
+      // Valid NOT_ASSESSED: attempts=0, correct=0, lastAssessedAt=null
+      expect(() => validateNodeStateConsistency("NOT_ASSESSED", 0, 0, null)).not.toThrow();
+      expect(() => validateNodeStateConsistency("NOT_ASSESSED", 0, 0, undefined)).not.toThrow();
+
+      // Invalid NOT_ASSESSED: attempts > 0
+      expect(() => validateNodeStateConsistency("NOT_ASSESSED", 1, 0, null)).toThrow(
+        NodeStateConsistencyError
+      );
+
+      // Invalid NOT_ASSESSED: correct > 0
+      expect(() => validateNodeStateConsistency("NOT_ASSESSED", 0, 1, null)).toThrow(
+        NodeStateConsistencyError
+      );
+
+      // Invalid NOT_ASSESSED: lastAssessedAt is not null
+      expect(() =>
+        validateNodeStateConsistency("NOT_ASSESSED", 0, 0, "2026-09-18T00:00:00Z")
+      ).toThrow(NodeStateConsistencyError);
+
+      // Invalid other states: lastAssessedAt is null
+      expect(() => validateNodeStateConsistency("DEVELOPING", 1, 1, null)).toThrow(
+        NodeStateConsistencyError
+      );
+      expect(() => validateNodeStateConsistency("SECURE", 2, 2, undefined)).toThrow(
+        NodeStateConsistencyError
+      );
+      expect(() => validateNodeStateConsistency("UNCERTAIN", 1, 0, null)).toThrow(
+        NodeStateConsistencyError
+      );
+
+      // Valid other states: lastAssessedAt is provided
+      expect(() =>
+        validateNodeStateConsistency("DEVELOPING", 1, 1, "2026-09-18T00:00:00Z")
+      ).not.toThrow();
+      expect(() =>
+        validateNodeStateConsistency("SECURE", 2, 2, "2026-09-18T00:00:00Z")
+      ).not.toThrow();
+    });
+
+    it("Migration SQL enforces check constraint for NOT_ASSESSED consistency", () => {
+      const migrationSql = fs.readFileSync(persistenceMigrationPath, "utf-8");
+      expect(migrationSql).toContain("chk_node_states_last_assessed");
+      expect(migrationSql).toContain("state = 'NOT_ASSESSED' AND attempts_count = 0 AND correct_count = 0 AND last_assessed_at IS NULL");
+      expect(migrationSql).toContain("state != 'NOT_ASSESSED' AND last_assessed_at IS NOT NULL");
+    });
+  });
+
+  describe("P1-4 Session / Mastery Semantic Match", () => {
+    it("Enforces reasonCode match to trigger session kind in InMemory repo", async () => {
+      const visitorToken = "visitor-token-p1-4-mastery-1234567890123456";
+      const learner = await repository.createLearner(
+        { educationStage: "LOWER_SECONDARY", gradeLevel: 6 },
+        { visitorToken }
+      );
+
+      const diagSession = await repository.createLearningSession(
+        { learnerId: learner.id, sessionKind: "DIAGNOSTIC", subjectId: "math", ruleVersion: "v1" },
+        { visitorToken }
+      );
+      const pracSession = await repository.createLearningSession(
+        { learnerId: learner.id, sessionKind: "PRACTICE", subjectId: "math", ruleVersion: "v1" },
+        { visitorToken }
+      );
+      const retestSession = await repository.createLearningSession(
+        { learnerId: learner.id, sessionKind: "RETEST", subjectId: "math", ruleVersion: "v1" },
+        { visitorToken }
+      );
+
+      // DIAGNOSTIC session with PRACTICE_EVALUATION reasonCode -> REJECTED
+      await expect(
+        repository.appendMasteryTransition(
+          {
+            learnerId: learner.id,
+            nodeId: "NODE-01",
+            triggerSessionId: diagSession.id,
+            previousState: "NOT_ASSESSED",
+            previousConfidence: "LOW",
+            newState: "DEVELOPING",
+            newConfidence: "MEDIUM",
+            reasonCode: "PRACTICE_EVALUATION",
+            ruleVersion: "v1",
+          },
+          { visitorToken }
+        )
+      ).rejects.toThrow(MasterySemanticMismatchError);
+
+      // DIAGNOSTIC session with DIAGNOSTIC_EVALUATION -> PASS
+      await expect(
+        repository.appendMasteryTransition(
+          {
+            learnerId: learner.id,
+            nodeId: "NODE-01",
+            triggerSessionId: diagSession.id,
+            previousState: "NOT_ASSESSED",
+            previousConfidence: "LOW",
+            newState: "DEVELOPING",
+            newConfidence: "MEDIUM",
+            reasonCode: "DIAGNOSTIC_EVALUATION",
+            ruleVersion: "v1",
+          },
+          { visitorToken }
+        )
+      ).resolves.toBeDefined();
+
+      // PRACTICE session with RETEST_EVALUATION reasonCode -> REJECTED
+      await expect(
+        repository.appendMasteryTransition(
+          {
+            learnerId: learner.id,
+            nodeId: "NODE-01",
+            triggerSessionId: pracSession.id,
+            previousState: "DEVELOPING",
+            previousConfidence: "MEDIUM",
+            newState: "SECURE",
+            newConfidence: "HIGH",
+            reasonCode: "RETEST_EVALUATION",
+            ruleVersion: "v1",
+          },
+          { visitorToken }
+        )
+      ).rejects.toThrow(MasterySemanticMismatchError);
+
+      // PRACTICE session with PRACTICE_EVALUATION -> PASS
+      await expect(
+        repository.appendMasteryTransition(
+          {
+            learnerId: learner.id,
+            nodeId: "NODE-01",
+            triggerSessionId: pracSession.id,
+            previousState: "DEVELOPING",
+            previousConfidence: "MEDIUM",
+            newState: "DEVELOPING",
+            newConfidence: "HIGH",
+            reasonCode: "PRACTICE_EVALUATION",
+            ruleVersion: "v1",
+          },
+          { visitorToken }
+        )
+      ).resolves.toBeDefined();
+
+      // RETEST session with RETEST_EVALUATION -> PASS
+      await expect(
+        repository.appendMasteryTransition(
+          {
+            learnerId: learner.id,
+            nodeId: "NODE-01",
+            triggerSessionId: retestSession.id,
+            previousState: "DEVELOPING",
+            previousConfidence: "HIGH",
+            newState: "SECURE",
+            newConfidence: "HIGH",
+            reasonCode: "RETEST_EVALUATION",
+            ruleVersion: "v1",
+          },
+          { visitorToken }
+        )
+      ).resolves.toBeDefined();
+    });
+
+    it("Enforces reasonCode match to trigger session kind in Supabase repo (Contract & Mock Client)", async () => {
+      const visitorToken = "visitor-token-p1-4-supa-123456789012345678";
+      const visitorHash = hashVisitorToken(visitorToken);
+      const learnerId = crypto.randomUUID();
+      const sessionId = crypto.randomUUID();
+
+      const mockClient = {
+        from: (table: string) => {
+          if (table === "learner_profiles") {
+            return {
+              select: () => ({
+                eq: () => ({
+                  maybeSingle: async () => ({
+                    data: { id: learnerId, visitor_owner_hash: visitorHash },
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
+          if (table === "learning_sessions") {
+            return {
+              select: () => ({
+                eq: () => ({
+                  maybeSingle: async () => ({
+                    data: { learner_id: learnerId, session_kind: "RETEST" },
+                    error: null,
+                  }),
+                }),
+              }),
+            };
+          }
+          if (table === "mastery_history") {
+            return {
+              insert: (payload: any) => ({
+                select: () => ({
+                  single: async () => ({ data: { id: crypto.randomUUID(), ...payload }, error: null }),
+                }),
+              }),
+            };
+          }
+          throw new Error(`Unexpected table ${table}`);
+        },
+      };
+
+      const supabaseRepo = new SupabaseLearningPersistenceRepository(mockClient as any);
+
+      // RETEST session with DIAGNOSTIC_EVALUATION -> REJECTED
+      await expect(
+        supabaseRepo.appendMasteryTransition(
+          {
+            learnerId,
+            nodeId: "NODE-01",
+            triggerSessionId: sessionId,
+            previousState: "DEVELOPING",
+            previousConfidence: "MEDIUM",
+            newState: "SECURE",
+            newConfidence: "HIGH",
+            reasonCode: "DIAGNOSTIC_EVALUATION",
+            ruleVersion: "v1",
+          },
+          { visitorToken }
+        )
+      ).rejects.toThrow(MasterySemanticMismatchError);
+
+      // RETEST session with RETEST_EVALUATION -> PASS
+      await expect(
+        supabaseRepo.appendMasteryTransition(
+          {
+            learnerId,
+            nodeId: "NODE-01",
+            triggerSessionId: sessionId,
+            previousState: "DEVELOPING",
+            previousConfidence: "MEDIUM",
+            newState: "SECURE",
+            newConfidence: "HIGH",
+            reasonCode: "RETEST_EVALUATION",
+            ruleVersion: "v1",
+          },
+          { visitorToken }
+        )
+      ).resolves.toBeDefined();
+    });
   });
 });
