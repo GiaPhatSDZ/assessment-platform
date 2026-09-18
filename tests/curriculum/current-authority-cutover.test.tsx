@@ -274,14 +274,37 @@ describe("AI School Current Authority & Legacy Cutover", () => {
     );
     const authorityDocPath = path.join(rootDir, "docs", "authority", "AI_SCHOOL_CURRENT_AUTHORITY.md");
 
-    it("general authority chain contains TT20, TT13, TT17", () => {
+    it("GEP TT32 and Math TT32 effectiveFrom is 2019-02-15 and agrees with authority document", () => {
+      const sources = JSON.parse(fs.readFileSync(canonicalRegistryPath, "utf-8"));
+      const gepSource = sources.find((s: any) => s.id === "SRC-VN-MOET-GEP-2018");
+      expect(gepSource).toBeDefined();
+      expect(gepSource.effectiveFrom).toBe("2019-02-15");
+      expect(gepSource.issuedAt).toBe("2018-12-26");
+
+      const mathSource = sources.find((s: any) => s.id === "SRC-VN-MOET-MATH-2018");
+      expect(mathSource).toBeDefined();
+      expect(mathSource.effectiveFrom).toBe("2019-02-15");
+      expect(mathSource.issuedAt).toBe("2018-12-26");
+
+      // Verify authority doc agreement
+      const authorityDoc = fs.readFileSync(authorityDocPath, "utf-8");
+      expect(authorityDoc).toContain("32/2018/TT-BGDĐT");
+      expect(authorityDoc).toContain("15/02/2019");
+    });
+
+    it("general authority chain contains TT20, TT13, TT17 and orders VBHN10 before TT17", () => {
       const sources = JSON.parse(fs.readFileSync(canonicalRegistryPath, "utf-8"));
       const gepSource = sources.find((s: any) => s.id === "SRC-VN-MOET-GEP-2018");
       expect(gepSource).toBeDefined();
       expect(gepSource.authorityChain).toContain("SRC-VN-MOET-AMEND-20-2021");
       expect(gepSource.authorityChain).toContain("SRC-VN-MOET-AMEND-13-2022");
-      expect(gepSource.authorityChain).toContain("SRC-VN-MOET-AMEND-17-2025");
       expect(gepSource.authorityChain).toContain("SRC-VN-MOET-VBHN-10-2022");
+      expect(gepSource.authorityChain).toContain("SRC-VN-MOET-AMEND-17-2025");
+
+      // Chronological order check: VBHN10 (2022-12-30) predates TT17 (2025-09-12)
+      const vbhnIndex = gepSource.authorityChain.indexOf("SRC-VN-MOET-VBHN-10-2022");
+      const tt17Index = gepSource.authorityChain.indexOf("SRC-VN-MOET-AMEND-17-2025");
+      expect(vbhnIndex).toBeLessThan(tt17Index);
     });
 
     it("TT13 effectiveFrom is 2022-08-03", () => {
@@ -313,6 +336,10 @@ describe("AI School Current Authority & Legacy Cutover", () => {
       const mathSource = sources.find((s: any) => s.id === "SRC-VN-MOET-MATH-2018");
       expect(mathSource).toBeDefined();
       expect(mathSource.authorityChain).not.toContain("SRC-VN-MOET-AMEND-17-2025");
+      expect(mathSource.authorityChain).toEqual([
+        "SRC-VN-MOET-MATH-2018",
+        "SRC-VN-MOET-VBHN-10-2022",
+      ]);
     });
 
     it("VBHN10/2022 is not called complete current-2026 consolidation and predates TT17/2025", () => {
@@ -348,6 +375,17 @@ describe("AI School Current Authority & Legacy Cutover", () => {
       expect(authorityDoc).toContain("NOT governed by TT 32/2018/TT-BGDĐT (GDPT 2018)");
       expect(authorityDoc).toContain("Đề án thí điểm GDMN mới 2026-2027");
       expect(authorityDoc).toContain("classified under Tier B and separated from current national standards");
+    });
+
+    it("does NOT add un-enacted August 2026 draft amendment to current legal authority", () => {
+      const sources = JSON.parse(fs.readFileSync(canonicalRegistryPath, "utf-8"));
+      for (const s of sources) {
+        expect(s.id).not.toContain("2026-DRAFT");
+        expect(s.documentNumber || "").not.toMatch(/dự thảo|draft/i);
+      }
+      const authorityDoc = fs.readFileSync(authorityDocPath, "utf-8");
+      expect(authorityDoc).not.toMatch(/dự thảo sửa đổi.*2026/i);
+      expect(authorityDoc).toContain("Draft Amendments Excluded");
     });
   });
 });

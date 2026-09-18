@@ -64,8 +64,8 @@ describe("NXBGD Source Verification Engine V2.1 & Provenance R2.1 Audit", () => 
       "SRC-VN-MOET-GEP-2018",
       "SRC-VN-MOET-AMEND-20-2021",
       "SRC-VN-MOET-AMEND-13-2022",
-      "SRC-VN-MOET-AMEND-17-2025",
       "SRC-VN-MOET-VBHN-10-2022",
+      "SRC-VN-MOET-AMEND-17-2025",
     ]);
 
     const vbhn10 = sourceRegistry.find((s) => s.id === "SRC-VN-MOET-VBHN-10-2022");

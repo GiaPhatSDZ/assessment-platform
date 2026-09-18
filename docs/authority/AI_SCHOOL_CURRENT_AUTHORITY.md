@@ -33,16 +33,18 @@ AI School is designed to replace opaque, high-stress testing, drill-and-kill, an
 #### GRADE 1–12 (Primary through Upper Secondary)
 - **Governing Authority:** TT32/2018 and effective amendments tracked by the source authority registry, with subject-specific applicability.
   - **Authority Snapshot Date:** `legalAuthorityAsOf: 2026-09-18`
-  - **General Authority Chain:**
+  - **General Authority Chain (Chronological Sequence):**
     - `32/2018/TT-BGDĐT` (Chương trình Giáo dục phổ thông ban hành 26/12/2018; có hiệu lực từ 15/02/2019)
     - `20/2021/TT-BGDĐT` (Sửa đổi, bổ sung một số điều ban hành 01/07/2021; có hiệu lực từ 16/08/2021)
     - `13/2022/TT-BGDĐT` (Sửa đổi, bổ sung Chương trình tổng thể và một số môn học THPT ban hành 03/08/2022; có hiệu lực từ 03/08/2022)
+    - `10/VBHN-BGDĐT` (Văn bản hợp nhất ban hành 30/12/2022 hợp nhất TT32 + TT20 + TT13; mốc hợp nhất lịch sử)
     - `17/2025/TT-BGDĐT` (Sửa đổi, bổ sung một số nội dung trong CT GDPT môn Lịch sử và Địa lí, Giáo dục công dân ban hành 12/09/2025; có hiệu lực từ 12/09/2025)
   - **Subject-Specific Applicability:** Amendments apply only according to their defined subject scope. For example, TT 17/2025/TT-BGDĐT modifies selected History/Geography/Civic Education programs; it does NOT modify Grade 6 Mathematics.
   - **Role of Official Consolidated Document 10/VBHN-BGDĐT (2022-12-30):**
     - Official consolidated snapshot through `TT32/2018 + TT20/2021 + TT13/2022`.
     - Predates `TT17/2025/TT-BGDĐT` and is preserved as historical/consolidated provenance.
     - Must NOT be described as a complete 2026 consolidation of current GDPT authority.
+  - **Draft Amendments Excluded:** Un-enacted drafts (such as draft amendments circulated in August 2026) are strictly excluded from current legal authority until formally enacted.
 - **Provenance Model:** Subject-specific provenance adhering to the frozen R2.1 source provenance model and official textbook/resource authorities.
 
 ### 1.2 Core Product Invariants

@@ -9,14 +9,14 @@
     "resourceType": "LEGAL_DOCUMENT",
     "url": "https://moet.gov.vn/van-ban/van-ban-quan-ly/Pages/chi-tiet-van-ban.aspx?ItemID=1301",
     "issuedAt": "2018-12-26",
-    "effectiveFrom": "2020-02-15",
+    "effectiveFrom": "2019-02-15",
     "sourceVersion": "2018-12-26-TT32-GEP",
     "authorityChain": [
       "SRC-VN-MOET-GEP-2018",
       "SRC-VN-MOET-AMEND-20-2021",
       "SRC-VN-MOET-AMEND-13-2022",
-      "SRC-VN-MOET-AMEND-17-2025",
-      "SRC-VN-MOET-VBHN-10-2022"
+      "SRC-VN-MOET-VBHN-10-2022",
+      "SRC-VN-MOET-AMEND-17-2025"
     ],
     "curriculumStatus": "CURRENT_NATIONAL",
     "requiredForSlice": false,
@@ -44,7 +44,7 @@
     "resourceType": "CURRICULUM_STANDARD",
     "url": "https://moet.gov.vn/van-ban/van-ban-quan-ly/Pages/chi-tiet-van-ban.aspx?ItemID=1301",
     "issuedAt": "2018-12-26",
-    "effectiveFrom": "2020-02-15",
+    "effectiveFrom": "2019-02-15",
     "sourceVersion": "2018-12-26-TT32-MATH",
     "authorityChain": [
       "SRC-VN-MOET-MATH-2018",
@@ -246,7 +246,7 @@
       "totalPages": 124,
       "haveCoverPage": true
     },
-    "remoteResponseFingerprint": "a82490aadb61a32c1f995844cae7ca49254f8f4b185df9939823eccab4044b76",
+    "remoteResponseFingerprint": "763ee620808d6a05ad242461a4f201b8df73224cb98684f6099d3ab2457cbc5f",
     "canonicalMetadataFingerprint": "7453725f1122d4515f3890ec98a5363c8ffbc0a326d839675f021d619e020d0d",
     "fingerprint": "7453725f1122d4515f3890ec98a5363c8ffbc0a326d839675f021d619e020d0d"
   },
@@ -289,7 +289,7 @@
       "totalPages": 112,
       "haveCoverPage": true
     },
-    "remoteResponseFingerprint": "8a9128abca0ab39093c0c9e74deec7764d5c6fe51b9caef8dd3894c3b447dfa3",
+    "remoteResponseFingerprint": "e44858d7c90eaf3e50c0fe43a2ed68bd5b2146aacded9f2fd0d3dc25d4e466c9",
     "canonicalMetadataFingerprint": "6054fcd1cc3110d76910771aa6000a6a10d66de319d017bebbe15d469b976c32",
     "fingerprint": "6054fcd1cc3110d76910771aa6000a6a10d66de319d017bebbe15d469b976c32"
   },
@@ -321,7 +321,7 @@
       "totalPages": 220,
       "haveCoverPage": true
     },
-    "remoteResponseFingerprint": "489f2af1e4936f9a4735e8263c933d1ec08771dc07c605a1fced0c68508f2d1a",
+    "remoteResponseFingerprint": "1a8f940fe1cf7a4d1ccb1b2270c2b414afba1ddb9733e696f84b94f75509bed2",
     "canonicalMetadataFingerprint": "05ff52e270eb9e2a3ed1b5a1e73171c64fab5076e7afc95445c0a6ed4fcd9db5",
     "fingerprint": "05ff52e270eb9e2a3ed1b5a1e73171c64fab5076e7afc95445c0a6ed4fcd9db5"
   },
@@ -355,7 +355,7 @@
       "totalPages": 7,
       "haveCoverPage": true
     },
-    "remoteResponseFingerprint": "46f1991e4f10abdaabeb66027008977f906d9c4698916ef44640b742c0396c42",
+    "remoteResponseFingerprint": "6ffc81a64aa89a9762de8a0e7e503da6dc148302bbf5517df3a0fd20aaf30c98",
     "canonicalMetadataFingerprint": "30fe4bab34f89d163739d7a582d242ad8d63a6a7c1d0486a860d7661483f6d9d",
     "fingerprint": "30fe4bab34f89d163739d7a582d242ad8d63a6a7c1d0486a860d7661483f6d9d"
   },
@@ -387,7 +387,7 @@
       "totalPages": 56,
       "haveCoverPage": true
     },
-    "remoteResponseFingerprint": "9c71b16dbf3daa4f0f7dd43e4b5ecb68ce93e9da684fcc90563711f1b96b392a",
+    "remoteResponseFingerprint": "c341d6fb451ed66b72831d4485ba7e1cedbd2cd5d6fcadba6418d23a74adae34",
     "canonicalMetadataFingerprint": "09b9625b6bf178717702623115b2c09da1186077d32da648d8d3b3e9ffe82d01",
     "fingerprint": "09b9625b6bf178717702623115b2c09da1186077d32da648d8d3b3e9ffe82d01"
   },
@@ -415,7 +415,7 @@
     "verificationStatus": "METADATA_VERIFIED",
     "httpStatus": 302,
     "canonicalTitle": "Slide phục vụ bồi dưỡng GV SGK Toán 6.2.Số học (update 2.6.2026).pptx",
-    "remoteResponseFingerprint": "56279d0a03c92aad2bef01e3536336b567873ec6ce93d8800282fa39a74d0094",
+    "remoteResponseFingerprint": "38a257b3623cc96d237dc679f94ec4ab1998343ee33e7e207490a43302ec484d",
     "canonicalMetadataFingerprint": "23c0f6e0f4d833b77709d9d05b6ad8e7af88f304e7eb8fe839ba0be94248d679",
     "fingerprint": "23c0f6e0f4d833b77709d9d05b6ad8e7af88f304e7eb8fe839ba0be94248d679"
   }
