@@ -1,6 +1,12 @@
 # Assessment Platform — Autonomous Implementation Plan v1.1
 
-**Date:** 2026-09-17  
+> [!NOTE]
+> **HISTORICAL BASELINE**  
+> **SUPERSEDED FOR CURRENT PUBLIC PRODUCT DIRECTION**  
+> **RETAINED AS REUSABLE PLATFORM-CORE REFERENCE**  
+> *This plan reflects the original v0.1 / v1.1 generic assessment platform implementation. The current authoritative product specification and architecture is defined in [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md).*
+
+**Date:** 2026-09-17 (Historical Baseline)  
 **Execution model:** One autonomous Gemini implementation run, with internal verification gates and no human checkpoint between milestones  
 **Spec authority:** `docs/superpowers/specs/2026-09-17-assessment-platform-design.md`  
 **Final controller audit:** After the full implementation is committed/pushed  

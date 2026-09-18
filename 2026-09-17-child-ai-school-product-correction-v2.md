@@ -1,7 +1,13 @@
 # Assessment Platform — Product Correction Specification V2
 ## Parent → Child → AI School
 
-**Status:** APPROVED correction authority  
+> [!NOTE]
+> **HISTORICAL BASELINE**  
+> **SUPERSEDED FOR CURRENT PUBLIC PRODUCT DIRECTION**  
+> **RETAINED AS REUSABLE PLATFORM-CORE REFERENCE**  
+> *This specification reflects the transitional V2 product correction. The current authoritative product specification and architecture is defined in [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md).*
+
+**Status:** Historical Baseline (Superseded by AI School Current Authority)  
 **Date:** 2026-09-17  
 **Repository:** `GiaPhatSDZ/assessment-platform`  
 **Audited baseline:** `main@600db58d9a81301634b4ba32a35263db30b08cfc`  

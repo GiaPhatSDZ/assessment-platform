@@ -1,7 +1,13 @@
 # ADR-002: Lưu Trữ Bằng Supabase PostgreSQL Kèm Bảo Mật Cấp Hàng (RLS)
 
+> [!NOTE]
+> **HISTORICAL BASELINE**  
+> **SUPERSEDED FOR CURRENT PUBLIC PRODUCT DIRECTION**  
+> **RETAINED AS REUSABLE PLATFORM-CORE REFERENCE**  
+> *This decision record reflects reusable platform-core persistence infrastructure. Current product authority is defined in [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](../authority/AI_SCHOOL_CURRENT_AUTHORITY.md).*
+
 ## Trạng Thái (Status)
-Đã Phê Duyệt (Accepted) — Ngày: 2026-09-17
+Đã Phê Duyệt (Accepted) — Ngày: 2026-09-17 (Platform Core Reference)
 
 ## Bối Cảnh (Context)
 Nền tảng cần một cơ sở dữ liệu quan hệ mạnh mẽ để lưu trữ các phiên đánh giá, câu trả lời, điểm số, thông tin Lead và tài khoản học viên, đồng thời hỗ trợ xác thực và cơ chế kiểm soát truy cập dữ liệu an toàn.

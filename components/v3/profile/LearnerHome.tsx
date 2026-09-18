@@ -61,10 +61,10 @@ export function LearnerHome({ user }: LearnerHomeProps) {
 
       {/* Current Active Subject & Topic Status */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-4">
+        <div className="md:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-              Trạng thái chủ đề đang học
+              Trạng thái chẩn đoán kiến thức
             </h2>
             <Link
               href="/curriculum"
@@ -74,47 +74,79 @@ export function LearnerHome({ user }: LearnerHomeProps) {
             </Link>
           </div>
 
-          <div className="rounded-2xl border border-warm-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
-            <div className="flex items-center justify-between border-b border-warm-100 pb-3 dark:border-slate-800">
-              <div>
-                <div className="text-xs font-semibold text-edu-700 dark:text-edu-400">Toán Lớp 6 · Chương Số Học</div>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white mt-0.5">
-                  Phép cộng phân số không cùng mẫu số
-                </h3>
+          {/* Truthful Empty Learner State */}
+          <div className="rounded-2xl border border-warm-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-4">
+            <div className="flex items-start gap-4">
+              <div className="rounded-xl bg-warm-100 p-3 text-warm-700 dark:bg-slate-800 dark:text-slate-300">
+                <Clock className="h-6 w-6" />
               </div>
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300">
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                <span>Đã có bằng chứng vững</span>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  Chưa có dữ liệu khảo sát được ghi nhận
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Học sinh chưa hoàn thành bài khảo sát chẩn đoán nào. AI School chỉ xác nhận năng lực dựa trên bằng chứng kiểm tra thực tế đối chiếu với đồ thị kiến thức chuẩn Bộ GD&ĐT, tuyệt đối không gán điểm năng lực suy diễn.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <Link
+                href="/learn/new"
+                className="inline-flex items-center gap-2 rounded-xl bg-edu-700 px-4 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-edu-800 transition"
+              >
+                <span>Bắt đầu chẩn đoán kiến thức</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Explicitly Badged Illustrative Demonstration Card */}
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/60 p-5 dark:border-slate-800 dark:bg-slate-900/40 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/80 pb-3 dark:border-slate-800">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="rounded-md bg-slate-200 px-2 py-0.5 text-[11px] font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                    Ví dụ minh họa
+                  </span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    Mô hình báo cáo sau khi hoàn thành chẩn đoán
+                  </span>
+                </div>
+                <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mt-1">
+                  Chủ đề: Phép cộng phân số (Toán Lớp 6)
+                </h4>
+              </div>
+              <span className="text-[11px] italic text-slate-500 dark:text-slate-400">
+                Không phải kết quả thực tế
               </span>
             </div>
 
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed italic">
+              Ví dụ minh họa: Giao diện dưới đây minh họa cách hệ thống theo dõi trạng thái từng mắt xích kiến thức thành phần, thay vì cho điểm số chung chung.
+            </p>
+
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-              <div className="p-2.5 rounded-xl bg-warm-50 border border-warm-200 dark:bg-slate-800/40 dark:border-slate-800">
+              <div className="p-2.5 rounded-xl bg-white border border-slate-200 dark:bg-slate-800/60 dark:border-slate-700">
                 <div className="text-slate-500 text-[11px]">BCNN (Lớp 6)</div>
-                <div className="font-bold text-emerald-700 mt-1">SECURE</div>
+                <div className="font-semibold text-slate-700 dark:text-slate-300 mt-1">Ví dụ minh họa</div>
               </div>
-              <div className="p-2.5 rounded-xl bg-warm-50 border border-warm-200 dark:bg-slate-800/40 dark:border-slate-800">
+              <div className="p-2.5 rounded-xl bg-white border border-slate-200 dark:bg-slate-800/60 dark:border-slate-700">
                 <div className="text-slate-500 text-[11px]">Cộng cùng mẫu (Lớp 4)</div>
-                <div className="font-bold text-emerald-700 mt-1">SECURE</div>
+                <div className="font-semibold text-slate-700 dark:text-slate-300 mt-1">Ví dụ minh họa</div>
               </div>
-              <div className="p-2.5 rounded-xl bg-warm-50 border border-warm-200 dark:bg-slate-800/40 dark:border-slate-800">
+              <div className="p-2.5 rounded-xl bg-white border border-slate-200 dark:bg-slate-800/60 dark:border-slate-700">
                 <div className="text-slate-500 text-[11px]">Quy đồng mẫu số</div>
-                <div className="font-bold text-emerald-700 mt-1">SECURE (Re-test)</div>
+                <div className="font-semibold text-slate-700 dark:text-slate-300 mt-1">Ví dụ minh họa</div>
               </div>
-              <div className="p-2.5 rounded-xl bg-warm-50 border border-warm-200 dark:bg-slate-800/40 dark:border-slate-800">
+              <div className="p-2.5 rounded-xl bg-white border border-slate-200 dark:bg-slate-800/60 dark:border-slate-700">
                 <div className="text-slate-500 text-[11px]">Cộng khác mẫu</div>
-                <div className="font-bold text-emerald-700 mt-1">SECURE (Re-test)</div>
+                <div className="font-semibold text-slate-700 dark:text-slate-300 mt-1">Ví dụ minh họa</div>
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-1 text-xs text-slate-500">
-              <span>Độ tin cậy bằng chứng: <strong>HIGH (Re-test đối soát)</strong></span>
-              <Link
-                href="/diagnostic/math-grade6"
-                className="font-semibold text-edu-700 hover:text-edu-800 dark:text-edu-400"
-              >
-                Xem lại chẩn đoán này →
-              </Link>
+            <div className="pt-1 text-[11px] text-slate-500">
+              Trạng thái bằng chứng: <em>Ví dụ minh họa (Chưa có dữ liệu bài thi của học sinh)</em>
             </div>
           </div>
         </div>
@@ -131,7 +163,7 @@ export function LearnerHome({ user }: LearnerHomeProps) {
               <span>Chẩn đoán chủ đề mới</span>
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Bạn đã hoàn thành củng cố bài Phép cộng phân số. Hãy chọn thêm một chủ đề mới để hệ thống lập bản đồ năng lực chuẩn xác.
+              Thực hiện bài chẩn đoán để hệ thống lập bản đồ chính xác các mắt xích kiến thức đã vững hoặc cần củng cố.
             </p>
             <Link
               href="/learn/new"
@@ -143,9 +175,9 @@ export function LearnerHome({ user }: LearnerHomeProps) {
           </div>
 
           <div className="rounded-2xl border border-warm-200 bg-white p-4 shadow-xs text-xs space-y-2 dark:border-slate-800 dark:bg-slate-900">
-            <div className="font-bold text-slate-900 dark:text-white">Quy tắc chấm điểm V3:</div>
+            <div className="font-bold text-slate-900 dark:text-white">Quy tắc chấm điểm GDPT 2018:</div>
             <p className="text-slate-500 leading-relaxed">
-              Hệ thống không tính điểm trung bình tổng quát <code>/100</code> mà ghi nhận trạng thái rời rạc cho từng nút kiến thức: <em>Đã vững, Cần học bù, hoặc Chưa chắc chắn</em>.
+              Hệ thống không tính điểm trung bình tổng quát <code>/100</code> hay gán nhãn năng lực suy diễn. Năng lực được ghi nhận độc lập cho từng nút kiến thức dựa trên bằng chứng khảo sát thực tế.
             </p>
           </div>
         </div>

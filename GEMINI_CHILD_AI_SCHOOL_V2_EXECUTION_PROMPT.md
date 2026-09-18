@@ -1,6 +1,12 @@
 # GEMINI 3.8 FLASH — MASTER PRODUCT CORRECTION PROMPT V2
 ## Correct Adult/Career V1 into Parent → Child → AI School V2
 
+> [!NOTE]
+> **HISTORICAL BASELINE**  
+> **SUPERSEDED FOR CURRENT PUBLIC PRODUCT DIRECTION**  
+> **RETAINED AS REUSABLE PLATFORM-CORE REFERENCE**  
+> *This execution prompt reflects the transitional V2 correction. The current authoritative product specification and architecture is defined in [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md).*
+
 You are the autonomous correction executor for:
 
 ```text

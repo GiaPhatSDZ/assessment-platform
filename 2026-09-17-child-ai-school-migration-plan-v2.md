@@ -1,7 +1,13 @@
 # Assessment Platform — Product Correction Migration Plan V2
 ## Existing Adult/Career V1 → Parent/Child AI School V2
 
-**Status:** Approved autonomous migration plan  
+> [!NOTE]
+> **HISTORICAL BASELINE**  
+> **SUPERSEDED FOR CURRENT PUBLIC PRODUCT DIRECTION**  
+> **RETAINED AS REUSABLE PLATFORM-CORE REFERENCE**  
+> *This plan reflects the transitional V1 → V2 migration. The current authoritative product specification and architecture is defined in [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md).*
+
+**Status:** Historical Baseline (Superseded by AI School Current Authority)  
 **Repository:** `GiaPhatSDZ/assessment-platform`  
 **Baseline:** `main@600db58d9a81301634b4ba32a35263db30b08cfc`  
 **Target release:** `v0.2.0`  

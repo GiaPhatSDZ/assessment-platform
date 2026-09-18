@@ -1,3 +1,18 @@
+/**
+ * @deprecated HISTORICAL_BASELINE_PROTOTYPE
+ *
+ * HISTORICAL BASELINE
+ * SUPERSEDED FOR CURRENT PUBLIC PRODUCT DIRECTION
+ * RETAINED AS REUSABLE PLATFORM-CORE REFERENCE
+ *
+ * This component contains obsolete demo/Gemini prompt-runner behavior from early prototyping.
+ * Under current AI School authority (docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md):
+ * - Student runtime must NOT execute generative AI directly.
+ * - Diagnostic flows must source exclusively through reviewed and published curriculum gates.
+ * - This component is NOT part of the active student runtime and is unreferenced by production routes.
+ *
+ * DO NOT IMPORT THIS COMPONENT INTO ACTIVE STUDENT ROUTES.
+ */
 "use client";
 
 import React, { useState } from "react";
@@ -105,6 +120,16 @@ export function KnowledgeGapRunner() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:py-12">
+      {/* Historical Prototype Archival Notice */}
+      <div className="mb-6 rounded-xl border border-amber-300 bg-amber-50 p-4 text-xs text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
+        <p className="font-bold uppercase tracking-wide">
+          [LƯU TRỮ LỊCH SỬ · NGUYÊN MẪU THỬ NGHIỆM KHÔNG THUỘC QUY TRÌNH CHÍNH THỨC]
+        </p>
+        <p className="mt-1 leading-relaxed">
+          Thành phần này là nguyên mẫu demo lịch sử (Gemini-prompt flow). Quy trình học sinh hiện tại tuân thủ AI School Authority (không chạy AI tạo sinh trực tiếp trên client; chỉ hiển thị nội dung đã qua kiểm duyệt).
+        </p>
+      </div>
+
       {/* Official Curriculum Header Banner */}
       <div className="mb-8 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">

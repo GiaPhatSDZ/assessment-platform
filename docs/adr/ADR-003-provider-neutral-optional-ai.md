@@ -1,7 +1,13 @@
 # ADR-003: Sinh Báo Cáo AI Tùy Chọn Trung Lập Nhà Cung Cấp (Provider-Neutral Optional AI)
 
+> [!NOTE]
+> **HISTORICAL BASELINE**  
+> **SUPERSEDED FOR CURRENT PUBLIC PRODUCT DIRECTION**  
+> **RETAINED AS REUSABLE PLATFORM-CORE REFERENCE**  
+> *This decision record reflects reusable platform-core AI infrastructure. Current product authority is defined in [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](../authority/AI_SCHOOL_CURRENT_AUTHORITY.md).*
+
 ## Trạng Thái (Status)
-Đã Phê Duyệt (Accepted) — Ngày: 2026-09-17
+Đã Phê Duyệt (Accepted) — Ngày: 2026-09-17 (Platform Core Reference)
 
 ## Bối Cảnh (Context)
 Để hỗ trợ người học có lộ trình phát triển kỹ năng rõ ràng, nền tảng cung cấp bản phân tích năng lực chuyên sâu và kế hoạch hành động 6 tuần do AI đề xuất. Tuy nhiên:

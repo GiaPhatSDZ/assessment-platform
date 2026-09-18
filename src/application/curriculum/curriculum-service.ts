@@ -3,6 +3,12 @@ import { CurriculumSource, KnowledgeGraph } from "@/src/domain/curriculum/types"
 import { DiagnosticItem } from "@/src/domain/diagnostic/types";
 
 export class CurriculumService {
+  /**
+   * @deprecated HISTORICAL_BASELINE_NON_AUTHORITATIVE
+   * Retained for legacy test reference only.
+   * Canonical source authority is subject-specific (e.g. `curriculum/vietnam/lower-secondary/grade-6/math/source-registry.json`)
+   * conforming to the frozen R2.1 SourceDocument provenance schema.
+   */
   static getSourceRegistry(): { version: string; sources: CurriculumSource[] } {
     return sourceRegistryData as unknown as { version: string; sources: CurriculumSource[] };
   }

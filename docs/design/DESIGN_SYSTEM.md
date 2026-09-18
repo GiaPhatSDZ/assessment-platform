@@ -1,6 +1,12 @@
 # Assessment Studio — Canonical Design System
 
-**Status:** Approved design system authority  
+> [!NOTE]
+> **HISTORICAL BASELINE**  
+> **SUPERSEDED FOR CURRENT PUBLIC PRODUCT DIRECTION**  
+> **RETAINED AS REUSABLE PLATFORM-CORE REFERENCE**  
+> *This design system document reflects the original V1 Assessment Studio styling. The current authoritative product specification and architecture is defined in [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md).*
+
+**Status:** Historical Baseline (Retained as Design System Reference)  
 **Version:** 1.0  
 **Stack:** Next.js (App Router) + React + Tailwind CSS + Lucide Icons + Recharts  
 **Intelligence Source:** UI UX Pro Max v2.15.0 evaluated against Product & Architecture Specification v1.1  

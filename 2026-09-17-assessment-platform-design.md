@@ -1,6 +1,12 @@
 # Assessment Platform — Product & Architecture Specification v1.1
 
-**Status:** Approved implementation authority  
+> [!NOTE]
+> **HISTORICAL BASELINE**  
+> **SUPERSEDED FOR CURRENT PUBLIC PRODUCT DIRECTION**  
+> **RETAINED AS REUSABLE PLATFORM-CORE REFERENCE**  
+> *This specification reflects the original v0.1 / v1.1 generic assessment platform design. The current authoritative product specification and architecture is defined in [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md).*
+
+**Status:** Historical Baseline (Superseded by AI School Current Authority)  
 **Date:** 2026-09-17  
 **Working repository name:** `assessment-platform`  
 **Working product name:** `Assessment Studio` (temporary; all branding must be centralized and replaceable)  

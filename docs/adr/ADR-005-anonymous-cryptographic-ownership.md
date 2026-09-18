@@ -1,7 +1,13 @@
 # ADR-005: Xác Thực Quyền Sở Hữu Phiên Ẩn Danh Bằng Mật Mã Học (Anonymous Cryptographic Ownership)
 
+> [!NOTE]
+> **HISTORICAL BASELINE**  
+> **SUPERSEDED FOR CURRENT PUBLIC PRODUCT DIRECTION**  
+> **RETAINED AS REUSABLE PLATFORM-CORE REFERENCE**  
+> *This decision record reflects reusable platform-core authentication infrastructure. Current product authority is defined in [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](../authority/AI_SCHOOL_CURRENT_AUTHORITY.md).*
+
 ## Trạng Thái (Status)
-Đã Phê Duyệt (Accepted) — Ngày: 2026-09-17
+Đã Phê Duyệt (Accepted) — Ngày: 2026-09-17 (Platform Core Reference)
 
 ## Bối Cảnh (Context)
 Nền tảng cho phép người dùng làm bài đánh giá và nhận kết quả ẩn danh mà không bắt buộc phải đăng ký tài khoản trước. Tuy nhiên, điều này đặt ra thách thức kỹ thuật về bảo mật:

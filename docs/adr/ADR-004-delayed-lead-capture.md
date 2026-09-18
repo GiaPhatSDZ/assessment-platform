@@ -1,7 +1,13 @@
 # ADR-004: Chiến Lược Thu Thập Lead Có Chủ Đích (Delayed Lead Capture Strategy)
 
+> [!NOTE]
+> **HISTORICAL BASELINE**  
+> **SUPERSEDED FOR CURRENT PUBLIC PRODUCT DIRECTION**  
+> **RETAINED AS REUSABLE PLATFORM-CORE REFERENCE**  
+> *This decision record reflects reusable platform-core lead capture infrastructure. Current product authority is defined in [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](../authority/AI_SCHOOL_CURRENT_AUTHORITY.md).*
+
 ## Trạng Thái (Status)
-Đã Phê Duyệt (Accepted) — Ngày: 2026-09-17
+Đã Phê Duyệt (Accepted) — Ngày: 2026-09-17 (Platform Core Reference)
 
 ## Bối Cảnh (Context)
 Nhiều nền tảng trắc nghiệm trực tuyến áp dụng kỹ thuật thao túng (dark pattern): cho người dùng làm bài 10-15 phút rồi bất ngờ chặn màn hình (paywall/email-wall), ép buộc phải nhập email hoặc số điện thoại mới cho xem kết quả. Kỹ thuật này gây ức chế tâm lý cao, dẫn đến tỷ lệ bỏ cuộc lớn và thu thập phải thông tin email rác.

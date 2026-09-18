@@ -1,8 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "version": "1.0.0",
+  "version": "1.0.0-legacy-non-authoritative",
   "updatedAt": "2026-09-17T12:00:00.000Z",
   "jurisdiction": "VN",
+  "isAuthoritative": false,
+  "registryStatus": "LEGACY_NON_AUTHORITATIVE",
+  "supersededBy": "Canonical curriculum subject source registry (e.g. curriculum/vietnam/lower-secondary/grade-6/math/source-registry.json) under R2.1 Source Provenance",
+  "notice": "HISTORICAL BASELINE — NON-AUTHORITATIVE. Do not use for content provenance or publication gates. Current source authority resides in the subject-specific source registries adhering to R2.1 Source Provenance (SourceDocument schema).",
   "sources": [
     {
       "id": "SRC-VN-MOET-GEP-2018",

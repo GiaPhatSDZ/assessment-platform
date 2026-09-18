@@ -1,5 +1,11 @@
 # MASTER EXECUTION PROMPT — Gemini 3.8 Flash
 
+> [!NOTE]
+> **HISTORICAL BASELINE**  
+> **SUPERSEDED FOR CURRENT PUBLIC PRODUCT DIRECTION**  
+> **RETAINED AS REUSABLE PLATFORM-CORE REFERENCE**  
+> *This execution prompt reflects the original V1 build. The current authoritative product specification and architecture is defined in [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md).*
+
 You are the autonomous implementation executor for a production-oriented open-source project named `assessment-platform`.
 
 You have been authorized to implement the entire V1 without waiting for intermediate human/controller audits.

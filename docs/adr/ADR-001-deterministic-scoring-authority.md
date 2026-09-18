@@ -1,7 +1,13 @@
 # ADR-001: Thẩm Quyền Điểm Số Toán Học Tất Định (Deterministic Scoring Authority)
 
+> [!NOTE]
+> **HISTORICAL BASELINE**  
+> **SUPERSEDED FOR CURRENT PUBLIC PRODUCT DIRECTION**  
+> **RETAINED AS REUSABLE PLATFORM-CORE REFERENCE**  
+> *This decision record reflects reusable platform-core scoring infrastructure. Current product authority is defined in [docs/authority/AI_SCHOOL_CURRENT_AUTHORITY.md](../authority/AI_SCHOOL_CURRENT_AUTHORITY.md).*
+
 ## Trạng Thái (Status)
-Đã Phê Duyệt (Accepted) — Ngày: 2026-09-17
+Đã Phê Duyệt (Accepted) — Ngày: 2026-09-17 (Platform Core Reference)
 
 ## Bối Cảnh (Context)
 Nhiều nền tảng đánh giá hiện nay sử dụng mô hình ngôn ngữ lớn (LLM) để vừa chấm điểm, vừa phân tích bài làm. Cách làm này mang lại nhiều rủi ro nghiêm trọng:
