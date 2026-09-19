@@ -115,7 +115,8 @@ export interface AtomicDiagnosticGradingParams {
   studentResponse: DiagnosticStudentResponse;
   selectedOptionId?: string | null;
   isCorrect: boolean;
-  misconceptionTags: string[];
+  attemptMisconceptionTags: string[];
+  nodeMisconceptionTags: string[];
   gradingRuleVersion: string;
   evidenceRuleVersion: string;
   nodeState: KnowledgeState;

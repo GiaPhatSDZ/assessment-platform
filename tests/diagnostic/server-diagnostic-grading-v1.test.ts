@@ -714,7 +714,8 @@ describe("Server-Side Diagnostic Grading V1 Test Matrix", () => {
         primaryNodeId: item.primaryNodeId,
         studentResponse: { type: "MCQ", selectedOptionId: "opt-1" },
         isCorrect: true,
-        misconceptionTags: [],
+        attemptMisconceptionTags: [],
+        nodeMisconceptionTags: [],
         gradingRuleVersion: "1.0.0",
         evidenceRuleVersion: "1.0.0",
         nodeState: "SECURE",
@@ -1040,7 +1041,8 @@ describe("Server-Side Diagnostic Grading V1 Test Matrix", () => {
       studentResponse: { type: "MCQ", selectedOptionId: "opt-1" },
       selectedOptionId: "opt-1",
       isCorrect: true,
-      misconceptionTags: [],
+      attemptMisconceptionTags: [],
+      nodeMisconceptionTags: [],
       gradingRuleVersion: "1.0.0",
       evidenceRuleVersion: "1.0.0",
       nodeState: "DEVELOPING",
@@ -1058,6 +1060,8 @@ describe("Server-Side Diagnostic Grading V1 Test Matrix", () => {
     expect(capturedRpcPayload.p_learner_id).toBe(learnerId);
     expect(capturedRpcPayload.p_item_id).toBe("ITEM-1");
     expect(capturedRpcPayload.p_expected_node_exists).toBe(false);
+    expect(capturedRpcPayload.p_attempt_misconception_tags).toEqual([]);
+    expect(capturedRpcPayload.p_node_misconception_tags).toEqual([]);
     expect(result.attemptId).toBe("att-123");
 
     // 3. Test ATTEMPT_ALREADY_RECORDED error translation
@@ -1071,7 +1075,8 @@ describe("Server-Side Diagnostic Grading V1 Test Matrix", () => {
         primaryNodeId: "NODE-1",
         studentResponse: { type: "MCQ", selectedOptionId: "opt-1" },
         isCorrect: true,
-        misconceptionTags: [],
+        attemptMisconceptionTags: [],
+        nodeMisconceptionTags: [],
         gradingRuleVersion: "1.0.0",
         evidenceRuleVersion: "1.0.0",
         nodeState: "DEVELOPING",
@@ -1096,7 +1101,8 @@ describe("Server-Side Diagnostic Grading V1 Test Matrix", () => {
         primaryNodeId: "NODE-1",
         studentResponse: { type: "MCQ", selectedOptionId: "opt-1" },
         isCorrect: true,
-        misconceptionTags: [],
+        attemptMisconceptionTags: [],
+        nodeMisconceptionTags: [],
         gradingRuleVersion: "1.0.0",
         evidenceRuleVersion: "1.0.0",
         nodeState: "DEVELOPING",
@@ -1121,7 +1127,8 @@ describe("Server-Side Diagnostic Grading V1 Test Matrix", () => {
         primaryNodeId: "NODE-1",
         studentResponse: { type: "MCQ", selectedOptionId: "opt-1" },
         isCorrect: true,
-        misconceptionTags: [],
+        attemptMisconceptionTags: [],
+        nodeMisconceptionTags: [],
         gradingRuleVersion: "1.0.0",
         evidenceRuleVersion: "1.0.0",
         nodeState: "DEVELOPING",
@@ -1324,5 +1331,149 @@ describe("Server-Side Diagnostic Grading V1 Test Matrix", () => {
     });
     expect(threeDistinctMixed.state).toBe("UNCERTAIN");
     expect(threeDistinctMixed.confidence).toBe("HIGH");
+  });
+
+  // 45 (P0): Migration history immutability and additive upgrade
+  it("Requirement 45 (P0): migration 00003 matches historical baseline and 00004 provides additive upgrade", () => {
+    const migration00003Path = path.join(rootDir, "supabase", "migrations", "20260919000003_server_diagnostic_grading_v1.sql");
+    const sql00003 = fs.readFileSync(migration00003Path, "utf-8");
+
+    // 00003 matches historical baseline: does NOT contain p_expected_node_exists in its signature
+    expect(sql00003).toContain("CREATE OR REPLACE FUNCTION public.record_atomic_diagnostic_grading(");
+    expect(sql00003).not.toContain("p_expected_node_exists");
+    expect(sql00003).toContain("p_misconception_tags JSONB");
+
+    const migration00004Path = path.join(rootDir, "supabase", "migrations", "20260919000004_diagnostic_grading_concurrency_fix.sql");
+    const sql00004 = fs.readFileSync(migration00004Path, "utf-8");
+
+    // 00004 drops old 00003 signature and creates authoritative upgrade with expectedNodeExists and split misconception tags
+    expect(sql00004).toContain("DROP FUNCTION IF EXISTS public.record_atomic_diagnostic_grading");
+    expect(sql00004).toContain("p_expected_node_exists BOOLEAN DEFAULT FALSE");
+    expect(sql00004).toContain("p_attempt_misconception_tags JSONB");
+    expect(sql00004).toContain("p_node_misconception_tags JSONB");
+    expect(sql00004).toContain("SET search_path = public, pg_temp");
+    expect(sql00004).toContain("GRANT EXECUTE ON FUNCTION public.record_atomic_diagnostic_grading TO service_role;");
+  });
+
+  // 46 (P1): Misconception tags split regression flow: attempt vs node projection across sequential attempts
+  it("Requirement 46 (P1): splits attemptMisconceptionTags and nodeMisconceptionTags cleanly across 3 sequential attempts", async () => {
+    const visitorToken = "v-token-miscon-p1-123456789";
+    const learner = await repository.createLearner(
+      { educationStage: "LOWER_SECONDARY", gradeLevel: 6 },
+      { visitorToken }
+    );
+    const session1 = await repository.createLearningSession(
+      { learnerId: learner.id, sessionKind: "DIAGNOSTIC", subjectId: "math", topicId: "fractions", ruleVersion: "1.0.0" },
+      { visitorToken }
+    );
+    const session2 = await repository.createLearningSession(
+      { learnerId: learner.id, sessionKind: "DIAGNOSTIC", subjectId: "math", topicId: "fractions", ruleVersion: "1.0.0" },
+      { visitorToken }
+    );
+    const session3 = await repository.createLearningSession(
+      { learnerId: learner.id, sessionKind: "DIAGNOSTIC", subjectId: "math", topicId: "fractions", ruleVersion: "1.0.0" },
+      { visitorToken }
+    );
+
+    const item1 = createTestPublishedItem({
+      id: "ITEM-MISCON-1",
+      primaryNodeId: "NODE-MISCON-TEST",
+      options: [
+        { id: "opt-1", content: [{ type: "text", value: "Correct" }], isCorrect: true },
+        { id: "opt-2", content: [{ type: "text", value: "Distractor A" }], isCorrect: false, misconceptionTag: "MISCON-A" },
+      ],
+      correctAnswer: "opt-1",
+    });
+
+    const item2 = createTestPublishedItem({
+      id: "ITEM-MISCON-2",
+      primaryNodeId: "NODE-MISCON-TEST",
+      options: [
+        { id: "opt-1", content: [{ type: "text", value: "Correct" }], isCorrect: true },
+        { id: "opt-2", content: [{ type: "text", value: "Distractor Neutral" }], isCorrect: false },
+      ],
+      correctAnswer: "opt-1",
+    });
+
+    const item3 = createTestPublishedItem({
+      id: "ITEM-MISCON-3",
+      primaryNodeId: "NODE-MISCON-TEST",
+      options: [
+        { id: "opt-1", content: [{ type: "text", value: "Correct" }], isCorrect: true },
+        { id: "opt-2", content: [{ type: "text", value: "Distractor B" }], isCorrect: false, misconceptionTag: "MISCON-B" },
+      ],
+      correctAnswer: "opt-1",
+    });
+
+    const resolver: CanonicalItemResolver = (id) => {
+      if (id === item1.id) return { item: item1, subjectId: "math", topicId: "fractions" };
+      if (id === item2.id) return { item: item2, subjectId: "math", topicId: "fractions" };
+      if (id === item3.id) return { item: item3, subjectId: "math", topicId: "fractions" };
+      return null;
+    };
+
+    const service = new ServerDiagnosticService(repository, resolver);
+
+    // Attempt 1: wrong with MISCON-A
+    const res1 = await service.submitAttempt({
+      learnerId: learner.id,
+      sessionId: session1.id,
+      itemId: item1.id,
+      itemVersion: "1.0.0",
+      response: { type: "MCQ", selectedOptionId: "opt-2" }, // triggers MISCON-A
+    }, { visitorToken });
+
+    expect(res1.accepted).toBe(true);
+    expect(res1.isCorrect).toBe(false);
+
+    // Verify Attempt 1 tags and Node 1 tags
+    const attempts1 = await repository.getLearnerNodeAttempts(learner.id, "NODE-MISCON-TEST", { visitorToken });
+    expect(attempts1.length).toBe(1);
+    expect(attempts1[0].misconceptionTags).toEqual(["MISCON-A"]);
+
+    const node1 = (await repository.getCurrentNodeStates(learner.id, { visitorToken }))["NODE-MISCON-TEST"];
+    expect(node1.misconceptionTags).toEqual(["MISCON-A"]);
+
+    // Attempt 2: correct with no misconception
+    const res2 = await service.submitAttempt({
+      learnerId: learner.id,
+      sessionId: session2.id,
+      itemId: item2.id,
+      itemVersion: "1.0.0",
+      response: { type: "MCQ", selectedOptionId: "opt-1" }, // correct
+    }, { visitorToken });
+
+    expect(res2.accepted).toBe(true);
+    expect(res2.isCorrect).toBe(true);
+
+    // Verify Attempt 2 tags are empty, but Node tags STILL contain MISCON-A
+    const attempts2 = await repository.getLearnerNodeAttempts(learner.id, "NODE-MISCON-TEST", { visitorToken });
+    expect(attempts2.length).toBe(2);
+    const attempt2 = attempts2.find((a) => a.itemId === item2.id)!;
+    expect(attempt2.misconceptionTags).toEqual([]);
+
+    const node2 = (await repository.getCurrentNodeStates(learner.id, { visitorToken }))["NODE-MISCON-TEST"];
+    expect(node2.misconceptionTags).toEqual(["MISCON-A"]);
+
+    // Attempt 3: wrong with MISCON-B
+    const res3 = await service.submitAttempt({
+      learnerId: learner.id,
+      sessionId: session3.id,
+      itemId: item3.id,
+      itemVersion: "1.0.0",
+      response: { type: "MCQ", selectedOptionId: "opt-2" }, // triggers MISCON-B
+    }, { visitorToken });
+
+    expect(res3.accepted).toBe(true);
+    expect(res3.isCorrect).toBe(false);
+
+    // Verify Attempt 3 tags are [MISCON-B], and Node tags contain unique [MISCON-A, MISCON-B]
+    const attempts3 = await repository.getLearnerNodeAttempts(learner.id, "NODE-MISCON-TEST", { visitorToken });
+    expect(attempts3.length).toBe(3);
+    const attempt3 = attempts3.find((a) => a.itemId === item3.id)!;
+    expect(attempt3.misconceptionTags).toEqual(["MISCON-B"]);
+
+    const node3 = (await repository.getCurrentNodeStates(learner.id, { visitorToken }))["NODE-MISCON-TEST"];
+    expect(node3.misconceptionTags).toEqual(["MISCON-A", "MISCON-B"]);
   });
 });

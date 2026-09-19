@@ -1,19 +1,22 @@
 -- ==============================================================================
--- AI School Database Migration: Server-Side Diagnostic Grading V1
--- File: supabase/migrations/20260919000003_server_diagnostic_grading_v1.sql
+-- AI School Database Migration: Diagnostic Grading Concurrency & Misconception Fix
+-- File: supabase/migrations/20260919000004_diagnostic_grading_concurrency_fix.sql
 --
 -- Controller Mandates:
--- 1. Adds unique constraint on (session_id, item_id) to prevent replay/duplicate attempts.
--- 2. Implements atomic persistence RPC function record_atomic_diagnostic_grading.
--- 3. A3: Concurrency-safe node projection lock / CAS returning STATE_CONFLICT_RETRY.
--- 4. A4: Service-role only execution, search_path locked.
+-- 1. P0: Migration history is immutable; upgrade RPC in this additive migration.
+-- 2. Drop old record_atomic_diagnostic_grading overload from 00003.
+-- 3. Replace with new signature containing p_expected_node_exists BOOLEAN.
+-- 4. P1: Split attempt vs node misconception tags (p_attempt_misconception_tags, p_node_misconception_tags).
+-- 5. Preserve SECURITY DEFINER, SET search_path = public, pg_temp, advisory lock,
+--    explicit node existence CAS, and service_role only execution permissions.
 -- ==============================================================================
 
--- 1. Enforce duplicate/replay prevention at the database level
-ALTER TABLE public.learning_attempts
-  ADD CONSTRAINT uq_learning_attempts_session_item UNIQUE (session_id, item_id);
+-- 1. Drop old 00003 overload
+DROP FUNCTION IF EXISTS public.record_atomic_diagnostic_grading(
+  UUID, UUID, TEXT, TEXT, TEXT, TEXT, JSONB, TEXT, BOOLEAN, JSONB, TEXT, TEXT, TEXT, TEXT, INT, INT, TIMESTAMPTZ, TEXT, TIMESTAMPTZ, BOOLEAN, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT
+);
 
--- 2. Atomic Diagnostic Grading Transaction RPC
+-- 2. Create authoritative upgraded RPC function
 CREATE OR REPLACE FUNCTION public.record_atomic_diagnostic_grading(
   p_learner_id UUID,
   p_session_id UUID,
@@ -24,15 +27,17 @@ CREATE OR REPLACE FUNCTION public.record_atomic_diagnostic_grading(
   p_student_response JSONB,
   p_selected_option_id TEXT,
   p_is_correct BOOLEAN,
-  p_misconception_tags JSONB,
+  p_attempt_misconception_tags JSONB,
   p_grading_rule_version TEXT,
   p_evidence_rule_version TEXT,
   p_node_state TEXT,
   p_node_confidence TEXT,
   p_attempts_count INT,
   p_correct_count INT,
+  p_node_misconception_tags JSONB,
   p_last_assessed_at TIMESTAMPTZ,
   p_node_rule_version TEXT,
+  p_expected_node_exists BOOLEAN DEFAULT FALSE,
   p_expected_node_updated_at TIMESTAMPTZ DEFAULT NULL,
   p_has_mastery_transition BOOLEAN DEFAULT FALSE,
   p_previous_state TEXT DEFAULT NULL,
@@ -84,19 +89,26 @@ BEGIN
     RAISE EXCEPTION 'ATTEMPT_ALREADY_RECORDED: Item % has already been attempted in session %', p_item_id, p_session_id;
   END IF;
 
-  -- 3. A3: CAS check on existing node state if caller specified expected projection timestamp
+  -- 3. A3 & P0-2: CAS check on existing node state (explicitly handling presence/absence)
   SELECT learner_id, node_id, state, confidence, updated_at INTO v_current_node
   FROM public.knowledge_node_states
   WHERE learner_id = p_learner_id AND node_id = p_primary_node_id;
 
-  IF p_expected_node_updated_at IS NOT NULL THEN
-    IF v_current_node.updated_at IS DISTINCT FROM p_expected_node_updated_at THEN
+  IF NOT p_expected_node_exists THEN
+    IF FOUND THEN
+      RAISE EXCEPTION 'STATE_CONFLICT_RETRY: Node state for node % was created concurrently', p_primary_node_id;
+    END IF;
+  ELSE
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'STATE_CONFLICT_RETRY: Expected node state for node % does not exist', p_primary_node_id;
+    END IF;
+    IF p_expected_node_updated_at IS NOT NULL AND v_current_node.updated_at IS DISTINCT FROM p_expected_node_updated_at THEN
       RAISE EXCEPTION 'STATE_CONFLICT_RETRY: Node state for node % was modified concurrently (expected %, found %)',
         p_primary_node_id, p_expected_node_updated_at, v_current_node.updated_at;
     END IF;
   END IF;
 
-  -- 4. Insert learning attempt
+  -- 4. Insert learning attempt (P1: stores attempt-specific misconception tags)
   INSERT INTO public.learning_attempts (
     session_id,
     learner_id,
@@ -120,7 +132,7 @@ BEGIN
     p_student_response,
     p_selected_option_id,
     p_is_correct,
-    p_misconception_tags,
+    p_attempt_misconception_tags,
     p_grading_rule_version,
     v_now
   )
@@ -148,7 +160,7 @@ BEGIN
   )
   RETURNING id INTO v_evidence_id;
 
-  -- 6. Upsert knowledge node state
+  -- 6. Upsert knowledge node state (P1: stores cumulative node projection misconception tags)
   INSERT INTO public.knowledge_node_states (
     learner_id,
     node_id,
@@ -167,7 +179,7 @@ BEGIN
     p_node_confidence,
     p_attempts_count,
     p_correct_count,
-    p_misconception_tags,
+    p_node_misconception_tags,
     p_last_assessed_at,
     p_node_rule_version,
     v_now

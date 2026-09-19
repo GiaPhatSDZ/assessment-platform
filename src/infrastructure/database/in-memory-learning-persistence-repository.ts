@@ -487,7 +487,7 @@ export class InMemoryLearningPersistenceRepository implements LearningPersistenc
         studentResponse: params.studentResponse,
         selectedOptionId: params.selectedOptionId ?? null,
         isCorrect: params.isCorrect,
-        misconceptionTags: params.misconceptionTags ?? [],
+        misconceptionTags: params.attemptMisconceptionTags ?? [],
         gradingRuleVersion: params.gradingRuleVersion,
         attemptedAt: now,
       };
@@ -523,7 +523,7 @@ export class InMemoryLearningPersistenceRepository implements LearningPersistenc
         confidence: params.nodeConfidence,
         attemptsCount: params.attemptsCount,
         correctCount: params.correctCount,
-        misconceptionTags: params.misconceptionTags ?? [],
+        misconceptionTags: params.nodeMisconceptionTags ?? [],
         lastAssessedAt: params.nodeState === "NOT_ASSESSED" ? null : (params.lastAssessedAt || now),
         ruleVersion: params.nodeRuleVersion,
         updatedAt: now,
