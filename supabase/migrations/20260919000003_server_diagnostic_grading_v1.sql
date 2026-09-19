@@ -33,6 +33,7 @@ CREATE OR REPLACE FUNCTION public.record_atomic_diagnostic_grading(
   p_correct_count INT,
   p_last_assessed_at TIMESTAMPTZ,
   p_node_rule_version TEXT,
+  p_expected_node_exists BOOLEAN DEFAULT FALSE,
   p_expected_node_updated_at TIMESTAMPTZ DEFAULT NULL,
   p_has_mastery_transition BOOLEAN DEFAULT FALSE,
   p_previous_state TEXT DEFAULT NULL,
@@ -84,13 +85,20 @@ BEGIN
     RAISE EXCEPTION 'ATTEMPT_ALREADY_RECORDED: Item % has already been attempted in session %', p_item_id, p_session_id;
   END IF;
 
-  -- 3. A3: CAS check on existing node state if caller specified expected projection timestamp
+  -- 3. A3 & P0-2: CAS check on existing node state (explicitly handling presence/absence)
   SELECT learner_id, node_id, state, confidence, updated_at INTO v_current_node
   FROM public.knowledge_node_states
   WHERE learner_id = p_learner_id AND node_id = p_primary_node_id;
 
-  IF p_expected_node_updated_at IS NOT NULL THEN
-    IF v_current_node.updated_at IS DISTINCT FROM p_expected_node_updated_at THEN
+  IF NOT p_expected_node_exists THEN
+    IF FOUND THEN
+      RAISE EXCEPTION 'STATE_CONFLICT_RETRY: Node state for node % was created concurrently', p_primary_node_id;
+    END IF;
+  ELSE
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'STATE_CONFLICT_RETRY: Expected node state for node % does not exist', p_primary_node_id;
+    END IF;
+    IF p_expected_node_updated_at IS NOT NULL AND v_current_node.updated_at IS DISTINCT FROM p_expected_node_updated_at THEN
       RAISE EXCEPTION 'STATE_CONFLICT_RETRY: Node state for node % was modified concurrently (expected %, found %)',
         p_primary_node_id, p_expected_node_updated_at, v_current_node.updated_at;
     END IF;

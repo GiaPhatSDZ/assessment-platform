@@ -193,6 +193,7 @@ export function gradeStudentResponse(
 export interface NodeStateEvaluationInput {
   attemptsCount: number;
   correctCount: number;
+  distinctAttemptedItemIds?: Set<string>;
   distinctCorrectItemIds: Set<string>;
   allMisconceptions: string[];
   assessedAt: string;
@@ -211,7 +212,7 @@ export interface NodeStateEvaluationOutput {
 /**
  * Pure evaluation of knowledge node state from cumulative attempt evidence.
  *
- * Matrix:
+ * Implements Controller Mandates A5 & P1-1:
  * - 0 attempts: NOT_ASSESSED / LOW (lastAssessedAt: null)
  * - 1 correct: UNCERTAIN / LOW (one correct does NOT overclaim SECURE)
  * - 1 incorrect: DEVELOPING / LOW
@@ -219,15 +220,28 @@ export interface NodeStateEvaluationOutput {
  *     SECURE ONLY IF distinct canonical itemIds >= 2 (A5).
  *     distinct == 2 -> MEDIUM, distinct >= 3 -> HIGH.
  *     If distinct < 2 (repeated same item) -> UNCERTAIN / LOW.
- * - Multiple (all incorrect):
- *     DEVELOPING (attempts == 2 -> MEDIUM, >= 3 -> HIGH).
- * - Multiple (mixed 0 < correct < attempts):
- *     UNCERTAIN / MEDIUM.
+ * - Multiple (all incorrect) (P1-1):
+ *     Confidence based strictly on distinct attempted items:
+ *     distinct == 1 (e.g. same item wrong 3 times) -> DEVELOPING / LOW.
+ *     distinct == 2 -> DEVELOPING / MEDIUM.
+ *     distinct >= 3 -> DEVELOPING / HIGH.
+ * - Multiple (mixed 0 < correct < attempts) (P1-1):
+ *     Confidence based strictly on distinct attempted items:
+ *     distinct <= 1 -> UNCERTAIN / LOW.
+ *     distinct == 2 -> UNCERTAIN / MEDIUM.
+ *     distinct >= 3 -> UNCERTAIN / HIGH.
  */
 export function computeConservativeNodeState(
   input: NodeStateEvaluationInput
 ): NodeStateEvaluationOutput {
-  const { attemptsCount, correctCount, distinctCorrectItemIds, allMisconceptions, assessedAt } = input;
+  const {
+    attemptsCount,
+    correctCount,
+    distinctAttemptedItemIds = new Set<string>(),
+    distinctCorrectItemIds,
+    allMisconceptions,
+    assessedAt,
+  } = input;
   const uniqueMisconceptions = Array.from(new Set(allMisconceptions));
 
   if (attemptsCount === 0) {
@@ -241,6 +255,14 @@ export function computeConservativeNodeState(
       ruleVersion: DIAGNOSTIC_NODE_STATE_RULE_VERSION,
     };
   }
+
+  const distinctAttemptedCount =
+    distinctAttemptedItemIds.size > 0
+      ? distinctAttemptedItemIds.size
+      : attemptsCount === 1
+      ? 1
+      : distinctCorrectItemIds.size;
+  const distinctCorrectCount = distinctCorrectItemIds.size;
 
   if (attemptsCount === 1) {
     if (correctCount === 1) {
@@ -271,11 +293,10 @@ export function computeConservativeNodeState(
   // Multiple attempts (attemptsCount >= 2)
   if (correctCount === attemptsCount) {
     // All correct: requires >= 2 independent evidence units (distinct items) for SECURE
-    const distinctCount = distinctCorrectItemIds.size;
-    if (distinctCount >= 2) {
+    if (distinctCorrectCount >= 2) {
       return {
         state: "SECURE",
-        confidence: distinctCount === 2 ? "MEDIUM" : "HIGH",
+        confidence: distinctCorrectCount === 2 ? "MEDIUM" : "HIGH",
         attemptsCount,
         correctCount,
         lastAssessedAt: assessedAt,
@@ -297,10 +318,19 @@ export function computeConservativeNodeState(
   }
 
   if (correctCount === 0) {
-    // All incorrect
+    // All incorrect: confidence based strictly on DISTINCT attempted item IDs (P1-1)
+    let confidence: EvidenceConfidence = "LOW";
+    if (distinctAttemptedCount >= 3) {
+      confidence = "HIGH";
+    } else if (distinctAttemptedCount === 2) {
+      confidence = "MEDIUM";
+    } else {
+      confidence = "LOW";
+    }
+
     return {
       state: "DEVELOPING",
-      confidence: attemptsCount === 2 ? "MEDIUM" : "HIGH",
+      confidence,
       attemptsCount,
       correctCount,
       lastAssessedAt: assessedAt,
@@ -309,10 +339,20 @@ export function computeConservativeNodeState(
     };
   }
 
-  // Mixed results
+  // Mixed results (0 < correctCount < attemptsCount):
+  // Confidence based strictly on DISTINCT evidence, not raw repeated retries (P1-1)
+  let mixedConfidence: EvidenceConfidence = "LOW";
+  if (distinctAttemptedCount >= 3) {
+    mixedConfidence = "HIGH";
+  } else if (distinctAttemptedCount === 2) {
+    mixedConfidence = "MEDIUM";
+  } else {
+    mixedConfidence = "LOW";
+  }
+
   return {
     state: "UNCERTAIN",
-    confidence: "MEDIUM",
+    confidence: mixedConfidence,
     attemptsCount,
     correctCount,
     lastAssessedAt: assessedAt,

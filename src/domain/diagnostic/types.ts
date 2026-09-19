@@ -124,6 +124,7 @@ export interface AtomicDiagnosticGradingParams {
   correctCount: number;
   lastAssessedAt: string | null;
   nodeRuleVersion: string;
+  expectedNodeExists: boolean;
   expectedNodeUpdatedAt?: string | null;
   hasMasteryTransition: boolean;
   previousState?: KnowledgeState;
@@ -144,6 +145,16 @@ export interface AtomicDiagnosticGradingResult {
 // ==============================================================================
 // DOMAIN ERROR CLASSES
 // ==============================================================================
+
+export class TestResolverInjectionForbiddenError extends Error {
+  readonly code = "TEST_RESOLVER_INJECTION_FORBIDDEN";
+  constructor(
+    message: string = "TEST_RESOLVER_INJECTION_FORBIDDEN: Custom item resolver injection is forbidden outside test environment."
+  ) {
+    super(message);
+    this.name = "TestResolverInjectionForbiddenError";
+  }
+}
 
 export class AttemptAlreadyRecordedError extends Error {
   constructor(message: string = "ATTEMPT_ALREADY_RECORDED: Item has already been attempted in this session.") {

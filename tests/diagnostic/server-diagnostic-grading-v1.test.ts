@@ -26,6 +26,7 @@ import {
   SessionClosedError,
   SessionCompatibilityError,
   StateConflictRetryError,
+  TestResolverInjectionForbiddenError,
 } from "../../src/domain/diagnostic/types";
 import {
   DIAGNOSTIC_GRADING_RULE_VERSION,
@@ -722,6 +723,7 @@ describe("Server-Side Diagnostic Grading V1 Test Matrix", () => {
         correctCount: 1,
         lastAssessedAt: "2026-09-18T11:00:00Z",
         nodeRuleVersion: "1.0.0",
+        expectedNodeExists: true,
         expectedNodeUpdatedAt: "2020-01-01T00:00:00.000Z", // Stale timestamp!
         hasMasteryTransition: true,
       }, { visitorToken })
@@ -1047,6 +1049,7 @@ describe("Server-Side Diagnostic Grading V1 Test Matrix", () => {
       correctCount: 0,
       lastAssessedAt: "2026-09-18T10:00:00Z",
       nodeRuleVersion: "1.0.0",
+      expectedNodeExists: false,
       hasMasteryTransition: false,
     }, { visitorToken });
 
@@ -1054,6 +1057,7 @@ describe("Server-Side Diagnostic Grading V1 Test Matrix", () => {
     expect(capturedRpcPayload).not.toBeNull();
     expect(capturedRpcPayload.p_learner_id).toBe(learnerId);
     expect(capturedRpcPayload.p_item_id).toBe("ITEM-1");
+    expect(capturedRpcPayload.p_expected_node_exists).toBe(false);
     expect(result.attemptId).toBe("att-123");
 
     // 3. Test ATTEMPT_ALREADY_RECORDED error translation
@@ -1076,6 +1080,7 @@ describe("Server-Side Diagnostic Grading V1 Test Matrix", () => {
         correctCount: 0,
         lastAssessedAt: "2026-09-18T10:00:00Z",
         nodeRuleVersion: "1.0.0",
+        expectedNodeExists: false,
         hasMasteryTransition: false,
       }, { visitorToken })
     ).rejects.toThrow(AttemptAlreadyRecordedError);
@@ -1100,6 +1105,7 @@ describe("Server-Side Diagnostic Grading V1 Test Matrix", () => {
         correctCount: 0,
         lastAssessedAt: "2026-09-18T10:00:00Z",
         nodeRuleVersion: "1.0.0",
+        expectedNodeExists: false,
         hasMasteryTransition: false,
       }, { visitorToken })
     ).rejects.toThrow(StateConflictRetryError);
@@ -1124,8 +1130,199 @@ describe("Server-Side Diagnostic Grading V1 Test Matrix", () => {
         correctCount: 0,
         lastAssessedAt: "2026-09-18T10:00:00Z",
         nodeRuleVersion: "1.0.0",
+        expectedNodeExists: false,
         hasMasteryTransition: false,
       }, { visitorToken })
     ).rejects.toThrow(SessionClosedError);
+  });
+
+  // 42 (P0-1): Reject custom item resolver injection in production environment
+  it("Requirement 42 (P0-1): rejects custom item resolver injection in production environment", () => {
+    const originalEnv = process.env.NODE_ENV;
+    try {
+      (process.env as any).NODE_ENV = "production";
+
+      const dummyResolver: CanonicalItemResolver = () => null;
+
+      // Direct constructor injection in production must throw
+      expect(() => {
+        new ServerDiagnosticService(repository, dummyResolver);
+      }).toThrow(TestResolverInjectionForbiddenError);
+
+      // createForTesting factory in production must also throw
+      expect(() => {
+        ServerDiagnosticService.createForTesting(repository, dummyResolver);
+      }).toThrow(/TEST_RESOLVER_INJECTION_FORBIDDEN/);
+
+      // Default constructor without custom resolver succeeds in production
+      expect(() => {
+        new ServerDiagnosticService(repository);
+      }).not.toThrow();
+    } finally {
+      (process.env as any).NODE_ENV = originalEnv;
+    }
+  });
+
+  // 43 (P0-2): First-node concurrency race recovers via automatic retry and reflects both attempts
+  it("Requirement 43 (P0-2): two first submissions for distinct items on unassessed node serialize and record both attempts", async () => {
+    const visitorToken = "v-token-concurrent-p02-123456789";
+    const learner = await repository.createLearner(
+      { educationStage: "LOWER_SECONDARY", gradeLevel: 6 },
+      { visitorToken }
+    );
+    const session = await repository.createLearningSession(
+      {
+        learnerId: learner.id,
+        sessionKind: "DIAGNOSTIC",
+        subjectId: "math",
+        topicId: "fractions",
+        ruleVersion: "1.0.0",
+      },
+      { visitorToken }
+    );
+
+    const itemA = createTestPublishedItem({
+      id: "ITEM-CONC-A",
+      primaryNodeId: "NODE-CONCURRENT-TARGET",
+    });
+    const itemB = createTestPublishedItem({
+      id: "ITEM-CONC-B",
+      primaryNodeId: "NODE-CONCURRENT-TARGET",
+    });
+
+    const resolver: CanonicalItemResolver = (id) => {
+      if (id === itemA.id) return { item: itemA, subjectId: "math", topicId: "fractions" };
+      if (id === itemB.id) return { item: itemB, subjectId: "math", topicId: "fractions" };
+      return null;
+    };
+
+    const service = new ServerDiagnosticService(repository, resolver);
+
+    // Initial check: node does NOT exist
+    const initialNodeStates = await repository.getCurrentNodeStates(learner.id, { visitorToken });
+    expect(initialNodeStates["NODE-CONCURRENT-TARGET"]).toBeUndefined();
+
+    // Execute both submissions concurrently
+    // Item A is correct (opt-1), Item B is incorrect (opt-2)
+    const [resA, resB] = await Promise.all([
+      service.submitAttempt(
+        {
+          learnerId: learner.id,
+          sessionId: session.id,
+          itemId: itemA.id,
+          itemVersion: "1.0.0",
+          response: { type: "MCQ", selectedOptionId: "opt-1" },
+        },
+        { visitorToken }
+      ),
+      service.submitAttempt(
+        {
+          learnerId: learner.id,
+          sessionId: session.id,
+          itemId: itemB.id,
+          itemVersion: "1.0.0",
+          response: { type: "MCQ", selectedOptionId: "opt-2" },
+        },
+        { visitorToken }
+      ),
+    ]);
+
+    expect(resA.accepted).toBe(true);
+    expect(resB.accepted).toBe(true);
+
+    // Final persisted truth verification:
+    // 1. Attempts count = 2
+    const attempts = await repository.getLearnerNodeAttempts(
+      learner.id,
+      "NODE-CONCURRENT-TARGET",
+      { visitorToken }
+    );
+    expect(attempts.length).toBe(2);
+
+    // 2. Node state reflects attempts_count = 2, correct_count = 1 (1 correct + 1 incorrect)
+    const finalNodeStates = await repository.getCurrentNodeStates(learner.id, { visitorToken });
+    const targetNode = finalNodeStates["NODE-CONCURRENT-TARGET"];
+    expect(targetNode).toBeDefined();
+    expect(targetNode.attemptsCount).toBe(2);
+    expect(targetNode.correctCount).toBe(1);
+    expect(targetNode.state).toBe("UNCERTAIN");
+  });
+
+  // 44 (P1-1): Independent evidence confidence escalation based strictly on distinct attempted items
+  it("Requirement 44 (P1-1): independent evidence confidence escalates only with distinct attempted item IDs", () => {
+    const assessedAt = "2026-09-18T10:00:00Z";
+
+    // 1. Same item wrong 3 times -> DEVELOPING / LOW (repeating same item does NOT escalate confidence)
+    const sameItemWrong3Times = computeConservativeNodeState({
+      attemptsCount: 3,
+      correctCount: 0,
+      distinctAttemptedItemIds: new Set(["item-1"]),
+      distinctCorrectItemIds: new Set(),
+      allMisconceptions: ["M1"],
+      assessedAt,
+    });
+    expect(sameItemWrong3Times.state).toBe("DEVELOPING");
+    expect(sameItemWrong3Times.confidence).toBe("LOW");
+
+    // 2. 2 distinct items wrong -> DEVELOPING / MEDIUM
+    const twoDistinctWrong = computeConservativeNodeState({
+      attemptsCount: 2,
+      correctCount: 0,
+      distinctAttemptedItemIds: new Set(["item-1", "item-2"]),
+      distinctCorrectItemIds: new Set(),
+      allMisconceptions: ["M1"],
+      assessedAt,
+    });
+    expect(twoDistinctWrong.state).toBe("DEVELOPING");
+    expect(twoDistinctWrong.confidence).toBe("MEDIUM");
+
+    // 3. 3+ distinct items wrong -> DEVELOPING / HIGH
+    const threeDistinctWrong = computeConservativeNodeState({
+      attemptsCount: 3,
+      correctCount: 0,
+      distinctAttemptedItemIds: new Set(["item-1", "item-2", "item-3"]),
+      distinctCorrectItemIds: new Set(),
+      allMisconceptions: ["M1"],
+      assessedAt,
+    });
+    expect(threeDistinctWrong.state).toBe("DEVELOPING");
+    expect(threeDistinctWrong.confidence).toBe("HIGH");
+
+    // 4. Mixed evidence: confidence based on distinct items
+    // Same item mixed 2 times (1 wrong, 1 correct) -> UNCERTAIN / LOW
+    const sameItemMixed = computeConservativeNodeState({
+      attemptsCount: 2,
+      correctCount: 1,
+      distinctAttemptedItemIds: new Set(["item-1"]),
+      distinctCorrectItemIds: new Set(["item-1"]),
+      allMisconceptions: [],
+      assessedAt,
+    });
+    expect(sameItemMixed.state).toBe("UNCERTAIN");
+    expect(sameItemMixed.confidence).toBe("LOW");
+
+    // 2 distinct items mixed (1 correct, 1 wrong) -> UNCERTAIN / MEDIUM
+    const twoDistinctMixed = computeConservativeNodeState({
+      attemptsCount: 2,
+      correctCount: 1,
+      distinctAttemptedItemIds: new Set(["item-1", "item-2"]),
+      distinctCorrectItemIds: new Set(["item-1"]),
+      allMisconceptions: [],
+      assessedAt,
+    });
+    expect(twoDistinctMixed.state).toBe("UNCERTAIN");
+    expect(twoDistinctMixed.confidence).toBe("MEDIUM");
+
+    // 3 distinct items mixed (1 correct, 2 wrong) -> UNCERTAIN / HIGH
+    const threeDistinctMixed = computeConservativeNodeState({
+      attemptsCount: 3,
+      correctCount: 1,
+      distinctAttemptedItemIds: new Set(["item-1", "item-2", "item-3"]),
+      distinctCorrectItemIds: new Set(["item-1"]),
+      allMisconceptions: [],
+      assessedAt,
+    });
+    expect(threeDistinctMixed.state).toBe("UNCERTAIN");
+    expect(threeDistinctMixed.confidence).toBe("HIGH");
   });
 });

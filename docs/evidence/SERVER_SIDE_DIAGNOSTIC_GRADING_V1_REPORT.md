@@ -1,12 +1,13 @@
 # AI School — Server-Side Diagnostic Grading V1 Report
 
 ```text
-EXECUTOR SERVER-SIDE DIAGNOSTIC GRADING V1 COMPLETE
+EXECUTOR SERVER-SIDE DIAGNOSTIC GRADING V1 CONTROLLER FIX COMPLETE
 CONTROLLER REVIEW: PENDING
 ```
 
 **Milestone:** Server-Side Diagnostic Grading V1  
-**Baseline Commit:** `92e6082350c6a31494a2656111207334c600c354`  
+**Baseline Audit Commit:** `4c1256a63fe4aad70bd687168ff0126733b50f53`  
+**Initial Baseline Commit:** `92e6082350c6a31494a2656111207334c600c354`  
 **Date:** 2026-09-19  
 **Repository:** `GiaPhatSDZ/assessment-platform`  
 **Branch:** `main`  
@@ -17,45 +18,10 @@ CONTROLLER REVIEW: PENDING
 
 Milestone **Server-Side Diagnostic Grading V1** establishes the authoritative, server-only diagnostic submission, deterministic evaluation, and atomic learning persistence pipeline for AI School.
 
-The submission flow enforces end-to-end cryptographic and pedagogical integrity:
-```text
-Client (Student Submission)
-  { learnerId, sessionId, itemId, itemVersion, response: { type, ... } }
-        │
-        ▼ (HttpOnly cookie + SSR auth context; cross-origin rejected)
-API Route Boundary (POST /api/learning/diagnostic/attempt)
-        │
-        ▼ (Ownership verification & active DIAGNOSTIC session check)
-Server Diagnostic Service (src/application/diagnostic/server-diagnostic-service.ts)
-        │
-        ├─► Canonical Item Resolution & Publication Guard (assertPublishedForStudent)
-        │     - Recomputes canonicalContentHash server-side
-        │     - Validates exact item version
-        │     - Verifies explicit subjectId/topicId compatibility (A6)
-        │
-        ├─► Deterministic Grading Engine (pure, no-LLM)
-        │     - MCQ: matches canonical correctAnswer; validates single correct option (A8)
-        │     - NUMERIC: strict answerSpec rule; tolerance from spec only; no fallback (A1)
-        │     - Misconceptions: WRONG != MISCONCEPTION. Distractor tag or []
-        │
-        ├─► Conservative Node State Matrix Projection
-        │     - 0 attempts: NOT_ASSESSED / LOW (last_assessed_at: null)
-        │     - 1 correct: UNCERTAIN / LOW (never overclaims SECURE on single attempt)
-        │     - 1 incorrect: DEVELOPING / LOW
-        │     - >=2 correct: SECURE requires >= 2 independent canonical items (A5)
-        │     - Multiple mixed: UNCERTAIN / MEDIUM
-        │     - Multiple incorrect: DEVELOPING (MEDIUM/HIGH)
-        │
-        ├─► Mastery Transition Detection
-        │     - Transition appended ONLY when state OR confidence actually changes
-        │
-        └─► Atomic Persistence Transaction
-              - PostgreSQL RPC: record_atomic_diagnostic_grading
-              - In-Memory Repository: transactional snapshot/rollback
-        │
-        ▼
-Safe Student Result DTO (zero answer keys, rationales, or internal hashes leaked)
-```
+Following Controller Audit on commit `4c1256a`, the following critical fixes have been integrated and verified:
+1. **P0-1 (Production Resolver Isolation):** `ServerDiagnosticService` constructor permits custom item resolver injection strictly in `NODE_ENV === "test"`. Any injection outside test throws `TestResolverInjectionForbiddenError` (`TEST_RESOLVER_INJECTION_FORBIDDEN`). Added `ServerDiagnosticService.createForTesting(...)` guarded test factory.
+2. **P0-2 (First-Node Concurrency Hole):** Added explicit `expectedNodeExists: boolean` token to `AtomicDiagnosticGradingParams` and `record_atomic_diagnostic_grading` RPC. Under the advisory lock, if `expectedNodeExists = false` and a node row exists, or if `expectedNodeExists = true` and `updated_at` does not match, the transaction raises `STATE_CONFLICT_RETRY`. `ServerDiagnosticService` catches conflict, reloads attempts, reloads node state, recomputes the projection, and retries persistence once.
+3. **P1-1 (Independent Evidence Confidence):** Matrix input tracks `distinctAttemptedItemIds`. Confidence escalation for incorrect and mixed evidence depends strictly on distinct items attempted (1 item wrong 3 times remains `DEVELOPING / LOW`; 2 distinct items wrong $\rightarrow$ `DEVELOPING / MEDIUM`; 3+ distinct items wrong $\rightarrow$ `DEVELOPING / HIGH`).
 
 ---
 
@@ -69,49 +35,48 @@ Safe Student Result DTO (zero answer keys, rationales, or internal hashes leaked
 | **Mastery History Rule Version** | `DIAGNOSTIC_MASTERY_RULE_VERSION = "1.0.0"` |
 | **Transaction RPC Name** | `public.record_atomic_diagnostic_grading` |
 | **Replay / Duplicate Policy** | `UNIQUE(session_id, item_id)` raising `ATTEMPT_ALREADY_RECORDED` |
-| **Concurrency Control** | Advisory transaction lock + CAS on `updated_at` raising `STATE_CONFLICT_RETRY` |
+| **Concurrency Control** | Advisory transaction lock + explicit existence & CAS check (`STATE_CONFLICT_RETRY`) + automatic 1-shot retry |
 
 ---
 
-## 3. Implementation Details & Controller Amendments
+## 3. Implementation Details & Controller Audit Fixes
 
-### 3.1 Server-Only Grading Authority & Security Boundary
-- `src/application/diagnostic/server-diagnostic-service.ts` enforces `import "server-only";`.
-- Browser/client never receives or imports `correctAnswer`, `answerSpec`, `rationale`, `distractorRationales`, or unpublished canonical items.
-- Ownership context (`visitorToken`, `userId`) is derived server-side from HttpOnly cookies and Supabase SSR `getAuthenticatedUser()`.
-- Client payload contains only: `learnerId`, `sessionId`, `itemId`, `itemVersion`, and `response`.
-- Rejects any client-supplied grading authority fields (`correctAnswer`, `isCorrect`, `rationale`, `misconceptionTags`, `gradingRuleVersion`, `itemContentHash`, `primaryNodeId`) with `400 Bad Request`.
+### 3.1 P0-1 Production Resolver Isolation
+- `src/application/diagnostic/server-diagnostic-service.ts`:
+  - Enforces `import "server-only";`.
+  - Default constructor signature: `constructor(persistenceRepo?, itemResolver?)`.
+  - If `itemResolver` is provided when `process.env.NODE_ENV !== "test"`, it immediately throws `TestResolverInjectionForbiddenError` (`TEST_RESOLVER_INJECTION_FORBIDDEN`).
+  - Provides test-only factory `ServerDiagnosticService.createForTesting(repo, resolver)` with identical runtime check.
+  - Production uses strictly `defaultCanonicalItemResolver`.
 
-### 3.2 Exact Item Authority & Recomputation
-- Canonical item resolved through `assertPublishedForStudent(item)`.
-- Fails closed for unreviewed, draft, or stale items (`ContentNotPublishedError`).
-- Recomputes `canonicalContentHash(item)` server-side; caller-supplied hash is strictly ignored.
-- **Grade 6 Content:** Remains `DRAFT` / `AI_DRAFT` / `SOURCE_LINKED`. The production route `/diagnostic/math-grade6` strictly returns `CONTENT_NOT_AVAILABLE`.
+### 3.2 P0-2 First-Node Concurrency Hole & Auto-Retry
+- **Atomic Contract:** Added `expectedNodeExists: boolean` to `AtomicDiagnosticGradingParams`.
+- **Database RPC:** `supabase/migrations/20260919000003_server_diagnostic_grading_v1.sql` accepts `p_expected_node_exists BOOLEAN DEFAULT FALSE`.
+  - Under `pg_advisory_xact_lock(hashtext(p_learner_id::text || ':' || p_primary_node_id))`:
+    - `IF NOT p_expected_node_exists AND FOUND THEN RAISE EXCEPTION 'STATE_CONFLICT_RETRY...'`
+    - `IF p_expected_node_exists AND (NOT FOUND OR updated_at IS DISTINCT FROM expected) THEN RAISE EXCEPTION 'STATE_CONFLICT_RETRY...'`
+- **In-Memory Repository:** Mirrors the exact same existence and CAS checks in `InMemoryLearningPersistenceRepository.recordAtomicDiagnosticSubmission`.
+- **ServerDiagnosticService Pipeline:** On catching `StateConflictRetryError`:
+  - Reloads past attempts for the target node (`getLearnerNodeAttempts`).
+  - Reloads current node states (`getCurrentNodeStates`).
+  - Recomputes deterministic node projection incorporating all attempts.
+  - Retries atomic submission ONCE. If conflict persists, propagates error.
+- **Regression Test:** Simulating two concurrent first submissions for distinct items on an unassessed node results in both attempts persisted, 2 evidence records, and node `attempts_count = 2` reflecting both attempts.
 
-### 3.3 Pure Deterministic Grading Engine (A1, A8, Misconceptions)
-- **MCQ (A8):** Exactly one option must have `isCorrect=true`, and `item.correctAnswer` must reference that same option ID. Any mismatch throws `InvalidCanonicalGradingItemError`.
-- **NUMERIC (A1):** Requires canonical `answerSpec` with valid `exactValue` or `value`. Fallback parsing of `correctAnswer` is forbidden. Missing/unsupported `answerSpec` throws `UnsupportedGradingRuleError`. Tolerance is taken strictly from `answerSpec.tolerance` (no invented tolerance).
-- **Misconception Semantics:** Wrong answer does not automatically inherit all misconception tags. Only explicitly mapped distractor misconception tags are recorded; otherwise, `detectedMisconceptions = []`.
-
-### 3.4 Conservative Node State Matrix & Independent Evidence (A5)
-- 1 correct answer produces `UNCERTAIN / LOW` (provisional positive signal; does not claim `SECURE`).
-- 1 incorrect answer produces `DEVELOPING / LOW`.
-- `SECURE` mastery strictly requires `>= 2` independent evidence units (distinct canonical `itemId`s). Repeating the same item across sessions cannot inflate confidence to `SECURE`.
-
-### 3.5 Atomic Persistence Transaction (A3, A4)
-- **Database Migration:** [`supabase/migrations/20260919000003_server_diagnostic_grading_v1.sql`](file:///d:/giao_duc/supabase/migrations/20260919000003_server_diagnostic_grading_v1.sql)
-  - Adds `UNIQUE(session_id, item_id)` to `learning_attempts`.
-  - Implements `record_atomic_diagnostic_grading` RPC:
-    - Atomically writes `learning_attempts`, `knowledge_evidence`, `knowledge_node_states`, and conditional `mastery_history`.
-    - Locks search path: `SET search_path = public, pg_temp;`.
-    - Revokes execute from `PUBLIC`, `anon`, and `authenticated`; grants execute exclusively to `service_role` (A4).
-    - Serializes node projection updates using advisory lock and CAS check, returning `STATE_CONFLICT_RETRY` on concurrent collision (A3).
-- **In-Memory Repository:** Uses transactional snapshots (`attemptsSnapshot`, `evidenceSnapshot`, `nodeStatesSnapshot`, `masterySnapshot`) to ensure all-or-nothing rollback on any failure.
-
-### 3.6 Route Boundary & Cross-Origin Protection (A7)
-- Route: `app/api/learning/diagnostic/attempt/route.ts`
-- Checks `Origin` header against `Host` to reject cross-origin POST attacks with `403 CROSS_ORIGIN_FORBIDDEN`.
-- Derives `visitorToken` strictly from HttpOnly cookies without auto-creation (missing cookie returns `401 UNAUTHORIZED`).
+### 3.3 P1-1 Independent Evidence Confidence Escalation
+- `src/domain/diagnostic/grading-engine.ts`:
+  - `NodeStateEvaluationInput` accepts `distinctAttemptedItemIds: Set<string>` alongside `distinctCorrectItemIds: Set<string>`.
+  - **All Incorrect (`correctCount === 0`):**
+    - 1 distinct item (e.g. same item wrong 1 or 3 times): `DEVELOPING / LOW`.
+    - 2 distinct items: `DEVELOPING / MEDIUM`.
+    - 3+ distinct items: `DEVELOPING / HIGH`.
+  - **Mixed Evidence (`0 < correctCount < attemptsCount`):**
+    - $\le 1$ distinct item: `UNCERTAIN / LOW`.
+    - 2 distinct items: `UNCERTAIN / MEDIUM`.
+    - 3+ distinct items: `UNCERTAIN / HIGH`.
+  - **All Correct (`correctCount === attemptsCount`):**
+    - $\ge 2$ distinct items: `SECURE` (`MEDIUM` for 2, `HIGH` for $\ge 3$).
+    - $< 2$ distinct items: `UNCERTAIN / LOW` (repeated same item correct does not overclaim `SECURE`).
 
 ---
 
@@ -119,7 +84,7 @@ Safe Student Result DTO (zero answer keys, rationales, or internal hashes leaked
 
 > [!IMPORTANT]
 > **1. No live Supabase integration test has been claimed:**  
-> Development verification is executed against the strict SQL migration schema using the in-memory transactional repository and typed Supabase mock-client contract tests verifying exact database column names, RPC function names, parameters, and error translations.
+> Development verification is executed against the strict SQL migration schema using the in-memory transactional repository and typed Supabase mock-client contract tests verifying exact database column names, RPC function names, parameters (`p_expected_node_exists`), and error translations.
 >
 > **2. Current Grade 6 content remains strictly DRAFT / fail-closed:**  
 > Grade 6 Mathematics items remain unreviewed (`DRAFT` / `AI_DRAFT` / `SOURCE_LINKED`). `/diagnostic/math-grade6` continues to return `CONTENT_NOT_AVAILABLE`. All automated grading tests execute exclusively against isolated test-published fixtures.
@@ -135,9 +100,10 @@ All quality gates passed with zero errors:
 
 | Verification Gate | Command | Result |
 |---|---|---|
-| Server Diagnostic Grading Test Suite (36 tests) | `npx vitest run tests/diagnostic/server-diagnostic-grading-v1.test.ts` | **PASS** (36/36 tests passing) |
+| Server Diagnostic Grading Test Suite (39 tests) | `npx vitest run tests/diagnostic/server-diagnostic-grading-v1.test.ts` | **PASS** (39/39 tests passing) |
+| Delivery Boundary Tests (15 tests) | `npx vitest run tests/curriculum/server-delivery-boundary-r2-2-1.test.ts` | **PASS** (15/15 tests passing) |
 | Persistence V1 Regression Matrix (38 tests) | `npx vitest run tests/persistence/learning-persistence-v1.test.tsx` | **PASS** (38/38 tests passing) |
-| Full Test Suite | `npm test` | **PASS** (325/325 tests across 40 test files) |
+| Full Test Suite | `npm test` | **PASS** (328/328 tests across 40 test files) |
 | Typecheck | `npx tsc --noEmit` | **PASS** (0 errors) |
 | Linter | `npm run lint` | **PASS** (0 errors, 0 warnings) |
 | Production Build | `npm run build` | **PASS** (25 static & dynamic routes compiled) |
@@ -147,33 +113,25 @@ All quality gates passed with zero errors:
 
 ## 6. Files Created & Modified
 
-1. [`supabase/migrations/20260919000003_server_diagnostic_grading_v1.sql`](file:///d:/giao_duc/supabase/migrations/20260919000003_server_diagnostic_grading_v1.sql) [NEW]
-   - Added unique constraint on `(session_id, item_id)`.
-   - Created atomic `record_atomic_diagnostic_grading` RPC with service-role security and CAS lock.
+1. [`supabase/migrations/20260919000003_server_diagnostic_grading_v1.sql`](file:///d:/giao_duc/supabase/migrations/20260919000003_server_diagnostic_grading_v1.sql) [MODIFY]
+   - Added `p_expected_node_exists BOOLEAN DEFAULT FALSE` to `record_atomic_diagnostic_grading`.
+   - Updated CAS to check presence vs absence under advisory lock.
 2. [`src/domain/diagnostic/types.ts`](file:///d:/giao_duc/src/domain/diagnostic/types.ts) [MODIFY]
-   - Added `DiagnosticSubmissionRequestDto`, `DiagnosticGradingResultDto`, `NumericAnswerSpec`, `AtomicDiagnosticGradingParams`.
-   - Added domain errors: `AttemptAlreadyRecordedError`, `UnsupportedGradingRuleError`, `InvalidCanonicalGradingItemError`, `InvalidGradingInputError`, `SessionClosedError`, `SessionCompatibilityError`, `StateConflictRetryError`.
-3. [`src/domain/diagnostic/grading-engine.ts`](file:///d:/giao_duc/src/domain/diagnostic/grading-engine.ts) [NEW]
-   - Implemented deterministic grading for MCQ and NUMERIC items.
-   - Enforced A1 (answerSpec required for numeric) and A8 (single correct option matching correctAnswer).
-   - Enforced conservative node state matrix and A5 (distinct items required for SECURE).
-   - Implemented mastery transition change detection.
-4. [`src/domain/content/canonical-item-resolver.ts`](file:///d:/giao_duc/src/domain/content/canonical-item-resolver.ts) [NEW]
-   - Implemented canonical item resolver returning explicit `subjectId` and `topicId` metadata (A6).
-5. [`src/application/learning-persistence-repository.ts`](file:///d:/giao_duc/src/application/learning-persistence-repository.ts) [MODIFY]
-   - Added `getLearnerNodeAttempts` and `recordAtomicDiagnosticSubmission` methods.
-6. [`src/infrastructure/database/in-memory-learning-persistence-repository.ts`](file:///d:/giao_duc/src/infrastructure/database/in-memory-learning-persistence-repository.ts) [MODIFY]
-   - Implemented transactional `recordAtomicDiagnosticSubmission` with rollback snapshot.
-   - Implemented `getLearnerNodeAttempts`.
-7. [`src/infrastructure/database/supabase-learning-persistence-repository.ts`](file:///d:/giao_duc/src/infrastructure/database/supabase-learning-persistence-repository.ts) [MODIFY]
-   - Implemented `recordAtomicDiagnosticSubmission` invoking RPC and translating errors.
-   - Implemented `getLearnerNodeAttempts`.
-8. [`src/application/diagnostic/server-diagnostic-service.ts`](file:///d:/giao_duc/src/application/diagnostic/server-diagnostic-service.ts) [NEW]
-   - Server-only diagnostic grading application service (`import "server-only"`).
-   - Enforced exact item authority, recomputed canonical hash, session checks, and safe DTO return.
-9. [`app/api/learning/diagnostic/attempt/route.ts`](file:///d:/giao_duc/app/api/learning/diagnostic/attempt/route.ts) [NEW]
-   - Authoritative API route handler with cross-origin POST check (A7) and HttpOnly cookie derivation.
-10. [`tests/diagnostic/server-diagnostic-grading-v1.test.ts`](file:///d:/giao_duc/tests/diagnostic/server-diagnostic-grading-v1.test.ts) [NEW]
-    - Comprehensive test suite covering all 31 base requirements + amendments A1–A8.
-11. [`docs/evidence/SERVER_SIDE_DIAGNOSTIC_GRADING_V1_REPORT.md`](file:///d:/giao_duc/docs/evidence/SERVER_SIDE_DIAGNOSTIC_GRADING_V1_REPORT.md) [NEW]
-    - Evidence report and specification documentation.
+   - Added `expectedNodeExists: boolean` to `AtomicDiagnosticGradingParams`.
+   - Exported `TestResolverInjectionForbiddenError` (`TEST_RESOLVER_INJECTION_FORBIDDEN`).
+3. [`src/domain/diagnostic/grading-engine.ts`](file:///d:/giao_duc/src/domain/diagnostic/grading-engine.ts) [MODIFY]
+   - Added `distinctAttemptedItemIds` to `NodeStateEvaluationInput`.
+   - Updated `computeConservativeNodeState` for P1-1 independent evidence confidence escalation.
+4. [`src/application/diagnostic/server-diagnostic-service.ts`](file:///d:/giao_duc/src/application/diagnostic/server-diagnostic-service.ts) [MODIFY]
+   - Implemented P0-1 production resolver isolation.
+   - Added `createForTesting` guarded factory.
+   - Implemented P0-2 automatic 1-shot retry on `StateConflictRetryError`.
+   - Tracked and passed `distinctAttemptedItemIds` and `expectedNodeExists`.
+5. [`src/infrastructure/database/in-memory-learning-persistence-repository.ts`](file:///d:/giao_duc/src/infrastructure/database/in-memory-learning-persistence-repository.ts) [MODIFY]
+   - Implemented explicit existence check and CAS in `recordAtomicDiagnosticSubmission`.
+6. [`src/infrastructure/database/supabase-learning-persistence-repository.ts`](file:///d:/giao_duc/src/infrastructure/database/supabase-learning-persistence-repository.ts) [MODIFY]
+   - Passed `p_expected_node_exists` into RPC call.
+7. [`tests/diagnostic/server-diagnostic-grading-v1.test.ts`](file:///d:/giao_duc/tests/diagnostic/server-diagnostic-grading-v1.test.ts) [MODIFY]
+   - Added tests 42 (P0-1), 43 (P0-2), 44 (P1-1). Total test count increased from 36 to 39.
+8. [`docs/evidence/SERVER_SIDE_DIAGNOSTIC_GRADING_V1_REPORT.md`](file:///d:/giao_duc/docs/evidence/SERVER_SIDE_DIAGNOSTIC_GRADING_V1_REPORT.md) [MODIFY]
+   - Evidence document updated with Controller fix report.

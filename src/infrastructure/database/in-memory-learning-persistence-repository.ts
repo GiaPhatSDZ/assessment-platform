@@ -440,14 +440,27 @@ export class InMemoryLearningPersistenceRepository implements LearningPersistenc
       }
     }
 
-    // A3: Check CAS on node state if expectedNodeUpdatedAt provided
+    // A3 & P0-2: Check CAS on node state (explicitly handling presence/absence)
     const nodeKey = `${params.learnerId}:${params.primaryNodeId}`;
     const currentNode = this.nodeStates.get(nodeKey);
-    if (params.expectedNodeUpdatedAt !== undefined && params.expectedNodeUpdatedAt !== null) {
-      if (currentNode && currentNode.updatedAt !== params.expectedNodeUpdatedAt) {
+    if (!params.expectedNodeExists) {
+      if (currentNode) {
         throw new StateConflictRetryError(
-          `STATE_CONFLICT_RETRY: Stale projection for node '${params.primaryNodeId}'. Expected '${params.expectedNodeUpdatedAt}', found '${currentNode.updatedAt}'.`
+          `STATE_CONFLICT_RETRY: Node state for node '${params.primaryNodeId}' was created concurrently.`
         );
+      }
+    } else {
+      if (!currentNode) {
+        throw new StateConflictRetryError(
+          `STATE_CONFLICT_RETRY: Expected node state for node '${params.primaryNodeId}' does not exist.`
+        );
+      }
+      if (params.expectedNodeUpdatedAt !== undefined && params.expectedNodeUpdatedAt !== null) {
+        if (currentNode.updatedAt !== params.expectedNodeUpdatedAt) {
+          throw new StateConflictRetryError(
+            `STATE_CONFLICT_RETRY: Stale projection for node '${params.primaryNodeId}'. Expected '${params.expectedNodeUpdatedAt}', found '${currentNode.updatedAt}'.`
+          );
+        }
       }
     }
 

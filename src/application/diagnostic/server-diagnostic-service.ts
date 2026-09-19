@@ -31,6 +31,8 @@ import {
   InvalidGradingInputError,
   AttemptAlreadyRecordedError,
   AtomicDiagnosticGradingParams,
+  StateConflictRetryError,
+  TestResolverInjectionForbiddenError,
 } from "../../domain/diagnostic/types";
 import {
   OwnershipContext,
@@ -56,7 +58,28 @@ export class ServerDiagnosticService {
     itemResolver?: CanonicalItemResolver
   ) {
     this.persistenceRepo = persistenceRepo || getLearningPersistenceRepository();
-    this.itemResolver = itemResolver || defaultCanonicalItemResolver;
+    if (itemResolver) {
+      if (process.env.NODE_ENV !== "test") {
+        throw new TestResolverInjectionForbiddenError();
+      }
+      this.itemResolver = itemResolver;
+    } else {
+      this.itemResolver = defaultCanonicalItemResolver;
+    }
+  }
+
+  /**
+   * Test-only factory for creating an instance with a custom item resolver.
+   * Fails closed outside test environment.
+   */
+  static createForTesting(
+    persistenceRepo?: LearningPersistenceRepository,
+    itemResolver?: CanonicalItemResolver
+  ): ServerDiagnosticService {
+    if (process.env.NODE_ENV !== "test") {
+      throw new TestResolverInjectionForbiddenError();
+    }
+    return new ServerDiagnosticService(persistenceRepo, itemResolver);
   }
 
   /**
@@ -140,93 +163,119 @@ export class ServerDiagnosticService {
     // 4. Deterministic Grading Engine (pure, no-LLM)
     const evaluated = gradeStudentResponse(resolved.item, params.response);
 
-    // 5. Query Historical Evidence on Target Node for Independent Evidence (A5)
-    const pastAttempts = await this.persistenceRepo.getLearnerNodeAttempts(
-      params.learnerId,
-      primaryNodeId,
-      ownership
-    );
-
-    // Duplicate attempt check in session
-    if (pastAttempts.some((a) => a.sessionId === params.sessionId && a.itemId === params.itemId)) {
-      throw new AttemptAlreadyRecordedError(
-        `ATTEMPT_ALREADY_RECORDED: Item '${params.itemId}' has already been attempted in session '${params.sessionId}'.`
+    // 5. Atomic Persistence Pipeline with Concurrency Retry (P0-2) & Distinct Evidence Tracking (P1-1)
+    const executeSubmissionWithRetry = async (
+      isRetry = false
+    ): Promise<{ atomicResult: any; newProjection: any }> => {
+      // Load past attempts for this learner & primary node
+      const pastAttempts = await this.persistenceRepo.getLearnerNodeAttempts(
+        params.learnerId,
+        primaryNodeId,
+        ownership
       );
-    }
 
-    // A5: Count distinct canonical item IDs for independent evidence verification
-    const distinctCorrectItemIds = new Set<string>();
-    for (const a of pastAttempts) {
-      if (a.isCorrect) {
-        distinctCorrectItemIds.add(a.itemId);
+      // Duplicate attempt check in session
+      if (pastAttempts.some((a) => a.sessionId === params.sessionId && a.itemId === params.itemId)) {
+        throw new AttemptAlreadyRecordedError(
+          `ATTEMPT_ALREADY_RECORDED: Item '${params.itemId}' has already been attempted in session '${params.sessionId}'.`
+        );
       }
-    }
-    if (evaluated.isCorrect) {
-      distinctCorrectItemIds.add(params.itemId);
-    }
 
-    const totalAttemptsCount = pastAttempts.length + 1;
-    const totalCorrectCount = pastAttempts.filter((a) => a.isCorrect).length + (evaluated.isCorrect ? 1 : 0);
-    const allMisconceptions = [
-      ...pastAttempts.flatMap((a) => a.misconceptionTags || []),
-      ...evaluated.detectedMisconceptions,
-    ];
-    const assessedAt = new Date().toISOString();
+      // A5 & P1-1: Count distinct canonical item IDs for independent evidence verification
+      const distinctAttemptedItemIds = new Set<string>();
+      const distinctCorrectItemIds = new Set<string>();
+      for (const a of pastAttempts) {
+        distinctAttemptedItemIds.add(a.itemId);
+        if (a.isCorrect) {
+          distinctCorrectItemIds.add(a.itemId);
+        }
+      }
+      distinctAttemptedItemIds.add(params.itemId);
+      if (evaluated.isCorrect) {
+        distinctCorrectItemIds.add(params.itemId);
+      }
 
-    // 6. Conservative Node State Matrix Evaluation
-    const newProjection = computeConservativeNodeState({
-      attemptsCount: totalAttemptsCount,
-      correctCount: totalCorrectCount,
-      distinctCorrectItemIds,
-      allMisconceptions,
-      assessedAt,
-    });
+      const totalAttemptsCount = pastAttempts.length + 1;
+      const totalCorrectCount = pastAttempts.filter((a) => a.isCorrect).length + (evaluated.isCorrect ? 1 : 0);
+      const allMisconceptions = [
+        ...pastAttempts.flatMap((a) => a.misconceptionTags || []),
+        ...evaluated.detectedMisconceptions,
+      ];
+      const assessedAt = new Date().toISOString();
 
-    // 7. Mastery Transition History Check
-    const currentNodeStates = await this.persistenceRepo.getCurrentNodeStates(params.learnerId, ownership);
-    const existingNodeState = currentNodeStates[primaryNodeId] || null;
+      // 6. Conservative Node State Matrix Evaluation
+      const newProjection = computeConservativeNodeState({
+        attemptsCount: totalAttemptsCount,
+        correctCount: totalCorrectCount,
+        distinctAttemptedItemIds,
+        distinctCorrectItemIds,
+        allMisconceptions,
+        assessedAt,
+      });
 
-    const transitionCheck = checkMasteryTransition(
-      existingNodeState?.state,
-      existingNodeState?.confidence,
-      newProjection.state,
-      newProjection.confidence
-    );
+      // 7. Mastery Transition History Check
+      const currentNodeStates = await this.persistenceRepo.getCurrentNodeStates(params.learnerId, ownership);
+      const existingNodeState = currentNodeStates[primaryNodeId] || null;
 
-    // 8. Atomic Persistence Transaction
-    const atomicParams: AtomicDiagnosticGradingParams = {
-      learnerId: params.learnerId,
-      sessionId: params.sessionId,
-      itemId: params.itemId,
-      itemVersion: resolved.item.version,
-      itemContentHash: canonicalHash,
-      primaryNodeId,
-      studentResponse: params.response,
-      selectedOptionId: evaluated.selectedOptionId,
-      isCorrect: evaluated.isCorrect,
-      misconceptionTags: evaluated.detectedMisconceptions,
-      gradingRuleVersion: DIAGNOSTIC_GRADING_RULE_VERSION,
-      evidenceRuleVersion: DIAGNOSTIC_EVIDENCE_RULE_VERSION,
-      nodeState: newProjection.state,
-      nodeConfidence: newProjection.confidence,
-      attemptsCount: newProjection.attemptsCount,
-      correctCount: newProjection.correctCount,
-      lastAssessedAt: newProjection.lastAssessedAt,
-      nodeRuleVersion: newProjection.ruleVersion,
-      expectedNodeUpdatedAt: existingNodeState?.updatedAt || null,
-      hasMasteryTransition: transitionCheck.hasTransition,
-      previousState: transitionCheck.previousState,
-      previousConfidence: transitionCheck.previousConfidence,
-      newState: transitionCheck.newState,
-      newConfidence: transitionCheck.newConfidence,
-      reasonCode: transitionCheck.reasonCode,
-      masteryRuleVersion: transitionCheck.ruleVersion,
+      const transitionCheck = checkMasteryTransition(
+        existingNodeState?.state,
+        existingNodeState?.confidence,
+        newProjection.state,
+        newProjection.confidence
+      );
+
+      // 8. Atomic Persistence Transaction
+      const atomicParams: AtomicDiagnosticGradingParams = {
+        learnerId: params.learnerId,
+        sessionId: params.sessionId,
+        itemId: params.itemId,
+        itemVersion: resolved.item.version,
+        itemContentHash: canonicalHash,
+        primaryNodeId,
+        studentResponse: params.response,
+        selectedOptionId: evaluated.selectedOptionId,
+        isCorrect: evaluated.isCorrect,
+        misconceptionTags: evaluated.detectedMisconceptions,
+        gradingRuleVersion: DIAGNOSTIC_GRADING_RULE_VERSION,
+        evidenceRuleVersion: DIAGNOSTIC_EVIDENCE_RULE_VERSION,
+        nodeState: newProjection.state,
+        nodeConfidence: newProjection.confidence,
+        attemptsCount: newProjection.attemptsCount,
+        correctCount: newProjection.correctCount,
+        lastAssessedAt: newProjection.lastAssessedAt,
+        nodeRuleVersion: newProjection.ruleVersion,
+        expectedNodeExists: existingNodeState !== null && existingNodeState !== undefined,
+        expectedNodeUpdatedAt: existingNodeState?.updatedAt || null,
+        hasMasteryTransition: transitionCheck.hasTransition,
+        previousState: transitionCheck.previousState,
+        previousConfidence: transitionCheck.previousConfidence,
+        newState: transitionCheck.newState,
+        newConfidence: transitionCheck.newConfidence,
+        reasonCode: transitionCheck.reasonCode,
+        masteryRuleVersion: transitionCheck.ruleVersion,
+      };
+
+      try {
+        const atomicResult = await this.persistenceRepo.recordAtomicDiagnosticSubmission(
+          atomicParams,
+          ownership
+        );
+        return { atomicResult, newProjection };
+      } catch (err: any) {
+        const isConflict =
+          err instanceof StateConflictRetryError ||
+          err?.name === "StateConflictRetryError" ||
+          err?.message?.includes("STATE_CONFLICT_RETRY");
+
+        if (!isRetry && isConflict) {
+          // P0-2: Retry ONCE by reloading attempts, reloading node state, and recomputing deterministic projection
+          return executeSubmissionWithRetry(true);
+        }
+        throw err;
+      }
     };
 
-    const atomicResult = await this.persistenceRepo.recordAtomicDiagnosticSubmission(
-      atomicParams,
-      ownership
-    );
+    const { atomicResult, newProjection } = await executeSubmissionWithRetry(false);
 
     // 9. Safe Result DTO Construction (Zero answer keys or rationales leaked)
     return {

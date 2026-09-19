@@ -760,6 +760,7 @@ export class SupabaseLearningPersistenceRepository implements LearningPersistenc
       p_correct_count: params.correctCount,
       p_last_assessed_at: params.nodeState === "NOT_ASSESSED" ? null : (params.lastAssessedAt || new Date().toISOString()),
       p_node_rule_version: params.nodeRuleVersion,
+      p_expected_node_exists: params.expectedNodeExists,
       p_expected_node_updated_at: params.expectedNodeUpdatedAt ?? null,
       p_has_mastery_transition: params.hasMasteryTransition,
       p_previous_state: params.previousState ?? null,
