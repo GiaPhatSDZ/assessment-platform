@@ -23,6 +23,10 @@ import {
   AppendMasteryTransitionParams,
   OwnershipContext,
 } from "../domain/learning-persistence/types";
+import {
+  AtomicDiagnosticGradingParams,
+  AtomicDiagnosticGradingResult,
+} from "../domain/diagnostic/types";
 
 export interface LearningPersistenceRepository {
   /**
@@ -134,4 +138,24 @@ export interface LearningPersistenceRepository {
     learnerId: string,
     ownership: OwnershipContext
   ): Promise<MasteryTransitionHistoryRecord[]>;
+
+  /**
+   * Retrieves historical attempts for an owned learner on a specific knowledge node.
+   * Used to count distinct canonical items for independent evidence verification (A5).
+   */
+  getLearnerNodeAttempts(
+    learnerId: string,
+    nodeId: string,
+    ownership: OwnershipContext
+  ): Promise<EvaluatedAttemptRecord[]>;
+
+  /**
+   * Executes atomic diagnostic submission transaction:
+   * learning_attempt + knowledge_evidence + node-state projection + optional mastery_history.
+   * Concurrency-safe, transactional rollback on any error, duplicate prevention.
+   */
+  recordAtomicDiagnosticSubmission(
+    params: AtomicDiagnosticGradingParams,
+    ownership: OwnershipContext
+  ): Promise<AtomicDiagnosticGradingResult>;
 }

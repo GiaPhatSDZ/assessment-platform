@@ -42,6 +42,13 @@ import {
   EvidenceSemanticMismatchError,
   MasterySemanticMismatchError,
 } from "../../domain/learning-persistence/types";
+import {
+  AtomicDiagnosticGradingParams,
+  AtomicDiagnosticGradingResult,
+  AttemptAlreadyRecordedError,
+  SessionClosedError,
+  StateConflictRetryError,
+} from "../../domain/diagnostic/types";
 import { hashVisitorToken, verifyVisitorTokenOwnership } from "../auth/anonymous-visitor";
 import { getSupabaseAdminClient, isSupabaseAdminConfigured } from "./supabase-server";
 
@@ -684,5 +691,103 @@ export class SupabaseLearningPersistenceRepository implements LearningPersistenc
       ruleVersion: item.rule_version,
       occurredAt: item.occurred_at,
     }));
+  }
+
+  async getLearnerNodeAttempts(
+    learnerId: string,
+    nodeId: string,
+    ownership: OwnershipContext
+  ): Promise<EvaluatedAttemptRecord[]> {
+    await this.assertLearnerOwnership(learnerId, ownership);
+
+    const { data, error } = await this.client
+      .from("learning_attempts")
+      .select("*")
+      .eq("learner_id", learnerId)
+      .eq("primary_node_id", nodeId)
+      .order("attempted_at", { ascending: true });
+
+    if (error) {
+      throw new DatabasePersistenceError(`Database error loading learner node attempts: ${error.message}`, error);
+    }
+
+    return (data || []).map((item) => ({
+      id: item.id,
+      sessionId: item.session_id,
+      learnerId: item.learner_id,
+      itemId: item.item_id,
+      itemVersion: item.item_version,
+      itemContentHash: item.item_content_hash,
+      primaryNodeId: item.primary_node_id,
+      studentResponse: item.student_response,
+      selectedOptionId: item.selected_option_id,
+      isCorrect: item.is_correct,
+      misconceptionTags: item.misconception_tags,
+      gradingRuleVersion: item.grading_rule_version,
+      attemptedAt: item.attempted_at,
+    }));
+  }
+
+  async recordAtomicDiagnosticSubmission(
+    params: AtomicDiagnosticGradingParams,
+    ownership: OwnershipContext
+  ): Promise<AtomicDiagnosticGradingResult> {
+    await this.assertLearnerOwnership(params.learnerId, ownership);
+
+    validateNodeStateConsistency(
+      params.nodeState,
+      params.attemptsCount,
+      params.correctCount,
+      params.lastAssessedAt
+    );
+
+    const { data, error } = await this.client.rpc("record_atomic_diagnostic_grading", {
+      p_learner_id: params.learnerId,
+      p_session_id: params.sessionId,
+      p_item_id: params.itemId,
+      p_item_version: params.itemVersion,
+      p_item_content_hash: params.itemContentHash,
+      p_primary_node_id: params.primaryNodeId,
+      p_student_response: params.studentResponse,
+      p_selected_option_id: params.selectedOptionId ?? null,
+      p_is_correct: params.isCorrect,
+      p_misconception_tags: params.misconceptionTags ?? [],
+      p_grading_rule_version: params.gradingRuleVersion,
+      p_evidence_rule_version: params.evidenceRuleVersion,
+      p_node_state: params.nodeState,
+      p_node_confidence: params.nodeConfidence,
+      p_attempts_count: params.attemptsCount,
+      p_correct_count: params.correctCount,
+      p_last_assessed_at: params.nodeState === "NOT_ASSESSED" ? null : (params.lastAssessedAt || new Date().toISOString()),
+      p_node_rule_version: params.nodeRuleVersion,
+      p_expected_node_updated_at: params.expectedNodeUpdatedAt ?? null,
+      p_has_mastery_transition: params.hasMasteryTransition,
+      p_previous_state: params.previousState ?? null,
+      p_previous_confidence: params.previousConfidence ?? null,
+      p_new_state: params.newState ?? null,
+      p_new_confidence: params.newConfidence ?? null,
+      p_reason_code: params.reasonCode ?? null,
+      p_mastery_rule_version: params.masteryRuleVersion ?? null,
+    });
+
+    if (error) {
+      if (error.message.includes("ATTEMPT_ALREADY_RECORDED")) {
+        throw new AttemptAlreadyRecordedError(error.message);
+      }
+      if (error.message.includes("STATE_CONFLICT_RETRY")) {
+        throw new StateConflictRetryError(error.message);
+      }
+      if (error.message.includes("SESSION_CLOSED")) {
+        throw new SessionClosedError(error.message);
+      }
+      throw new DatabasePersistenceError(`Database error executing atomic diagnostic grading: ${error.message}`, error);
+    }
+
+    return {
+      attemptId: data.attempt_id,
+      evidenceId: data.evidence_id,
+      masteryId: data.mastery_id,
+      nodeUpdatedAt: data.node_updated_at,
+    };
   }
 }

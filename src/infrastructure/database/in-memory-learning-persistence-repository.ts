@@ -35,6 +35,13 @@ import {
   EvidenceSemanticMismatchError,
   MasterySemanticMismatchError,
 } from "../../domain/learning-persistence/types";
+import {
+  AtomicDiagnosticGradingParams,
+  AtomicDiagnosticGradingResult,
+  AttemptAlreadyRecordedError,
+  SessionClosedError,
+  StateConflictRetryError,
+} from "../../domain/diagnostic/types";
 import { hashVisitorToken, verifyVisitorTokenOwnership } from "../auth/anonymous-visitor";
 
 export class InMemoryLearningPersistenceRepository implements LearningPersistenceRepository {
@@ -387,5 +394,162 @@ export class InMemoryLearningPersistenceRepository implements LearningPersistenc
     // Chronological sort
     transitions.sort((a, b) => new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime());
     return transitions;
+  }
+
+  async getLearnerNodeAttempts(
+    learnerId: string,
+    nodeId: string,
+    ownership: OwnershipContext
+  ): Promise<EvaluatedAttemptRecord[]> {
+    this.assertLearnerOwnership(learnerId, ownership);
+    const result: EvaluatedAttemptRecord[] = [];
+    for (const attempt of this.attempts.values()) {
+      if (attempt.learnerId === learnerId && attempt.primaryNodeId === nodeId) {
+        result.push({ ...attempt });
+      }
+    }
+    result.sort((a, b) => new Date(a.attemptedAt).getTime() - new Date(b.attemptedAt).getTime());
+    return result;
+  }
+
+  async recordAtomicDiagnosticSubmission(
+    params: AtomicDiagnosticGradingParams,
+    ownership: OwnershipContext
+  ): Promise<AtomicDiagnosticGradingResult> {
+    this.assertLearnerOwnership(params.learnerId, ownership);
+
+    const session = this.sessions.get(params.sessionId);
+    if (!session || session.learnerId !== params.learnerId) {
+      throw new OwnershipChainMismatchError(
+        `Session '${params.sessionId}' does not belong to learner '${params.learnerId}'.`
+      );
+    }
+    if (session.sessionKind !== "DIAGNOSTIC") {
+      throw new Error(`Invalid session kind '${session.sessionKind}'. Expected 'DIAGNOSTIC'.`);
+    }
+    if (session.status !== "STARTED" && session.status !== "IN_PROGRESS") {
+      throw new SessionClosedError(`Session '${params.sessionId}' is closed with status '${session.status}'.`);
+    }
+
+    // Duplicate attempt check: UNIQUE(session_id, item_id)
+    for (const existing of this.attempts.values()) {
+      if (existing.sessionId === params.sessionId && existing.itemId === params.itemId) {
+        throw new AttemptAlreadyRecordedError(
+          `ATTEMPT_ALREADY_RECORDED: Item '${params.itemId}' has already been attempted in session '${params.sessionId}'.`
+        );
+      }
+    }
+
+    // A3: Check CAS on node state if expectedNodeUpdatedAt provided
+    const nodeKey = `${params.learnerId}:${params.primaryNodeId}`;
+    const currentNode = this.nodeStates.get(nodeKey);
+    if (params.expectedNodeUpdatedAt !== undefined && params.expectedNodeUpdatedAt !== null) {
+      if (currentNode && currentNode.updatedAt !== params.expectedNodeUpdatedAt) {
+        throw new StateConflictRetryError(
+          `STATE_CONFLICT_RETRY: Stale projection for node '${params.primaryNodeId}'. Expected '${params.expectedNodeUpdatedAt}', found '${currentNode.updatedAt}'.`
+        );
+      }
+    }
+
+    // Transactional snapshot to ensure all-or-nothing rollback on any failure
+    const attemptsSnapshot = new Map(this.attempts);
+    const evidenceSnapshot = new Map(this.evidence);
+    const nodeStatesSnapshot = new Map(this.nodeStates);
+    const masterySnapshot = new Map(this.masteryTransitions);
+
+    try {
+      const now = new Date().toISOString();
+      const attemptId = crypto.randomUUID();
+      const evidenceId = crypto.randomUUID();
+
+      // 1. Learning attempt
+      const attemptRecord: EvaluatedAttemptRecord = {
+        id: attemptId,
+        sessionId: params.sessionId,
+        learnerId: params.learnerId,
+        itemId: params.itemId,
+        itemVersion: params.itemVersion,
+        itemContentHash: params.itemContentHash,
+        primaryNodeId: params.primaryNodeId,
+        studentResponse: params.studentResponse,
+        selectedOptionId: params.selectedOptionId ?? null,
+        isCorrect: params.isCorrect,
+        misconceptionTags: params.misconceptionTags ?? [],
+        gradingRuleVersion: params.gradingRuleVersion,
+        attemptedAt: now,
+      };
+      this.attempts.set(attemptId, attemptRecord);
+
+      // 2. Knowledge evidence
+      const expectedEvidenceOutcome = params.isCorrect ? "CORRECT" : "INCORRECT";
+      const evidenceRecord: KnowledgeEvidenceRecord = {
+        id: evidenceId,
+        learnerId: params.learnerId,
+        sessionId: params.sessionId,
+        attemptId,
+        nodeId: params.primaryNodeId,
+        evidenceType: "DIAGNOSTIC_ATTEMPT",
+        outcome: expectedEvidenceOutcome,
+        observedAt: now,
+        ruleVersion: params.evidenceRuleVersion,
+      };
+      this.evidence.set(evidenceId, evidenceRecord);
+
+      // 3. Node state projection
+      validateNodeStateConsistency(
+        params.nodeState,
+        params.attemptsCount,
+        params.correctCount,
+        params.lastAssessedAt
+      );
+
+      const nodeRecord: KnowledgeNodeStateRecord = {
+        learnerId: params.learnerId,
+        nodeId: params.primaryNodeId,
+        state: params.nodeState,
+        confidence: params.nodeConfidence,
+        attemptsCount: params.attemptsCount,
+        correctCount: params.correctCount,
+        misconceptionTags: params.misconceptionTags ?? [],
+        lastAssessedAt: params.nodeState === "NOT_ASSESSED" ? null : (params.lastAssessedAt || now),
+        ruleVersion: params.nodeRuleVersion,
+        updatedAt: now,
+      };
+      this.nodeStates.set(nodeKey, nodeRecord);
+
+      // 4. Mastery history (if transition occurred)
+      let masteryId: string | null = null;
+      if (params.hasMasteryTransition && params.newState && params.newConfidence) {
+        masteryId = crypto.randomUUID();
+        const masteryRecord: MasteryTransitionHistoryRecord = {
+          id: masteryId,
+          learnerId: params.learnerId,
+          nodeId: params.primaryNodeId,
+          triggerSessionId: params.sessionId,
+          previousState: params.previousState || "NOT_ASSESSED",
+          previousConfidence: params.previousConfidence || "LOW",
+          newState: params.newState,
+          newConfidence: params.newConfidence,
+          reasonCode: "DIAGNOSTIC_EVALUATION",
+          ruleVersion: params.masteryRuleVersion || "1.0.0",
+          occurredAt: now,
+        };
+        this.masteryTransitions.set(masteryId, masteryRecord);
+      }
+
+      return {
+        attemptId,
+        evidenceId,
+        masteryId,
+        nodeUpdatedAt: now,
+      };
+    } catch (err) {
+      // Rollback to snapshot on any error
+      this.attempts = attemptsSnapshot;
+      this.evidence = evidenceSnapshot;
+      this.nodeStates = nodeStatesSnapshot;
+      this.masteryTransitions = masterySnapshot;
+      throw err;
+    }
   }
 }
